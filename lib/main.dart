@@ -28,12 +28,12 @@ class HomePage extends StatelessWidget {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  FadeAnimation(1, Text("Welcome", style: TextStyle(
+                  FadeAnimation(1, Text("PasstheCup", style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 30
                   ),)),
                   SizedBox(height: 20,),
-                  FadeAnimation(1.2, Text("Automatic identity verification which enables you to verify your identity", 
+                  FadeAnimation(1.2, Text("Lucky to see you here. Join Now",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.grey[700],
