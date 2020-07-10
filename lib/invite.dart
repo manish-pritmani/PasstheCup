@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/utils.dart';
 
 class Invite extends StatelessWidget {
   @override
@@ -10,15 +11,16 @@ class Invite extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         brightness: Brightness.light,
-        backgroundColor: Colors.white,
+        backgroundColor:  Utils().getBGColor(),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black,),
+          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white,),
         ),
       ),
       body: Container(
+        color:  Utils().getBGColor(),
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
         child: Column(
@@ -31,7 +33,7 @@ class Invite extends StatelessWidget {
                   Column(
                     children: <Widget>[
                       FadeAnimation(1, Text("Enter Invite Code", style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 25, color: Colors.white,
                           fontWeight: FontWeight.w500
                       ),)),
                       Padding(
@@ -44,7 +46,7 @@ class Invite extends StatelessWidget {
                       ),
                       FadeAnimation(1.2, Text("Recently Invite from", style: TextStyle(
                           fontSize: 15,
-                          color: Colors.grey[700]
+                          color: Colors.white
                       ),)),
                       SizedBox(height: 10,),
                       Row(
@@ -52,7 +54,7 @@ class Invite extends StatelessWidget {
                         children: <Widget>[
                           FadeAnimation(1.3, CircleAvatar(backgroundImage: AssetImage("assets/man.png"),)),
                           SizedBox(width: 10,),
-                          FadeAnimation(1.3, Text("Manish Pritmani", style: TextStyle(
+                          FadeAnimation(1.3, Text("Ayush Mehre", style: TextStyle( color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.w400
                           ),)),
@@ -85,7 +87,7 @@ class Invite extends StatelessWidget {
                             borderRadius: BorderRadius.circular(50)
                         ),
                         child: Text("Enter Game", style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                             fontSize: 18
                         ),),
                       ),
@@ -98,7 +100,7 @@ class Invite extends StatelessWidget {
               height: MediaQuery.of(context).size.height / 2.9,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage('assets/background.png'),
+                      image: AssetImage('assets/homerun3.png'),
                       fit: BoxFit.cover
                   )
               ),

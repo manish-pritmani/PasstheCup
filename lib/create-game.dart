@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/utils.dart';
 
 class CreateGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor:  Utils().getBGColor(),
       appBar: AppBar(
         elevation: 0,
         brightness: Brightness.light,
-        backgroundColor: Colors.white,
+        backgroundColor:  Utils().getBGColor(),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black,),
+          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white,),
         ),
       ),
       body: SingleChildScrollView(
         child: Container(
+          color: Utils().getBGColor(),
           height: MediaQuery.of(context).size.height,
           width: double.infinity,
           child: Column(
@@ -31,7 +33,7 @@ class CreateGame extends StatelessWidget {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        FadeAnimation(1, Text("Create New Game", style: TextStyle(
+                        FadeAnimation(1, Text("Create New Game", style: TextStyle( color: Colors.white,
                             fontSize: 25,
                             fontWeight: FontWeight.w500
                         ),)),
@@ -87,7 +89,7 @@ class CreateGame extends StatelessWidget {
                               borderRadius: BorderRadius.circular(50)
                           ),
                           child: Text("Create New Game", style: TextStyle(
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                               fontSize: 18
                           ),),
                         ),
@@ -100,7 +102,7 @@ class CreateGame extends StatelessWidget {
                 height: MediaQuery.of(context).size.height / 2.9,
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage('assets/background.png'),
+                        image: AssetImage('assets/homerun3.png'),
                         fit: BoxFit.cover
                     )
                 ),
@@ -119,7 +121,7 @@ class CreateGame extends StatelessWidget {
         Text(label, style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w400,
-            color: Colors.black87
+            color: Colors.white
         ),),
         SizedBox(height: 5,),
         TextField(

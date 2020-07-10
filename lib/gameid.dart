@@ -2,25 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/game.dart';
 import 'package:passthecup/gamelobby.dart';
+import 'package:passthecup/utils.dart';
 
 class GameId extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor: Utils().getBGColor(),
       appBar: AppBar(
         elevation: 0,
         brightness: Brightness.light,
-        backgroundColor: Colors.white,
+        backgroundColor: Utils().getBGColor(),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black,),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            size: 20,
+            color: Colors.white,
+          ),
         ),
       ),
       body: Container(
+        color: Utils().getBGColor(),
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
         child: Column(
@@ -32,10 +38,15 @@ class GameId extends StatelessWidget {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      FadeAnimation(1, Text("Enter Game-Code to Join", style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.w500
-                      ),)),
+                      FadeAnimation(
+                          1,
+                          Text(
+                            "Enter Game-Code to Join",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.w500),
+                          )),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 40),
                         child: Column(
@@ -44,55 +55,62 @@ class GameId extends StatelessWidget {
                           ],
                         ),
                       ),
-                      FadeAnimation(1.2, Text("You have Total Coins : 250", style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.grey[700]
-                      ),)),
+                      FadeAnimation(
+                          1.2,
+                          Text(
+                            "You have Total Coins : 250",
+                            style: TextStyle(
+                                fontSize: 15, color: Colors.white),
+                          )),
                     ],
                   ),
-                  FadeAnimation(1.4, Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 40),
-                    child: Container(
-                      padding: EdgeInsets.only(top: 3, left: 3),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border(
-                            bottom: BorderSide(color: Colors.black),
-                            top: BorderSide(color: Colors.black),
-                            left: BorderSide(color: Colors.black),
-                            right: BorderSide(color: Colors.black),
-                          )
-                      ),
-                      child: MaterialButton(
-                        minWidth: double.infinity,
-                        height: 60,
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Lobby()));
-                        },
-                        color: Colors.amberAccent,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50)
+                  FadeAnimation(
+                      1.4,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Container(
+                          padding: EdgeInsets.only(top: 3, left: 3),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border(
+                                bottom: BorderSide(color: Colors.black),
+                                top: BorderSide(color: Colors.black),
+                                left: BorderSide(color: Colors.black),
+                                right: BorderSide(color: Colors.black),
+                              )),
+                          child: MaterialButton(
+                            minWidth: double.infinity,
+                            height: 60,
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Lobby()));
+                            },
+                            color: Colors.amberAccent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50)),
+                            child: Text(
+                              "Enter Game",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ),
                         ),
-                        child: Text("Enter Game", style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18
-                        ),),
-                      ),
-                    ),
-                  )),
+                      )),
                 ],
               ),
             ),
-            FadeAnimation(1.2, Container(
-              height: MediaQuery.of(context).size.height / 2.9,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/background.png'),
-                      fit: BoxFit.cover
-                  )
-              ),
-            ))
+            FadeAnimation(
+                1.2,
+                Container(
+                  height: MediaQuery.of(context).size.height / 2.9,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/homerun3.png'),
+                          fit: BoxFit.cover)),
+                ))
           ],
         ),
       ),
@@ -103,25 +121,27 @@ class GameId extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(label, style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: Colors.black87
-        ),),
-        SizedBox(height: 5,),
+        Text(
+          label,
+          style: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
+        ),
+        SizedBox(
+          height: 5,
+        ),
         TextField(
           obscureText: obscureText,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey[400])
-            ),
+                borderSide: BorderSide(color: Colors.grey[400])),
             border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey[400])
-            ),
+                borderSide: BorderSide(color: Colors.grey[400])),
           ),
         ),
-        SizedBox(height: 30,),
+        SizedBox(
+          height: 30,
+        ),
       ],
     );
   }

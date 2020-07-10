@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/utils.dart';
 
 class SignupPage extends StatelessWidget {
   @override
@@ -10,16 +11,17 @@ class SignupPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         brightness: Brightness.light,
-        backgroundColor: Colors.white,
+        backgroundColor:Utils().getBGColor(),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black,),
+          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white,),
         ),
       ),
       body: SingleChildScrollView(
         child: Container(
+          color: Utils().getBGColor(),
           padding: EdgeInsets.symmetric(horizontal: 40),
           height: MediaQuery.of(context).size.height - 50,
           width: double.infinity,
@@ -28,14 +30,14 @@ class SignupPage extends StatelessWidget {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  FadeAnimation(1, Text("Sign up", style: TextStyle(
+                  FadeAnimation(1, Text("Sign up", style: TextStyle( color: Colors.white,
                     fontSize: 30,
                     fontWeight: FontWeight.bold
                   ),)),
                   SizedBox(height: 20,),
                   FadeAnimation(1.2, Text("Create an account, It's free", style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey[700]
+                      color: Colors.white
                   ),)),
                 ],
               ),
@@ -75,8 +77,8 @@ class SignupPage extends StatelessWidget {
               FadeAnimation(1.6, Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("Already have an account?"),
-                  Text(" Login", style: TextStyle(
+                  Text("Already have an account?", style: TextStyle(color: Colors.white),),
+                  Text(" Login", style: TextStyle( color: Colors.white,
                     fontWeight: FontWeight.w600, fontSize: 18
                   ),),
                 ],
@@ -95,7 +97,7 @@ class SignupPage extends StatelessWidget {
         Text(label, style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w400,
-          color: Colors.black87
+            color: Colors.white
         ),),
         SizedBox(height: 5,),
         TextField(

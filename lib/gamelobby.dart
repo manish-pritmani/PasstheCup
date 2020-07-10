@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/game.dart';
+import 'package:passthecup/utils.dart';
 
 class Lobby extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor:  Utils().getBGColor(),
       appBar: AppBar(
         elevation: 0,
         brightness: Brightness.light,
-        backgroundColor: Colors.white,
+        backgroundColor:  Utils().getBGColor(),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black,),
+          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white,),
         ),
         actions: <Widget>[
           Padding(
@@ -41,7 +42,7 @@ class Lobby extends StatelessWidget {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      FadeAnimation(1, Text("Game Lobby", style: TextStyle(
+                      FadeAnimation(1, Text("Game Lobby", style: TextStyle( color: Colors.white,
                           fontSize: 25,
                           fontWeight: FontWeight.w400
                       ),)),
@@ -72,7 +73,7 @@ class Lobby extends StatelessWidget {
                                       children: <Widget>[
                                         FadeAnimation(1.3, CircleAvatar(backgroundImage: AssetImage("assets/man.png"),)),
                                         SizedBox(width: 10,),
-                                        FadeAnimation(1.3, Text("Manish Pritmani", style: TextStyle(
+                                        FadeAnimation(1.3, Text("Ayush Mehre", style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400
                                         ),)),
@@ -87,7 +88,7 @@ class Lobby extends StatelessWidget {
                                       children: <Widget>[
                                         FadeAnimation(1.3, CircleAvatar(backgroundImage: AssetImage("assets/girl.png"),)),
                                         SizedBox(width: 10,),
-                                        FadeAnimation(1.3, Text("Amrisha Jain", style: TextStyle(
+                                        FadeAnimation(1.3, Text("Player Name", style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400
                                         ),)),
@@ -184,7 +185,7 @@ class Lobby extends StatelessWidget {
                                     SizedBox(width: 10,),
                                     FadeAnimation(1.3, CircleAvatar(maxRadius:15,backgroundImage: AssetImage("assets/girl.png"),)),
                                     SizedBox(width: 10,),
-                                    FadeAnimation(1.3, Text("Amrisha Jain", style: TextStyle(
+                                    FadeAnimation(1.3, Text("Player Name", style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w400
                                     ),)),
@@ -201,7 +202,7 @@ class Lobby extends StatelessWidget {
                                     SizedBox(width: 10,),
                                     FadeAnimation(1.3, CircleAvatar(maxRadius:15,backgroundImage: AssetImage("assets/girl.png"),)),
                                     SizedBox(width: 10,),
-                                    FadeAnimation(1.3, Text("Amrisha Jain", style: TextStyle(
+                                    FadeAnimation(1.3, Text("Player Name", style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w400
                                     ),)),
@@ -218,7 +219,7 @@ class Lobby extends StatelessWidget {
                                     SizedBox(width: 10,),
                                     FadeAnimation(1.3, CircleAvatar(maxRadius:15,backgroundImage: AssetImage("assets/girl.png"),)),
                                     SizedBox(width: 10,),
-                                    FadeAnimation(1.3, Text("Manav Yadav", style: TextStyle(
+                                    FadeAnimation(1.3, Text("Player Name", style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w400
                                     ),)),
@@ -235,7 +236,7 @@ class Lobby extends StatelessWidget {
                                     SizedBox(width: 10,),
                                     FadeAnimation(1.3, CircleAvatar(maxRadius:15,backgroundImage: AssetImage("assets/girl.png"),)),
                                     SizedBox(width: 10,),
-                                    FadeAnimation(1.3, Text("Avismita Jain", style: TextStyle(
+                                    FadeAnimation(1.3, Text("Player Name", style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w400
                                     ),)),
@@ -245,7 +246,7 @@ class Lobby extends StatelessWidget {
                                 FadeAnimation(1.4, Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 40),
                                   child: Container(
-                                    
+
                                     child: FlatButton.icon(
                                       icon: Icon(Icons.add_circle_outline),
                                       onPressed: () {
@@ -294,7 +295,7 @@ class Lobby extends StatelessWidget {
                             borderRadius: BorderRadius.circular(50)
                         ),
                         child: Text("Enter Game", style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                             fontSize: 18
                         ),),
                       ),
