@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:login_page_day_23/animation/FadeAnimation.dart';
+import 'package:passthecup/animation/animation_controller.dart';
 
 class SignupPage extends StatelessWidget {
   @override

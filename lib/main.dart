@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:login_page_day_23/animation/FadeAnimation.dart';
-import 'package:login_page_day_23/login.dart';
-import 'package:login_page_day_23/signup.dart';
+import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/login.dart';
+import 'package:passthecup/signup.dart';
 
 void main() {
   runApp(
@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  FadeAnimation(1, Text("PasstheCup", style: TextStyle(
+                  FadeAnimation(1, Text("Pass the Cup", style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 30
                   ),)),

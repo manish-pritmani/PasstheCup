@@ -1,4 +1,4 @@
-name: login_page_day_23
+name: passthecup
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -49,6 +49,8 @@ flutter:
   assets:
     - assets/background.png
     - assets/illustration.png
+    - assets/man.png
+    - assets/girl.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
