@@ -287,7 +287,7 @@ class Lobby extends StatelessWidget {
                         minWidth: double.infinity,
                         height: 60,
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => SampleScreen()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => inGame()));
                         },
                         color: Colors.amberAccent,
                         elevation: 0,

@@ -4,15 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:passthecup/utils.dart';
 
-class SampleScreen extends StatefulWidget {
-  SampleScreen() : super();
+class inGame extends StatefulWidget {
+  inGame() : super();
 
   @override
-  State<StatefulWidget> createState() => _SampleScreenState();
+  State<StatefulWidget> createState() => _inGameState();
 }
 
-class _SampleScreenState extends State<SampleScreen>
-    with PortraitStatefulModeMixin<SampleScreen> {
+class _inGameState extends State<inGame>
+    with PortraitStatefulModeMixin<inGame> {
   @override
   Widget build(BuildContext context) {
     super.build(context);

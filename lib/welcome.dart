@@ -4,8 +4,56 @@ import 'package:passthecup/create-game.dart';
 import 'package:passthecup/gameid.dart';
 import 'package:passthecup/invite.dart';
 import 'package:passthecup/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class Welcome extends StatelessWidget {
+class Welcome extends StatefulWidget {
+  @override
+  _WelcomeState createState() => _WelcomeState();
+}
+
+class _WelcomeState extends State<Welcome> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  FirebaseUser user;
+  bool isSignedIn = false;
+  String gamerImage;
+
+  checkAuthentication() async{
+    _auth.onAuthStateChanged.listen((user){
+      if(user == null){
+        Navigator.pushReplacementNamed(context, '/signin');
+      }
+    });
+  }
+
+  getUser() async{
+    FirebaseUser firebaseUser = await _auth.currentUser();
+    await firebaseUser?.reload();
+    firebaseUser = await _auth.currentUser();
+
+    if(firebaseUser != null){
+      setState(() {
+        this.user = firebaseUser;
+        this.isSignedIn = true;
+        this.gamerImage = user.photoUrl;
+      });
+    }
+    print("${user.displayName} is the gamer name with profile image url ${user.photoUrl}");
+  }
+
+  //TODO: Implement logout button somewhere in welcome screen
+  signout() async{
+    _auth.signOut();
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    this.checkAuthentication();
+    this.getUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +89,12 @@ class Welcome extends StatelessWidget {
                     children: <Widget>[
                       FadeAnimation(
                           1,
+                            CircleAvatar(
+                              backgroundImage: user.photoUrl!=null?NetworkImage("${user.photoUrl}"):AssetImage('asset/index.png'),
+                            )
+                      ),
+                      FadeAnimation(
+                          1,
                           Text(
                             "Welcome",
                             style: TextStyle(
@@ -51,12 +105,13 @@ class Welcome extends StatelessWidget {
                       FadeAnimation(
                           1,
                           Text(
-                            "Ayush Mehre",
+                            "${user.displayName==null?user.email: user.displayName}",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w400),
-                          )),
+                          ),
+                      ),
                       SizedBox(
                         height: 20,
                       ),
@@ -167,6 +222,36 @@ class Welcome extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(50)),
                             child: Text(
                               "Invite Friends",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      )),
+                  FadeAnimation(
+                      1.4,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Container(
+                          padding: EdgeInsets.only(top: 3, left: 3),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border(
+                                bottom: BorderSide(color: Colors.black),
+                                top: BorderSide(color: Colors.black),
+                                left: BorderSide(color: Colors.black),
+                                right: BorderSide(color: Colors.black),
+                              )),
+                          child: MaterialButton(
+                            minWidth: double.infinity,
+                            height: 60,
+                            onPressed: signout,
+                            color: Colors.amberAccent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50)),
+                            child: Text(
+                              "Signout",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),

@@ -1,10 +1,28 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
-import 'package:passthecup/game.dart';
-import 'package:passthecup/gamelobby.dart';
 import 'package:passthecup/utils.dart';
 
-class GameId extends StatelessWidget {
+class GameId extends StatefulWidget {
+  @override
+  _GameIdState createState() => _GameIdState();
+}
+
+class _GameIdState extends State<GameId> {
+
+  String _enteredGameId = '';
+
+  void _searchGame() async {
+    var result = await Firestore.instance
+        .collection("games")
+        .where("creatorId", isEqualTo: _enteredGameId)
+        .where("joinPlayers", isLessThan: 4)
+        .getDocuments();
+    result.documents.forEach((result) {
+      print(result.data);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +69,7 @@ class GameId extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 40),
                         child: Column(
                           children: <Widget>[
-                            FadeAnimation(1.2, makeInput(label: "")),
+                            FadeAnimation(1.2, makeInput(label: "Game Code")),
                           ],
                         ),
                       ),
@@ -81,12 +99,7 @@ class GameId extends StatelessWidget {
                           child: MaterialButton(
                             minWidth: double.infinity,
                             height: 60,
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Lobby()));
-                            },
+                            onPressed: _searchGame,
                             color: Colors.amberAccent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -129,7 +142,7 @@ class GameId extends StatelessWidget {
         SizedBox(
           height: 5,
         ),
-        TextField(
+        TextFormField(
           obscureText: obscureText,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
@@ -138,6 +151,12 @@ class GameId extends StatelessWidget {
             border: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey[400])),
           ),
+          validator: (value) {
+            return value.isEmpty ? 'Please provide correct game id.' : null;
+          },
+          onSaved: (value) {
+            return _enteredGameId = value;
+          },
         ),
         SizedBox(
           height: 30,

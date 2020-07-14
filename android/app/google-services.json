@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "93712255872",
+    "firebase_url": "https://passthecup-1b762.firebaseio.com",
+    "project_id": "passthecup-1b762",
+    "storage_bucket": "passthecup-1b762.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93712255872:android:68532865c3763a7ea78f65",
+        "android_client_info": {
+          "package_name": "com.passthecup.application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "93712255872-lcrnh46an4ktqcj7t06h51bis9h3ke8c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxko4fwFEtcxPI5EWauTowPRKQoAuFY_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "93712255872-lcrnh46an4ktqcj7t06h51bis9h3ke8c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

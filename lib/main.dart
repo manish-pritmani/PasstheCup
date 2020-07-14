@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/login.dart';
 import 'package:passthecup/signup.dart';
 import 'package:passthecup/utils.dart';
+import 'package:passthecup/welcome.dart';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     home: HomePage(),
+    routes: {
+      '/decide': (BuildContext context)=> HomePage(),
+      '/signin': (BuildContext context)=> LoginPage(),
+      '/signup': (BuildContext context)=> SignupPage(),
+      '/welcome': (BuildContext context)=> Welcome(),
+    },
   ));
 }
 
@@ -37,7 +43,8 @@ class HomePage extends StatelessWidget {
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 30),
-                      )),
+                      )
+                  ),
                   SizedBox(
                     height: 20,
                   ),

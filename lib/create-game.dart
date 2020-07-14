@@ -1,8 +1,37 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/utils.dart';
 
-class CreateGame extends StatelessWidget {
+class CreateGame extends StatefulWidget {
+  @override
+  _CreateGameState createState() => _CreateGameState();
+}
+
+class _CreateGameState extends State<CreateGame> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  FirebaseUser user;
+
+  getUser() async{
+    FirebaseUser firebaseUser = await _auth.currentUser();
+    await firebaseUser?.reload();
+    firebaseUser = await _auth.currentUser();
+    if(firebaseUser != null){
+      setState(() {
+        this.user = firebaseUser;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.getUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +110,16 @@ class CreateGame extends StatelessWidget {
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
-
+                            Firestore.instance.collection("games").document(user.uid).setData(
+                                {
+                                  "name" : user.displayName,
+                                  "joinPlayers" : 0,
+                                  "creatorId" : user.uid,
+                                  "status": 0,
+                                  "createdOn": DateTime.now().toString(),
+                                }).then((_){
+                              print("Game Created Successfully!");
+                            });
                           },
                           color: Colors.amberAccent,
                           elevation: 0,
@@ -91,7 +129,8 @@ class CreateGame extends StatelessWidget {
                           child: Text("Create New Game", style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18
-                          ),),
+                          ),
+                          ),
                         ),
                       ),
                     )),
