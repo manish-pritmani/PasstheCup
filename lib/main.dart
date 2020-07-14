@@ -11,9 +11,13 @@ void main() {
     debugShowCheckedModeBanner: false,
     home: HomePage(),
     routes: {
+      //Todo : created routes for quick navigation within app
       '/decide': (BuildContext context)=> HomePage(),
+
       '/signin': (BuildContext context)=> LoginPage(),
+
       '/signup': (BuildContext context)=> SignupPage(),
+
       '/welcome': (BuildContext context)=> Welcome(),
     },
   ));

@@ -16,10 +16,12 @@ class _LoginPageState extends State<LoginPage> {
 
   String _email, _password;
 
+  //Todo : navigate to sign up
   navigateToSignUpScreen() {
     Navigator.pushReplacementNamed(context, '/signup');
   }
 
+  //Todo : check if already authenticated
   checkAuthentication() async {
     _auth.onAuthStateChanged.listen((user) async {
       if (user != null) {
@@ -28,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  //Todo : Check form state and sign in
   void signin() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
@@ -42,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  //Todo : Show errors in login
   showError(String message) {
     showDialog(
         context: context,
@@ -199,6 +203,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  //Todo : input taker
   Widget makeInput({label, obscureText = false,message,onSave}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

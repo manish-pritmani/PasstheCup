@@ -110,6 +110,7 @@ class _CreateGameState extends State<CreateGame> {
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
+                            //Todo : Create game with the details
                             Firestore.instance.collection("games").document(user.uid).setData(
                                 {
                                   "name" : user.displayName,
@@ -153,6 +154,7 @@ class _CreateGameState extends State<CreateGame> {
     );
   }
 
+  //Todo : Take create game inputs
   Widget makeInput({label, obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

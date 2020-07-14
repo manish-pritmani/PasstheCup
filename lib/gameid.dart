@@ -10,8 +10,10 @@ class GameId extends StatefulWidget {
 
 class _GameIdState extends State<GameId> {
 
+  //Todo : Capture Game Id in this string
   String _enteredGameId = '';
 
+  //Todo : Query firestore for the game.
   void _searchGame() async {
     var result = await Firestore.instance
         .collection("games")
@@ -130,6 +132,8 @@ class _GameIdState extends State<GameId> {
     );
   }
 
+
+  //Todo : Capture Game Id input from this class only
   Widget makeInput({label, obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -18,6 +18,7 @@ class _WelcomeState extends State<Welcome> {
   bool isSignedIn = false;
   String gamerImage;
 
+  //Todo : check if authenticated
   checkAuthentication() async{
     _auth.onAuthStateChanged.listen((user){
       if(user == null){
@@ -25,7 +26,7 @@ class _WelcomeState extends State<Welcome> {
       }
     });
   }
-
+  //Todo : get user details
   getUser() async{
     FirebaseUser firebaseUser = await _auth.currentUser();
     await firebaseUser?.reload();
