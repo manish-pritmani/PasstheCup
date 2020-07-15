@@ -24,9 +24,9 @@ class _LoginPageState extends State<LoginPage> {
   //Todo : check if already authenticated
   checkAuthentication() async {
     _auth.onAuthStateChanged.listen((user) async {
-      if (user != null) {
-        Navigator.pushReplacementNamed(context, '/decide');
-      }
+//      if (user != null) {
+//        Navigator.pushReplacementNamed(context, '/decide');
+//      }
     });
   }
 
@@ -35,10 +35,17 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       try {
+        Utils().showAlertDialog(context);
         AuthResult user = await _auth.signInWithEmailAndPassword(
           email: _email,
           password: _password,
         );
+        Navigator.pop(context);
+        Navigator.of(context).push(new MaterialPageRoute<Welcome>(
+          builder: (BuildContext context) {
+            return new Welcome();
+          },
+        ));
       } catch (e) {
         showError(e);
       }
@@ -69,6 +76,10 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     this.checkAuthentication();
+    setState(() {
+      _email = "ayushmehre@gmail.com";
+      _password = "123456";
+    });
   }
 
   @override
@@ -87,131 +98,152 @@ class _LoginPageState extends State<LoginPage> {
           icon: Icon(
             Icons.arrow_back_ios,
             size: 20,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
       ),
-      body: Container(
-        color: Utils().getBGColor(),
-        height: MediaQuery.of(context).size.height,
-        width: double.infinity,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              FadeAnimation(
-                  1.2,
-                  Container(
-                    height: MediaQuery.of(context).size.height / 2.9,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/homerun.png'),
-                            fit: BoxFit.cover)),
-                  )),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Column(
+      body: SingleChildScrollView(
+        child: Container(
+            color: Utils().getBGColor(),
+            height: MediaQuery.of(context).size.height,
+            width: double.infinity,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  FadeAnimation(
+                      1.2,
+                      Container(
+                        height: MediaQuery.of(context).size.height / 2.9,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage('assets/homerun_blue.png'),
+                                fit: BoxFit.cover)),
+                      )),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        FadeAnimation(
-                            1,
-                            Text(
-                              "Login",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold),
-                            )),
-                        SizedBox(
-                          height: 5,
+                        Column(
+                          children: <Widget>[
+                            FadeAnimation(
+                                1,
+                                Text(
+                                  "Login",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            FadeAnimation(
+                                1.2,
+                                Text(
+                                  "Login to your account",
+                                  style: TextStyle(
+                                      fontSize: 15, color: Colors.black),
+                                )),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 40, right: 40),
+                          child: Column(
+                            children: <Widget>[
+                              FadeAnimation(
+                                  1.2,
+                                  makeInput(
+                                      label: "Email",
+                                      message: "Provide an email",
+                                      onSave: _email)),
+                              FadeAnimation(
+                                  1.3,
+                                  makeInput(
+                                      label: "Password",
+                                      obscureText: true,
+                                      message: "Provide password",
+                                      onSave: _password)),
+                            ],
+                          ),
                         ),
                         FadeAnimation(
-                            1.2,
-                            Text(
-                              "Login to your account",
-                              style: TextStyle(fontSize: 15, color: Colors.white),
+                            1.4,
+                            Padding(
+                              padding: EdgeInsets.only(left: 40, right: 40),
+                              child: Container(
+                                padding: EdgeInsets.only(top: 3, left: 3),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    border: Border(
+                                      bottom: BorderSide(color: Colors.black),
+                                      top: BorderSide(color: Colors.black),
+                                      left: BorderSide(color: Colors.black),
+                                      right: BorderSide(color: Colors.black),
+                                    )),
+                                child: MaterialButton(
+                                  minWidth: double.infinity,
+                                  height: 60,
+                                  onPressed: signin,
+                                  color: Colors.redAccent,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50)),
+                                  child: Text(
+                                    "Login",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  ),
+                                ),
+                              ),
                             )),
+                        FadeAnimation(
+                            1.5,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Don't have an account?",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                FlatButton(
+                                  onPressed: navigateToSignUpScreen,
+                                  child: Text(
+                                    "Sign up",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 17),
+                                  ),
+                                )
+                              ],
+                            )),
+                        Image.asset(
+                          "assets/sagames_full.png",
+                          height: 100,
+                        )
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Column(
-                        children: <Widget>[
-                          FadeAnimation(1.2, makeInput(label: "Email",message: "Provide an email",onSave: _email)),
-                          FadeAnimation(1.3,
-                              makeInput(label: "Password", obscureText: true,message: "Provide password",onSave: _password)),
-                        ],
-                      ),
-                    ),
-                    FadeAnimation(
-                        1.4,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Container(
-                            padding: EdgeInsets.only(top: 3, left: 3),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border(
-                                  bottom: BorderSide(color: Colors.black),
-                                  top: BorderSide(color: Colors.black),
-                                  left: BorderSide(color: Colors.black),
-                                  right: BorderSide(color: Colors.black),
-                                )),
-                            child: MaterialButton(
-                              minWidth: double.infinity,
-                              height: 60,
-                              onPressed: signin,
-                              color: Colors.greenAccent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: Text(
-                                "Login",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        )),
-                    FadeAnimation(
-                        1.5,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              "Don't have an account?",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                           FlatButton(onPressed: navigateToSignUpScreen, child: Text(
-                             "Sign up",
-                             style: TextStyle(
-                                 color: Colors.white,
-                                 fontWeight: FontWeight.w600,
-                                 fontSize: 17),
-                           ),)
-                          ],
-                        ))
-                  ],
-                ),
-              )
-            ],
-          ),
-        )
+                  )
+                ],
+              ),
+            )),
       ),
     );
   }
 
   //Todo : input taker
-  Widget makeInput({label, obscureText = false,message,onSave}) {
+  Widget makeInput({label, obscureText = false, message, onSave}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
           label,
           style: TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.white),
+              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black),
         ),
         SizedBox(
           height: 5,
@@ -230,7 +262,18 @@ class _LoginPageState extends State<LoginPage> {
             border: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey[400])),
           ),
-          onSaved: (input) => onSave = input,
+          onSaved: (input) {
+            setState(() {
+              switch (label) {
+                case "Email":
+                  _email = input;
+                  break;
+                case "Password":
+                  _password = input;
+                  break;
+              }
+            });
+          },
         ),
         SizedBox(
           height: 30,

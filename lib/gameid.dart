@@ -3,26 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/utils.dart';
 
+import 'gamelobby.dart';
+
 class GameId extends StatefulWidget {
   @override
   _GameIdState createState() => _GameIdState();
 }
 
 class _GameIdState extends State<GameId> {
-
   //Todo : Capture Game Id in this string
   String _enteredGameId = '';
 
   //Todo : Query firestore for the game.
   void _searchGame() async {
-    var result = await Firestore.instance
-        .collection("games")
-        .where("creatorId", isEqualTo: _enteredGameId)
-        .where("joinPlayers", isLessThan: 4)
-        .getDocuments();
-    result.documents.forEach((result) {
-      print(result.data);
-    });
+//    var result = await Firestore.instance
+//        .collection("games")
+//        .where("creatorId", isEqualTo: _enteredGameId)
+//        .where("joinPlayers", isLessThan: 4)
+//        .getDocuments();
+//    result.documents.forEach((result) {
+//      print(result.data);
+//    });
+    Navigator.of(context).push(new MaterialPageRoute<Lobby>(
+      builder: (BuildContext context) {
+        return new Lobby();
+      },
+    ));
   }
 
   @override
@@ -41,7 +47,7 @@ class _GameIdState extends State<GameId> {
           icon: Icon(
             Icons.arrow_back_ios,
             size: 20,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
       ),
@@ -58,15 +64,18 @@ class _GameIdState extends State<GameId> {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      FadeAnimation(
-                          1,
-                          Text(
-                            "Enter Game-Code to Join",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.w500),
-                          )),
+                      Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: FadeAnimation(
+                            1,
+                            Text(
+                              "Enter Game-Code to Join",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500),
+                            )),
+                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 40),
                         child: Column(
@@ -78,9 +87,8 @@ class _GameIdState extends State<GameId> {
                       FadeAnimation(
                           1.2,
                           Text(
-                            "You have Total Coins : 250",
-                            style: TextStyle(
-                                fontSize: 15, color: Colors.white),
+                            "Your Coins : 250",
+                            style: TextStyle(fontSize: 15, color: Colors.black),
                           )),
                     ],
                   ),
@@ -102,14 +110,16 @@ class _GameIdState extends State<GameId> {
                             minWidth: double.infinity,
                             height: 60,
                             onPressed: _searchGame,
-                            color: Colors.amberAccent,
+                            color: Colors.redAccent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
                             child: Text(
                               "Enter Game",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18),
                             ),
                           ),
                         ),
@@ -123,7 +133,7 @@ class _GameIdState extends State<GameId> {
                   height: MediaQuery.of(context).size.height / 2.9,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('assets/homerun3.png'),
+                          image: AssetImage('assets/homerun4_blue.png'),
                           fit: BoxFit.cover)),
                 ))
           ],
@@ -131,7 +141,6 @@ class _GameIdState extends State<GameId> {
       ),
     );
   }
-
 
   //Todo : Capture Game Id input from this class only
   Widget makeInput({label, obscureText = false}) {

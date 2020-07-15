@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/main.dart';
 import 'package:passthecup/utils.dart';
+import 'package:passthecup/welcome.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -10,7 +12,6 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -32,6 +33,11 @@ class _SignupPageState extends State<SignupPage> {
   void initState() {
     super.initState();
     this.checkAuthentication();
+    setState(() {
+      _name = "ayush mehre";
+      _email = "ayushmehre@gmail.com";
+      _password = "123456";
+    });
   }
 
   signup() async {
@@ -39,10 +45,12 @@ class _SignupPageState extends State<SignupPage> {
       _formKey.currentState.save();
 
       try {
+        Utils().showAlertDialog(context);
         AuthResult user = await _auth.createUserWithEmailAndPassword(
           email: _email,
           password: _password,
         );
+        Navigator.pop(context);
         if (user != null) {
           Firestore.instance.collection("user").document(_email).setData({
             "name": _name,
@@ -54,9 +62,15 @@ class _SignupPageState extends State<SignupPage> {
           UserUpdateInfo userUpdateInfo = UserUpdateInfo();
           userUpdateInfo.displayName = _name;
           user.user.updateProfile(userUpdateInfo);
+          Navigator.of(context).push(new MaterialPageRoute<Welcome>(
+            builder: (BuildContext context) {
+              return new Welcome();
+            },
+          ));
         }
       } catch (e) {
-        showError(e);
+        Navigator.pop(context);
+        showError(e.toString());
       }
     }
   }
@@ -88,98 +102,141 @@ class _SignupPageState extends State<SignupPage> {
       appBar: AppBar(
         elevation: 0,
         brightness: Brightness.light,
-        backgroundColor:Utils().getBGColor(),
+        backgroundColor: Utils().getBGColor(),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white,),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            size: 20,
+            color: Colors.black,
+          ),
         ),
       ),
       body: SingleChildScrollView(
         child: Container(
-          color: Utils().getBGColor(),
-          padding: EdgeInsets.symmetric(horizontal: 40),
-          height: MediaQuery.of(context).size.height - 50,
-          width: double.infinity,
-          child: Form(key: _formKey,
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  FadeAnimation(1, Text("Sign up", style: TextStyle( color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold
-                  ),)),
-                  SizedBox(height: 20,),
-                  FadeAnimation(1.2, Text("Create an account, It's free", style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white
-                  ),)),
-                ],
-              ),
-              Column(
-                children: <Widget>[
-                  FadeAnimation(1.2, makeInput(label: "Name",message: "Provide an name",onSave: _name)),
-                  FadeAnimation(1.2, makeInput(label: "Email",message: "Provide an email",onSave: _email)),
-                  FadeAnimation(1.3,
-                      makeInput(label: "Password", obscureText: true,message: "Provide password",onSave: _password)),
-                ],
-              ),
-              FadeAnimation(1.5, Container(
-                padding: EdgeInsets.only(top: 3, left: 3),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black),
-                      top: BorderSide(color: Colors.black),
-                      left: BorderSide(color: Colors.black),
-                      right: BorderSide(color: Colors.black),
+            color: Utils().getBGColor(),
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            height: MediaQuery.of(context).size.height - 100,
+            width: double.infinity,
+            child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        FadeAnimation(
+                            1,
+                            Text(
+                              "Sign up",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold),
+                            )),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        FadeAnimation(
+                            1.2,
+                            Text(
+                              "Create an account, It's free",
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.black),
+                            )),
+                      ],
+                    ),
+                    Column(
+                      children: <Widget>[
+                        FadeAnimation(
+                            1.2,
+                            makeInput(
+                                label: "Name",
+                                message: "Provide an name",
+                                onSave: _name)),
+                        FadeAnimation(
+                            1.2,
+                            makeInput(
+                                label: "Email",
+                                message: "Provide an email",
+                                onSave: _email)),
+                        FadeAnimation(
+                            1.3,
+                            makeInput(
+                                label: "Password",
+                                obscureText: true,
+                                message: "Provide password",
+                                onSave: _password)),
+                      ],
+                    ),
+                    FadeAnimation(
+                        1.5,
+                        Container(
+                          padding: EdgeInsets.only(top: 3, left: 3),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border(
+                                bottom: BorderSide(color: Colors.black),
+                                top: BorderSide(color: Colors.black),
+                                left: BorderSide(color: Colors.black),
+                                right: BorderSide(color: Colors.black),
+                              )),
+                          child: MaterialButton(
+                            minWidth: double.infinity,
+                            height: 60,
+                            onPressed: signup,
+                            color: Colors.redAccent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50)),
+                            child: Text(
+                              "Sign up",
+                              style: TextStyle( color: Colors.white,
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ),
+                        )),
+                    FadeAnimation(
+                        1.6,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Already have an account?",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            FlatButton(
+                              onPressed: navigateToSignInScreen,
+                              child: Text(
+                                " Login",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18),
+                              ),
+                            )
+                          ],
+                        )),
+                    Image.asset(
+                      "assets/sagames_full.png",
+                      height: 100,
                     )
-                ),
-                child: MaterialButton(
-                  minWidth: double.infinity,
-                  height: 60,
-                  onPressed: signup,
-                  color: Colors.greenAccent,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)
-                  ),
-                  child: Text("Sign up", style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18
-                  ),),
-                ),
-              )),
-              FadeAnimation(1.6, Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("Already have an account?", style: TextStyle(color: Colors.white),),
-                  FlatButton(
-                    onPressed: navigateToSignInScreen,
-                    child: Text(" Login", style: TextStyle( color: Colors.white,
-                        fontWeight: FontWeight.w600, fontSize: 18
-                    ),),
-                  )
-                ],
-              )),
-            ],
-          ))
-        ),
+                  ],
+                ))),
       ),
     );
   }
 
-  Widget makeInput({label, obscureText = false,message,onSave}) {
+  Widget makeInput({label, obscureText = false, message, onSave}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
           label,
           style: TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.white),
+              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black),
         ),
         SizedBox(
           height: 5,
@@ -198,7 +255,21 @@ class _SignupPageState extends State<SignupPage> {
             border: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey[400])),
           ),
-          onSaved: (input) => onSave = input,
+          onSaved: (input) {
+            setState(() {
+              switch (label) {
+                case "Email":
+                  _email = input;
+                  break;
+                case "Name":
+                  _name = input;
+                  break;
+                case "Password":
+                  _password = input;
+                  break;
+              }
+            });
+          },
         ),
         SizedBox(
           height: 30,

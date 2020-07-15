@@ -45,7 +45,7 @@ class _inGameState extends State<inGame>
                               child: Container(
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: Colors.amberAccent),
+                                      color: Colors.redAccent),
                                   child: Column(
                                     children: <Widget>[
                                       SizedBox(
@@ -62,7 +62,7 @@ class _inGameState extends State<inGame>
                                 Text(
                                   "Name",
                                   style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500),
                                 )),
@@ -71,7 +71,7 @@ class _inGameState extends State<inGame>
                                 Text(
                                   "ERA     ",
                                   style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w400),
                                 )),
@@ -99,7 +99,7 @@ class _inGameState extends State<inGame>
                               child: Container(
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: Colors.amberAccent),
+                                      color: Colors.redAccent),
                                   child: Column(
                                     children: <Widget>[
                                       SizedBox(
@@ -116,7 +116,7 @@ class _inGameState extends State<inGame>
                                 Text(
                                   "Name",
                                   style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500),
                                 )),
@@ -125,7 +125,7 @@ class _inGameState extends State<inGame>
                                 Text(
                                   "Battling",
                                   style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 17,
                                       fontWeight: FontWeight.w400),
                                 )),
@@ -150,7 +150,7 @@ class _inGameState extends State<inGame>
                       child: Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: Colors.amberAccent),
+                              color: Utils().getBlue()),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
@@ -163,7 +163,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Pitch 1",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -174,7 +174,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Strike",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -187,7 +187,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Pitch 2",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -198,7 +198,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Strike",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -211,7 +211,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Pitch 3",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -222,7 +222,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Strike",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -235,7 +235,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Pitch 4",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -246,7 +246,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Strike",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -262,7 +262,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "4.",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600),
                                       )),
@@ -283,7 +283,7 @@ class _inGameState extends State<inGame>
                                       1.3,
                                       Text(
                                         "Ayush Mehre",
-                                        style: TextStyle(
+                                        style: TextStyle( color: Colors.white,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400),
                                       )),
@@ -315,14 +315,14 @@ class _inGameState extends State<inGame>
                                   padding: EdgeInsets.symmetric(horizontal: 20),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: Colors.amberAccent),
+                                      color: Colors.redAccent),
                                   child: Column(
                                     children: <Widget>[
                                       FadeAnimation(
                                           1,
                                           Text(
                                             "3",
-                                            style: TextStyle(
+                                            style: TextStyle( color: Colors.white,
                                                 fontSize: 40,
                                                 fontWeight: FontWeight.w400),
                                           )),
@@ -345,14 +345,14 @@ class _inGameState extends State<inGame>
                                   padding: EdgeInsets.symmetric(horizontal: 20),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: Colors.tealAccent),
+                                      color: Utils().getBlue()),
                                   child: Column(
                                     children: <Widget>[
                                       FadeAnimation(
                                           1,
                                           Text(
                                             "7th",
-                                            style: TextStyle(
+                                            style: TextStyle( color: Colors.white,
                                                 fontSize: 25,
                                                 fontWeight: FontWeight.w400),
                                           )),
@@ -375,14 +375,14 @@ class _inGameState extends State<inGame>
                                   padding: EdgeInsets.symmetric(horizontal: 20),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: Colors.amberAccent),
+                                      color: Colors.redAccent),
                                   child: Column(
                                     children: <Widget>[
                                       FadeAnimation(
                                           1,
                                           Text(
                                             "3",
-                                            style: TextStyle(
+                                            style: TextStyle( color: Colors.white,
                                                 fontSize: 40,
                                                 fontWeight: FontWeight.w400),
                                           )),
@@ -414,7 +414,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "Player",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
                         )),
@@ -423,7 +423,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "45 Points",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         )),
@@ -445,7 +445,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "Player",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
                         )),
@@ -454,7 +454,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "100 Points",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         )),
@@ -476,7 +476,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "Player",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
                         )),
@@ -485,7 +485,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "39 Points",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         )),
@@ -507,7 +507,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "Player",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
                         )),
@@ -516,7 +516,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "480 Points",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         )),
@@ -538,7 +538,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "Player",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
                         )),
@@ -547,7 +547,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "96 Points",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         )),
@@ -569,7 +569,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "Player",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
                         )),
@@ -578,7 +578,7 @@ class _inGameState extends State<inGame>
                         Text(
                           "269 Points",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         )),

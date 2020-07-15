@@ -19,34 +19,35 @@ class _WelcomeState extends State<Welcome> {
   String gamerImage;
 
   //Todo : check if authenticated
-  checkAuthentication() async{
-    _auth.onAuthStateChanged.listen((user){
-      if(user == null){
+  checkAuthentication() async {
+    _auth.onAuthStateChanged.listen((user) {
+      if (user == null) {
         Navigator.pushReplacementNamed(context, '/signin');
       }
     });
   }
+
   //Todo : get user details
-  getUser() async{
+  getUser() async {
     FirebaseUser firebaseUser = await _auth.currentUser();
     await firebaseUser?.reload();
     firebaseUser = await _auth.currentUser();
 
-    if(firebaseUser != null){
+    if (firebaseUser != null) {
       setState(() {
         this.user = firebaseUser;
         this.isSignedIn = true;
         this.gamerImage = user.photoUrl;
       });
     }
-    print("${user.displayName} is the gamer name with profile image url ${user.photoUrl}");
+    print(
+        "${user.displayName} is the gamer name with profile image url ${user.photoUrl}");
   }
 
   //TODO: Implement logout button somewhere in welcome screen
-  signout() async{
+  signout() async {
     _auth.signOut();
   }
-
 
   @override
   void initState() {
@@ -71,7 +72,7 @@ class _WelcomeState extends State<Welcome> {
           icon: Icon(
             Icons.arrow_back_ios,
             size: 20,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
       ),
@@ -90,28 +91,29 @@ class _WelcomeState extends State<Welcome> {
                     children: <Widget>[
                       FadeAnimation(
                           1,
-                            CircleAvatar(
-                              backgroundImage: user.photoUrl!=null?NetworkImage("${user.photoUrl}"):AssetImage('asset/index.png'),
-                            )
-                      ),
+                          CircleAvatar(
+                            backgroundImage: user.photoUrl != null
+                                ? NetworkImage("${user.photoUrl}")
+                                : AssetImage('asset/index.png'),
+                          )),
                       FadeAnimation(
                           1,
                           Text(
                             "Welcome",
                             style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold),
                           )),
                       FadeAnimation(
-                          1,
-                          Text(
-                            "${user.displayName==null?user.email: user.displayName}",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400),
-                          ),
+                        1,
+                        Text(
+                          "${user.displayName == null ? user.email : user.displayName}",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400),
+                        ),
                       ),
                       SizedBox(
                         height: 20,
@@ -147,13 +149,13 @@ class _WelcomeState extends State<Welcome> {
                                   MaterialPageRoute(
                                       builder: (context) => GameId()));
                             },
-                            color: Colors.greenAccent,
+                            color: Colors.redAccent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
                             child: Text(
                               "Join Game",
-                              style: TextStyle(
+                              style: TextStyle( color: Colors.white,
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ),
@@ -182,13 +184,13 @@ class _WelcomeState extends State<Welcome> {
                                   MaterialPageRoute(
                                       builder: (context) => CreateGame()));
                             },
-                            color: Colors.deepOrangeAccent,
+                            color: Colors.redAccent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
                             child: Text(
                               "Create Game",
-                              style: TextStyle(
+                              style: TextStyle( color: Colors.white,
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ),
@@ -217,13 +219,13 @@ class _WelcomeState extends State<Welcome> {
                                   MaterialPageRoute(
                                       builder: (context) => Invite()));
                             },
-                            color: Colors.amberAccent,
+                            color: Utils().getBlue(),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
                             child: Text(
                               "Invite Friends",
-                              style: TextStyle(
+                              style: TextStyle(color: Colors.white,
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ),
@@ -247,13 +249,13 @@ class _WelcomeState extends State<Welcome> {
                             minWidth: double.infinity,
                             height: 60,
                             onPressed: signout,
-                            color: Colors.amberAccent,
+                            color: Utils().getBlue(),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
                             child: Text(
                               "Signout",
-                              style: TextStyle(
+                              style: TextStyle( color: Colors.white,
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ),
@@ -268,7 +270,7 @@ class _WelcomeState extends State<Welcome> {
                   height: MediaQuery.of(context).size.height / 2.9,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('assets/homerun3.png'),
+                          image: AssetImage('assets/homerun4_blue.png'),
                           fit: BoxFit.cover)),
                 ))
           ],

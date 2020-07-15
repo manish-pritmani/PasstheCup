@@ -45,7 +45,7 @@ class _CreateGameState extends State<CreateGame> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white,),
+          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black,),
         ),
       ),
       body: SingleChildScrollView(
@@ -62,7 +62,7 @@ class _CreateGameState extends State<CreateGame> {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        FadeAnimation(1, Text("Create New Game", style: TextStyle( color: Colors.white,
+                        FadeAnimation(1, Text("Create New Game", style: TextStyle( color: Colors.black,
                             fontSize: 25,
                             fontWeight: FontWeight.w500
                         ),)),
@@ -122,13 +122,13 @@ class _CreateGameState extends State<CreateGame> {
                               print("Game Created Successfully!");
                             });
                           },
-                          color: Colors.amberAccent,
+                          color: Colors.redAccent,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(50)
                           ),
                           child: Text("Create New Game", style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.bold, color: Colors.white,
                               fontSize: 18
                           ),
                           ),
@@ -142,7 +142,7 @@ class _CreateGameState extends State<CreateGame> {
                 height: MediaQuery.of(context).size.height / 2.9,
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage('assets/homerun3.png'),
+                        image: AssetImage('assets/homerun4_blue.png'),
                         fit: BoxFit.cover
                     )
                 ),
@@ -162,7 +162,7 @@ class _CreateGameState extends State<CreateGame> {
         Text(label, style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w400,
-            color: Colors.white
+            color: Colors.black
         ),),
         SizedBox(height: 5,),
         TextField(

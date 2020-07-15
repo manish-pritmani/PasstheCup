@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/login.dart';
 import 'package:passthecup/signup.dart';
@@ -44,9 +45,9 @@ class HomePage extends StatelessWidget {
                       Text(
                         "Pass the Cup",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 30),
+                            fontSize: 40),
                       )
                   ),
                   SizedBox(
@@ -57,7 +58,7 @@ class HomePage extends StatelessWidget {
                       Text(
                         "Glad to see you here. Join Now",
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 15),
+                        style: TextStyle(color: Colors.black, fontSize: 15),
                       )),
                 ],
               ),
@@ -73,24 +74,35 @@ class HomePage extends StatelessWidget {
                 children: <Widget>[
                   FadeAnimation(
                       1.5,
-                      MaterialButton(
-                        minWidth: double.infinity,
-                        height: 60,
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()));
-                        },
-                        shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18),
+                      Container(
+                        padding: EdgeInsets.only(top: 3, left: 3),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border(
+                              bottom: BorderSide(color: Colors.black),
+                              top: BorderSide(color: Colors.black),
+                              left: BorderSide(color: Colors.black),
+                              right: BorderSide(color: Colors.black),
+                            )),
+                        child: MaterialButton(
+                          minWidth: double.infinity,
+                          height: 60,
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginPage()));
+                          },
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
+                          color:Utils().getBlue(),
                         ),
                       )),
                   SizedBox(
@@ -117,17 +129,24 @@ class HomePage extends StatelessWidget {
                                 MaterialPageRoute(
                                     builder: (context) => SignupPage()));
                           },
-                          color: Colors.greenAccent,
+                          color: Colors.red,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(50)),
                           child: Text(
                             "Sign up",
-                            style: TextStyle(
+                            style: TextStyle( color: Colors.white,
                                 fontWeight: FontWeight.w600, fontSize: 18),
                           ),
                         ),
-                      ))
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.only(top:32.0),
+                    child: Image.asset(
+                      "assets/sagames_full.png",
+                      height: 70,
+                    ),
+                  )
                 ],
               )
             ],
