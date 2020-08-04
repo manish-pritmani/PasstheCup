@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           password: _password,
         );
         Navigator.pop(context);
-        Navigator.of(context).push(new MaterialPageRoute<Welcome>(
+        Navigator.of(context).pushReplacement(new MaterialPageRoute<Welcome>(
           builder: (BuildContext context) {
             return new Welcome();
           },
@@ -118,8 +118,8 @@ class _LoginPageState extends State<LoginPage> {
                         height: MediaQuery.of(context).size.height / 2.9,
                         decoration: BoxDecoration(
                             image: DecorationImage(
-                                image: AssetImage('assets/homerun_blue.png'),
-                                fit: BoxFit.cover)),
+                                image: AssetImage('assets/batter.png'),
+                                fit: BoxFit.contain)),
                       )),
                   Expanded(
                     child: Column(
@@ -155,12 +155,14 @@ class _LoginPageState extends State<LoginPage> {
                               FadeAnimation(
                                   1.2,
                                   makeInput(
+                                      defaultvalue: "ayushmehre@gmail.com",
                                       label: "Email",
                                       message: "Provide an email",
                                       onSave: _email)),
                               FadeAnimation(
                                   1.3,
                                   makeInput(
+                                      defaultvalue: "123456",
                                       label: "Password",
                                       obscureText: true,
                                       message: "Provide password",
@@ -177,10 +179,10 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
                                     border: Border(
-                                      bottom: BorderSide(color: Colors.black),
-                                      top: BorderSide(color: Colors.black),
-                                      left: BorderSide(color: Colors.black),
-                                      right: BorderSide(color: Colors.black),
+                                      bottom: BorderSide(color: Colors.transparent),
+                                      top: BorderSide(color: Colors.transparent),
+                                      left: BorderSide(color: Colors.transparent),
+                                      right: BorderSide(color: Colors.transparent),
                                     )),
                                 child: MaterialButton(
                                   minWidth: double.infinity,
@@ -236,7 +238,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   //Todo : input taker
-  Widget makeInput({label, obscureText = false, message, onSave}) {
+  Widget makeInput(
+      {label, obscureText = false, message, onSave, defaultvalue = ""}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -249,6 +252,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 5,
         ),
         TextFormField(
+          controller: new TextEditingController(text: defaultvalue),
           obscureText: obscureText,
           validator: (input) {
             if (input.isEmpty) {

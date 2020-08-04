@@ -29,4 +29,28 @@ class Utils{
     return  Hexcolor("#304ffe");
   }
 
+  showToast(String text, BuildContext context, {Function() ok}) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+//          title: new Text("Message"),
+          content: new Text(text),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+                if (ok != null) {
+                  ok();
+                }
+              },
+            ),
+//            CupertinoDialogAction(
+//              child: Text("No"),
+//            )
+          ],
+        ));
+  }
+
 }

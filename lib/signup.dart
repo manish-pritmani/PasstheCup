@@ -178,10 +178,10 @@ class _SignupPageState extends State<SignupPage> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(50),
                               border: Border(
-                                bottom: BorderSide(color: Colors.black),
-                                top: BorderSide(color: Colors.black),
-                                left: BorderSide(color: Colors.black),
-                                right: BorderSide(color: Colors.black),
+                                bottom: BorderSide(color: Colors.transparent),
+                                top: BorderSide(color: Colors.transparent),
+                                left: BorderSide(color: Colors.transparent),
+                                right: BorderSide(color: Colors.transparent),
                               )),
                           child: MaterialButton(
                             minWidth: double.infinity,

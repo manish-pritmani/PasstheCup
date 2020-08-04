@@ -27,6 +27,7 @@ void main() {
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var borderColor = Colors.transparent;
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -58,7 +59,7 @@ class HomePage extends StatelessWidget {
                       Text(
                         "Glad to see you here. Join Now",
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: TextStyle(color: borderColor, fontSize: 15),
                       )),
                 ],
               ),
@@ -79,10 +80,10 @@ class HomePage extends StatelessWidget {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
                             border: Border(
-                              bottom: BorderSide(color: Colors.black),
-                              top: BorderSide(color: Colors.black),
-                              left: BorderSide(color: Colors.black),
-                              right: BorderSide(color: Colors.black),
+                              bottom: BorderSide(color: borderColor),
+                              top: BorderSide(color: borderColor),
+                              left: BorderSide(color: borderColor),
+                              right: BorderSide(color: borderColor),
                             )),
                         child: MaterialButton(
                           minWidth: double.infinity,
@@ -115,10 +116,10 @@ class HomePage extends StatelessWidget {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
                             border: Border(
-                              bottom: BorderSide(color: Colors.black),
-                              top: BorderSide(color: Colors.black),
-                              left: BorderSide(color: Colors.black),
-                              right: BorderSide(color: Colors.black),
+                              bottom: BorderSide(color: borderColor),
+                              top: BorderSide(color: borderColor),
+                              left: BorderSide(color: borderColor),
+                              right: BorderSide(color: borderColor),
                             )),
                         child: MaterialButton(
                           minWidth: double.infinity,
