@@ -45,8 +45,8 @@ class API {
     }
   }
 
-  Future<GameObjectPlayByPlay> fetchGamePlayByPlay() async {
-    var url = "https://api.sportsdata.io/v3/mlb/pbp/json/PlayByPlay/59696$keyString";
+  Future<GameObjectPlayByPlay> fetchGamePlayByPlay(String gamid) async {
+    var url = "https://api.sportsdata.io/v3/mlb/pbp/json/PlayByPlay/$gamid$keyString";
     final response =
         await http.get(url);
 

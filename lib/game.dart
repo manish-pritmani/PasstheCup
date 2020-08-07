@@ -79,7 +79,9 @@ class _inGameState extends State<inGame>
     setState(() {
       fetching = true;
     });
-    API().fetchGamePlayByPlay().then((value) {
+    API()
+        .fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
+        .then((value) {
       onGameFetched(value);
       return null;
     }).catchError((onError) {
@@ -547,31 +549,21 @@ class _inGameState extends State<inGame>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Container(
-                      padding: EdgeInsets.only(top: 3, left: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          border: Border(
-                            bottom: BorderSide(color: borderColor),
-                            top: BorderSide(color: borderColor),
-                            left: BorderSide(color: borderColor),
-                            right: BorderSide(color: borderColor),
-                          )),
-                      child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.redAccent),
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                getAwayTeamRuns().toString(),
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ))),
+                          color: Colors.redAccent),
+                      child: Column(
+                        children: <Widget>[
+                          Text(
+                            getAwayTeamRuns().toString(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )),
                 ),
               ],
             ),
@@ -598,7 +590,7 @@ class _inGameState extends State<inGame>
             Column(
               children: <Widget>[
                 Text(
-                  getHomeTeamRuns(),
+                 gameObjectPlayByPlay.game.homeTeam,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -607,32 +599,21 @@ class _inGameState extends State<inGame>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Container(
-                      padding: EdgeInsets.only(top: 3, left: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          border: Border(
-                            bottom: BorderSide(color: borderColor),
-                            top: BorderSide(color: borderColor),
-                            left: BorderSide(color: borderColor),
-                            right: BorderSide(color: borderColor),
-                          )),
-                      child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.redAccent),
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                gameObjectPlayByPlay.game.homeTeamRuns
-                                    .toString(),
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ))),
+                          color: Colors.redAccent),
+                      child: Column(
+                        children: <Widget>[
+                          Text(
+                           getHomeTeamRuns(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )),
                 ),
                 /* Text(
                   "Balls",
@@ -653,7 +634,11 @@ class _inGameState extends State<inGame>
     if (!simulation) {
       return gameObjectPlayByPlay.game.homeTeam;
     } else {
-      return gameObjectPlayByPlay.game.homeTeam;
+      var score = 0;
+      for (int i = 0; i <= currentInnings; i++) {
+        score = gameObjectPlayByPlay.game.innings[i].homeTeamRuns+ score;
+      }
+      return score.toString();
     }
   }
 
@@ -661,7 +646,11 @@ class _inGameState extends State<inGame>
     if (!simulation) {
       return gameObjectPlayByPlay.game.awayTeamRuns;
     } else {
-      return gameObjectPlayByPlay.game.awayTeamRuns;
+      var score = 0;
+      for (int i = 0; i <= currentInnings; i++) {
+        score = gameObjectPlayByPlay.game.innings[i].awayTeamRuns+ score;
+      }
+      return score;
     }
   }
 
@@ -752,7 +741,7 @@ class _inGameState extends State<inGame>
 
   List<Widget> getInningsScoreUptoNow() {
     List<Widget> widgets = List<Widget>();
-    widgets.add(getTextForTable(getHomeTeamRuns(), wide: true, bold: true));
+    widgets.add(getTextForTable(gameObjectPlayByPlay.game.homeTeam, wide: true, bold: true));
     for (int i = 0; i < 9; i++) {
       if (i <= currentInnings) {
         widgets.add(getTextForTable(
