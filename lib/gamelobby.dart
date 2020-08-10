@@ -50,8 +50,10 @@ class LobbyState extends State<Lobby> {
         addMeAsAPlayer();
       }
     }).catchError((e){
-      //Utils().showToast("Error", context);
-      Navigator.pop(context);
+      Utils().showToast(e.toString(), context, ok: (){
+        Navigator.pop(context);
+      });
+
     });
   }
 

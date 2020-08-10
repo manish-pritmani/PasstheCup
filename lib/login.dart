@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                   FadeAnimation(
                       1.2,
                       Container(
-                        height: MediaQuery.of(context).size.height / 2.9,
+                        height: 150,
                         decoration: BoxDecoration(
                             image: DecorationImage(
                                 image: AssetImage('assets/batter.png'),
@@ -223,9 +223,11 @@ class _LoginPageState extends State<LoginPage> {
                                 )
                               ],
                             )),
-                        Image.asset(
-                          "assets/sagames_full.png",
-                          height: 100,
+                        FadeAnimation(
+                          1, Image.asset(
+                            "assets/sagames_full.png",
+                            height: 50,
+                          ),
                         )
                       ],
                     ),

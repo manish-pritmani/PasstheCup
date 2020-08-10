@@ -119,8 +119,7 @@ class _SignupPageState extends State<SignupPage> {
         child: Container(
             color: Utils().getBGColor(),
             padding: EdgeInsets.symmetric(horizontal: 40),
-            height: MediaQuery.of(context).size.height - 100,
-            width: double.infinity,
+            width: double.maxFinite,
             child: Form(
                 key: _formKey,
                 child: Column(
@@ -220,9 +219,11 @@ class _SignupPageState extends State<SignupPage> {
                             )
                           ],
                         )),
-                    Image.asset(
-                      "assets/sagames_full.png",
-                      height: 100,
+                    FadeAnimation(
+                      1, Image.asset(
+                        "assets/sagames_full.png",
+                        height: 50,
+                      ),
                     )
                   ],
                 ))),

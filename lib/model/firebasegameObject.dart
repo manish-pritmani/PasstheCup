@@ -29,16 +29,21 @@ class FirebaseGameObject {
 
   FirebaseGameObject.fromJson(Map<String, dynamic> json) {
     joinPlayers = json['joinPlayers'];
-    selectedTeam = json['selectedTeam'] != null
-        ? new TeamObject.fromJson(json['selectedTeam'])
-        : null;
     creatorId = json['creatorId'];
     name = json['name'];
     hostID = json['hostID'];
     gameCode = json['gameCode'];
-    selectedGame = json['selectedGame'] != null
-        ? new GameObject.fromJson(json['selectedGame'])
-        : null;
+    if (json['selectedGame'] != null) {
+      selectedGame = new GameObject.fromJson(json['selectedGame']);
+    } else {
+      selectedGame = null;
+    }
+    if (json['selectedTeam'] != null) {
+      Map<String, dynamic> jsonTeam = json['selectedTeam'];
+      selectedTeam = new TeamObject.fromJson(jsonTeam);
+    } else {
+      selectedTeam = null;
+    }
     createdOn = json['createdOn'];
     status = json['status'];
     if (json['players'] != null) {
