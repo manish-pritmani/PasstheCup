@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     this.checkAuthentication();
     setState(() {
-      _email = "ayushmehre@gmail.com";
+      _email = "ayush@gmail,com";
       _password = "123456";
     });
   }
@@ -155,14 +155,14 @@ class _LoginPageState extends State<LoginPage> {
                               FadeAnimation(
                                   1.2,
                                   makeInput(
-                                      defaultvalue: "ayushmehre@gmail.com",
+//                                      defaultvalue: "ayushmehre@gmail.com",
                                       label: "Email",
                                       message: "Provide an email",
                                       onSave: _email)),
                               FadeAnimation(
                                   1.3,
                                   makeInput(
-                                      defaultvalue: "123456",
+//                                      defaultvalue: "123456",
                                       label: "Password",
                                       obscureText: true,
                                       message: "Provide password",
@@ -237,9 +237,56 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  //Todo : input taker
-  Widget makeInput(
-      {label, obscureText = false, message, onSave, defaultvalue = ""}) {
+//  //Todo : input taker
+//  Widget makeInput(
+//      {label, obscureText = false, message, onSave, defaultvalue = ""}) {
+//    return Column(
+//      crossAxisAlignment: CrossAxisAlignment.start,
+//      children: <Widget>[
+//        Text(
+//          label,
+//          style: TextStyle(
+//              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black),
+//        ),
+//        SizedBox(
+//          height: 5,
+//        ),
+//        TextFormField(
+//          controller: new TextEditingController(text: defaultvalue),
+//          obscureText: obscureText,
+//          validator: (input) {
+//            if (input.isEmpty) {
+//              return message;
+//            }
+//          },
+//          decoration: InputDecoration(
+//            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+//            enabledBorder: OutlineInputBorder(
+//                borderSide: BorderSide(color: Colors.grey[400])),
+//            border: OutlineInputBorder(
+//                borderSide: BorderSide(color: Colors.grey[400])),
+//          ),
+//          onSaved: (input) {
+//            setState(() {
+//              switch (label) {
+//                case "Email":
+//                  _email = input;
+//                  break;
+//                case "Password":
+//                  _password = input;
+//                  break;
+//              }
+//            });
+//          },
+//        ),
+//        SizedBox(
+//          height: 30,
+//        ),
+//      ],
+//    );
+//  }
+
+  Widget makeInput({label, obscureText = false, message, onSave}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -252,7 +299,6 @@ class _LoginPageState extends State<LoginPage> {
           height: 5,
         ),
         TextFormField(
-          controller: new TextEditingController(text: defaultvalue),
           obscureText: obscureText,
           validator: (input) {
             if (input.isEmpty) {
@@ -272,6 +318,9 @@ class _LoginPageState extends State<LoginPage> {
                 case "Email":
                   _email = input;
                   break;
+//                case "Name":
+//                  _name = input;
+//                  break;
                 case "Password":
                   _password = input;
                   break;
@@ -285,4 +334,5 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
+
 }

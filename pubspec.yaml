@@ -30,6 +30,9 @@ dependencies:
   http: ^0.12.1
   intl: ^0.16.1
   flutter_svg: ^0.17.0
+  sa_stateless_animation: ^1.0.1
+  supercharged: ^1.8.2
+  share: ^0.6.4+3
 
 
   # The following adds the Cupertino Icons font to your application.

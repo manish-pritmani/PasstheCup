@@ -53,6 +53,7 @@ class _SignupPageState extends State<SignupPage> {
         Navigator.pop(context);
         if (user != null) {
           Firestore.instance.collection("user").document(_email).setData({
+            "score": 100,
             "name": _name,
             "email": _email,
             "password": _password,
@@ -154,13 +155,13 @@ class _SignupPageState extends State<SignupPage> {
                             1.2,
                             makeInput(
                                 label: "Name",
-                                message: "Provide an name",
+                                message: "Provide a name",
                                 onSave: _name)),
                         FadeAnimation(
                             1.2,
                             makeInput(
                                 label: "Email",
-                                message: "Provide an email",
+                                message: "Provide email",
                                 onSave: _email)),
                         FadeAnimation(
                             1.3,

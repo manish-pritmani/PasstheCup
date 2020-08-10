@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
 import 'package:passthecup/model/gameObjectPlaybyPlay.dart';
 import 'package:passthecup/utils.dart';
+import 'package:sa_stateless_animation/sa_stateless_animation.dart';
 
 import 'api.dart';
 import 'model/Player.dart';
@@ -34,13 +36,22 @@ class _inGameState extends State<inGame>
 
   Color borderColor;
 
+  int activePlayer = 0;
   int currentPlay = 0;
   int currentPitch = 0;
   int currentInnings = 0;
   bool simulation;
-  List<Player> players = List();
+
+//  List<Player> players = List();
 
   bool sim;
+  bool gameOver;
+
+  bool dialogShown;
+
+  int cupScore;
+
+  String displaymsg;
 
   _inGameState(this.firebaseGameObject, this.sim);
 
@@ -56,15 +67,17 @@ class _inGameState extends State<inGame>
       currentPlay = 0;
       currentInnings = 0;
       simulation = sim;
+      activePlayer = 0;
+      gameOver = false;
+      cupScore = 25;
+      displaymsg = "";
     });
 
     borderColor = Colors.transparent;
 
-    timer = Timer.periodic(
-        Duration(seconds: 5),
-        (Timer t) => simulation
-            ? onGameFetched(gameObjectPlayByPlay)
-            : fetchGameDetails());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
+    });
     fetchGameDetails();
   }
 
@@ -92,6 +105,20 @@ class _inGameState extends State<inGame>
   }
 
   void onGameFetched(GameObjectPlayByPlay value) {
+    if (gameOver) {
+      if (!dialogShown) {
+        Utils().showToast("Game Over", context);
+        setState(() {
+          dialogShown = true;
+        });
+      }
+      return;
+    }
+
+    if (value == null) {
+      print("Null Game Object");
+      return;
+    }
     setState(() {
       gameObjectPlayByPlay = value;
       fetching = false;
@@ -108,9 +135,17 @@ class _inGameState extends State<inGame>
         } else {
           var sizeOfPitchesInCurrentPlay = plays[currentPlay].pitches.length;
           if (sizeOfPitchesInCurrentPlay - 1 < currentPitch) {
-            currentPlay++;
-            currentPitch = 1;
-            currentInnings = plays[currentPlay].inningNumber - 1;
+            awardScoresToPlayers(plays[currentPlay]);
+            if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
+              currentPlay = currentPlay + 1;
+              changeActivePlayer();
+              currentPitch = 1;
+              currentInnings = plays[currentPlay].inningNumber - 1;
+            } else {
+              setState(() {
+                gameOver = true;
+              });
+            }
           } else {
             currentPitch++;
           }
@@ -125,6 +160,19 @@ class _inGameState extends State<inGame>
       var runsBattedIn = play.runsBattedIn;
       //print("Play $counter:\nResult: $result\nDescription: $description\nRuns Batted In: $runsBattedIn\n\n");
       counter++;
+    }
+  }
+
+  void changeActivePlayer() {
+    var length = firebaseGameObject.players.length;
+    if (activePlayer + 1 > length - 1) {
+      setState(() {
+        activePlayer = 0;
+      });
+    } else {
+      setState(() {
+        activePlayer++;
+      });
     }
   }
 
@@ -156,13 +204,36 @@ class _inGameState extends State<inGame>
     );
   }
 
+  getAnimatedWidget() {
+//    return PlayAnimation<Color>( // <-- specify type of animated variable
+//        tween: Colors.red.tweenTo(Colors.blue), // <-- define tween of colors
+//        builder: (context, child, value) { // <-- builder function
+//          return Container(
+//              color: value, // <-- use animated value
+//              width: 100,
+//              height: 100
+//          );
+//        });
+//  }
+  }
+
   Widget buildColumn() {
     return Container(
-      padding: EdgeInsets.only(top: 48),
+      padding: EdgeInsets.only(top: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
+          Visibility(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                displaymsg,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            visible: true,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -187,35 +258,31 @@ class _inGameState extends State<inGame>
               ],
             ),
           ),
-          Visibility(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Text(
-                "refreshing....",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            visible: false,
-          )
+
         ],
       ),
     );
   }
 
-  Column getScoreData() {
-    return Column(
-      children: <Widget>[
-        getPointsColumn(),
-        SizedBox(
-          height: 20,
-        ),
-        simulation ? getBSO() : getBSOLive(),
-        SizedBox(
-          height: 20,
-        ),
-        getPointsTable(),
-      ],
-    );
+  Widget getScoreData() {
+    try {
+      return Column(
+        children: <Widget>[
+          getPointsColumn(),
+          SizedBox(
+            height: 20,
+          ),
+          simulation ? getBSO() : getBSOLive(),
+          SizedBox(
+            height: 20,
+          ),
+          getPointsTable(),
+        ],
+      );
+    } catch (e) {
+      print(e);
+      return Text(e.message);
+    }
   }
 
   Widget getCurrentInningData() {
@@ -495,8 +562,10 @@ class _inGameState extends State<inGame>
   Widget getPlayersRow() {
     List<Widget> playersW = List();
     //playersW.add(getCupWidget());
+    var count = 0;
     for (Player player in firebaseGameObject.players) {
-      playersW.add(getPlayerWidget(player));
+      playersW.add(getPlayerWidget(player, active: count == activePlayer));
+      count++;
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -504,14 +573,18 @@ class _inGameState extends State<inGame>
     );
   }
 
-  Widget getPlayerWidget(Player player) {
+  Widget getPlayerWidget(Player player, {bool active = false}) {
     return Padding(
       padding: const EdgeInsets.only(right: 24.0),
       child: Column(
         children: <Widget>[
           CircleAvatar(
-            maxRadius: 20,
-            backgroundImage: AssetImage("assets/user.png"),
+            radius: active ? 22 : 20,
+            backgroundColor: Colors.yellow,
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage("assets/user.png"),
+            ),
           ),
           Text(
             player.name,
@@ -528,106 +601,111 @@ class _inGameState extends State<inGame>
     );
   }
 
-  Column getPointsColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                Text(
-                  gameObjectPlayByPlay.game.awayTeam,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.white),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.redAccent),
-                      child: Column(
-                        children: <Widget>[
-                          Text(
-                            getAwayTeamRuns().toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      )),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Container(
-                  margin: EdgeInsets.only(top: 20),
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Utils().getBlue()),
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        getCurrentInningNumber(),
+  Widget getPointsColumn() {
+    try {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Text(
+                    gameObjectPlayByPlay.game.awayTeam,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.redAccent),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              getAwayTeamRuns().toString(),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Utils().getBlue()),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          getCurrentInningNumber(),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )),
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    gameObjectPlayByPlay.game.homeTeam,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.redAccent),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              getHomeTeamRuns(),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )),
+                  ),
+                  /* Text(
+                        "Balls",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  )),
-            ),
-            Column(
-              children: <Widget>[
-                Text(
-                 gameObjectPlayByPlay.game.homeTeam,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.white),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.redAccent),
-                      child: Column(
-                        children: <Widget>[
-                          Text(
-                           getHomeTeamRuns(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      )),
-                ),
-                /* Text(
-                  "Balls",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white),
-                ),*/
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),*/
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+    } catch (e) {
+      print(e);
+      return Text(e.toString());
+    }
   }
 
   String getHomeTeamRuns() {
@@ -636,7 +714,7 @@ class _inGameState extends State<inGame>
     } else {
       var score = 0;
       for (int i = 0; i <= currentInnings; i++) {
-        score = gameObjectPlayByPlay.game.innings[i].homeTeamRuns+ score;
+        score = gameObjectPlayByPlay.game.innings[i].homeTeamRuns + score;
       }
       return score.toString();
     }
@@ -648,7 +726,7 @@ class _inGameState extends State<inGame>
     } else {
       var score = 0;
       for (int i = 0; i <= currentInnings; i++) {
-        score = gameObjectPlayByPlay.game.innings[i].awayTeamRuns+ score;
+        score = gameObjectPlayByPlay.game.innings[i].awayTeamRuns + score;
       }
       return score;
     }
@@ -741,7 +819,8 @@ class _inGameState extends State<inGame>
 
   List<Widget> getInningsScoreUptoNow() {
     List<Widget> widgets = List<Widget>();
-    widgets.add(getTextForTable(gameObjectPlayByPlay.game.homeTeam, wide: true, bold: true));
+    widgets.add(getTextForTable(gameObjectPlayByPlay.game.homeTeam,
+        wide: true, bold: true));
     for (int i = 0; i < 9; i++) {
       if (i <= currentInnings) {
         widgets.add(getTextForTable(
@@ -804,35 +883,41 @@ class _inGameState extends State<inGame>
   }
 
   Widget getBSO() {
-    Plays play = gameObjectPlayByPlay.plays[currentPlay];
-    Pitches pitch = play.pitches[currentPitch - 1];
+    try {
+      Plays play = gameObjectPlayByPlay.plays[currentPlay];
+      Pitches pitch = play.pitches[currentPitch - 1];
 
-    var ballsBeforePitch = pitch.ballsBeforePitch + (pitch.ball ? 1 : 0);
-    var strikesBeforePitch = pitch.strikesBeforePitch + (pitch.strike ? 1 : 0);
+      var ballsBeforePitch = pitch.ballsBeforePitch + (pitch.ball ? 1 : 0);
+      var strikesBeforePitch =
+          pitch.strikesBeforePitch + (pitch.strike ? 1 : 0);
 
-    var variable = 0;
-    if (!pitch.strike &&
-        !pitch.ball &&
-        !pitch.foul &&
-        !pitch.swinging &&
-        !pitch.looking &&
-        play.out) {
-      variable++;
+      var variable = 0;
+      if (!pitch.strike &&
+          !pitch.ball &&
+          !pitch.foul &&
+          !pitch.swinging &&
+          !pitch.looking &&
+          play.out) {
+        variable++;
+      }
+      var outs = pitch.outs + variable;
+      return Row(
+        children: <Widget>[
+          getDotView("BALL", ballsBeforePitch),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("STRIKE", strikesBeforePitch),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("OUT", outs),
+        ],
+      );
+    } catch (e) {
+      print(e);
+      return Text(e.toString());
     }
-    var outs = pitch.outs + variable;
-    return Row(
-      children: <Widget>[
-        getDotView("BALL", ballsBeforePitch),
-        SizedBox(
-          width: 30,
-        ),
-        getDotView("STRIKE", strikesBeforePitch),
-        SizedBox(
-          width: 30,
-        ),
-        getDotView("OUT", outs),
-      ],
-    );
   }
 
   Widget getBSOLive() {
@@ -883,7 +968,7 @@ class _inGameState extends State<inGame>
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "25",
+              cupScore.toString(),
               style: TextStyle(
                 fontSize: 50.0,
                 fontWeight: FontWeight.bold,
@@ -909,6 +994,86 @@ class _inGameState extends State<inGame>
         color: Colors.white70,
       ),
     );
+  }
+
+  void awardScoresToPlayers(Plays play) {
+    var result = play.result;
+    int pointsToBeAwarded = getPointsToBeAwardedByResult(result);
+    setState(() {
+      firebaseGameObject.players[activePlayer].gamescore =
+          firebaseGameObject.players[activePlayer].gamescore +
+              pointsToBeAwarded;
+      cupScore = cupScore - pointsToBeAwarded;
+      displaymsg = "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result";
+    });
+    print(
+        "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result");
+    updateFirebaseGameObject();
+  }
+
+  int getPointsToBeAwardedByResult(String result) {
+    int points = 0;
+    switch (result) {
+      case "Ground out":
+        points = -1;
+        break;
+      case "Single":
+        points = 1;
+        break;
+      case "Foul Out":
+        points = -1;
+        break;
+      case "Strikeout Swinging":
+        points = -2;
+        break;
+      case "Home Run":
+        points = cupScore;
+        break;
+      case "Walk":
+        points = 1;
+        break;
+      case "Fielder’s Choice":
+        points = -1;
+        break;
+      case "Pop Out":
+        points = -1;
+        break;
+      case "Lineout":
+        points = -1;
+        break;
+      case "Sacrifice Fly":
+        points = 1;
+        break;
+      case "Line into Double Play":
+        points = -2;
+        break;
+      case "Double":
+        points = 2;
+        break;
+      case "Hit by Pitch":
+        points = 1;
+        break;
+      case "Stolen Base":
+        points = 0;
+        break;
+      case "Sacrifice":
+        points = 0;
+        break;
+      case "Error":
+        points = -1;
+        break;
+      case "Intentional Walk":
+        points = 1;
+        break;
+      case "Triple":
+        points = 5;
+        break;
+    }
+    return points;
+  }
+
+  void updateFirebaseGameObject() {
+    Firestore.instance.collection('games').document(firebaseGameObject.gameCode).setData(firebaseGameObject.toJson());
   }
 }
 

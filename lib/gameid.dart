@@ -55,7 +55,12 @@ class _GameIdState extends State<GameId> {
         builder: (BuildContext context) {
           return new Lobby(_enteredGameId, true, user: user);
         },
-      ));
+      )).then((value) {
+        if(value == null){
+          Utils().showToast("No Game Found", context);
+        }
+        return null;
+      });
     } else {
       Utils().showToast("Invalid Game ID, must be 6 characters", context);
     }

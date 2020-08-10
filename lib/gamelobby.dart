@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,6 +49,9 @@ class LobbyState extends State<Lobby> {
       if (add) {
         addMeAsAPlayer();
       }
+    }).catchError((e){
+      //Utils().showToast("Error", context);
+      Navigator.pop(context);
     });
   }
 
@@ -205,11 +209,17 @@ class LobbyState extends State<Lobby> {
   }
 
   void openGameScreen(BuildContext context, bool simulation) {
-    Navigator.pop(context);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => inGame(firebaseGameObject, simulation: simulation,)));
+    firebaseGameObject.status = 1;
+    Firestore.instance.collection("games").document(firebaseGameObject.gameCode).setData(firebaseGameObject.toJson(), merge: true).then((value) {
+      Navigator.pop(context);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => inGame(firebaseGameObject, simulation: simulation,)));
+      return null;
+    }).catchError((onError)=>{
+      Utils().showToast(onError.message, context)
+    });
   }
 
   List<Widget> getAllPlayers() {

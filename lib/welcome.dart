@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/create-game.dart';
@@ -5,6 +8,7 @@ import 'package:passthecup/gameid.dart';
 import 'package:passthecup/invite.dart';
 import 'package:passthecup/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:share/share.dart';
 
 class Welcome extends StatefulWidget {
   @override
@@ -17,7 +21,7 @@ class _WelcomeState extends State<Welcome> {
   FirebaseUser user;
   bool isSignedIn = false;
   String gamerImage;
-
+  DocumentSnapshot firebaseUserObject;
   Color borderColor;
 
   //Todo : check if authenticated
@@ -41,6 +45,18 @@ class _WelcomeState extends State<Welcome> {
         this.isSignedIn = true;
         this.gamerImage = user.photoUrl;
       });
+      Firestore.instance
+          .collection("user")
+          .document(user.email)
+          .get()
+          .then((value) {
+        setState(() {
+          firebaseUserObject = value;
+        });
+        return null;
+      });
+    } else {
+      Utils().showToast("UserObject null", context);
     }
     print(
         "${user.displayName} is the gamer name with profile image url ${user.photoUrl}");
@@ -63,33 +79,58 @@ class _WelcomeState extends State<Welcome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Utils().getBGColor(),
-      appBar: AppBar(
-        elevation: 0,
-        brightness: Brightness.light,
+    if (firebaseUserObject != null) {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Utils().getBGColor(),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            size: 20,
-            color: Colors.black54,
+        appBar: AppBar(
+          elevation: 0,
+          brightness: Brightness.light,
+          backgroundColor: Utils().getBGColor(),
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Center(
+                child: Text(
+                  "Your coins💰: ${firebaseUserObject.data["score"]}",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
+                ),
+              ),
+            )
+          ],
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              size: 20,
+              color: Colors.transparent,
+            ),
           ),
         ),
-      ),
-      body: user == null
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : buildContainer(context),
-    );
+        body: user == null
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : buildContainer(context),
+      );
+    } else {
+      return Container(
+        color: Colors.white,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
   }
 
   Container buildContainer(BuildContext context) {
+    Color color = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+    String hex = "808080"; // color.value.toRadixString(16).substring(2);
     return Container(
       color: Utils().getBGColor(),
       height: MediaQuery.of(context).size.height,
@@ -101,37 +142,46 @@ class _WelcomeState extends State<Welcome> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Column(
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-//                    getAvatar(),
-                    FadeAnimation(
-                        1,
-                        Text(
-                          "Welcome",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold),
-                        )),
-                    FadeAnimation(
-                      1,
-                      Text(
-                        "${user.displayName == null ? user.email : user.displayName}",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    getAvatarWidget(hex),
                     SizedBox(
-                      height: 20,
+                      width: 10,
                     ),
-                    FadeAnimation(
-                        1.2,
-                        Text(
-                          "Total Coins : 250",
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        )),
+                    Column(
+                      children: <Widget>[
+//                    getAvatar(),
+                        FadeAnimation(
+                            1,
+                            Text(
+                              "Welcome",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold),
+                            )),
+                        FadeAnimation(
+                          1,
+                          Text(
+                            "${firebaseUserObject.data["name"] == null ? user.email : user.displayName}"
+                                .toUpperCase(),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        SizedBox(
+                          height: 0,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 FadeAnimation(
@@ -226,10 +276,12 @@ class _WelcomeState extends State<Welcome> {
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Invite()));
+                            Share.share(
+                                'Download the PassTheCup App from AppStore: https://apps.apple.com/in/app/facebook/id284882215');
+//                            Navigator.push(
+//                                context,
+//                                MaterialPageRoute(
+//                                    builder: (context) => Invite()));
                           },
                           color: Utils().getBlue(),
                           elevation: 0,
@@ -294,14 +346,24 @@ class _WelcomeState extends State<Welcome> {
     );
   }
 
+  FadeAnimation getAvatarWidget(String hex) {
+    return FadeAnimation(
+        1,
+        CircleAvatar(
+          radius: 20,
+          backgroundImage: NetworkImage(
+              "https://ui-avatars.com/api/?name=${user.displayName}&bold=true&background=$hex&color=ffffff"),
+        ));
+  }
+
   FadeAnimation getAvatar() {
     return FadeAnimation(
-                      1,
-                      CircleAvatar(
-                        backgroundImage: user.photoUrl != null
-                            ? NetworkImage("${user.photoUrl}")
-                            : AssetImage('asset/index.png'),
-                      ));
+        1,
+        CircleAvatar(
+          backgroundImage: user.photoUrl != null
+              ? NetworkImage("${user.photoUrl}")
+              : AssetImage('asset/index.png'),
+        ));
   }
 
   Widget makeInput({label, obscureText = false}) {

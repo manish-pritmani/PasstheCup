@@ -158,10 +158,12 @@ class _CreateGameState extends State<CreateGame> {
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
-                            if (_currenteam!=null && _currengame!=null) {
+                            if (_currenteam != null && _currengame != null) {
                               createGameAndEnter(context);
                             } else {
-                              Utils().showToast("Select Team and Game before creating game", context);
+                              Utils().showToast(
+                                  "Select Team and Game before creating game",
+                                  context);
                             }
                           },
                           color: Colors.redAccent,
@@ -199,6 +201,9 @@ class _CreateGameState extends State<CreateGame> {
     List<Map<String, dynamic>> players = List();
     var player = Player(
         name: user.displayName, email: user.email, gamescore: 0, host: true);
+    players.add(player.toJson());
+    players.add(player.toJson());
+    players.add(player.toJson());
     players.add(player.toJson());
     String gameID = generateGameID();
     var map = {
