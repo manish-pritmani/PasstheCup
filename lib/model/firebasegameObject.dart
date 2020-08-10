@@ -34,7 +34,8 @@ class FirebaseGameObject {
     hostID = json['hostID'];
     gameCode = json['gameCode'];
     if (json['selectedGame'] != null) {
-      selectedGame = new GameObject.fromJson(json['selectedGame']);
+      var jsonSelectedGame = json['selectedGame'];
+      selectedGame = new GameObject.fromJson(jsonSelectedGame);
     } else {
       selectedGame = null;
     }
