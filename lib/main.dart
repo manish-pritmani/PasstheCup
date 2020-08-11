@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/login.dart';
@@ -9,20 +10,33 @@ import 'package:passthecup/utils.dart';
 import 'package:passthecup/welcome.dart';
 
 void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: HomePage(),
-    routes: {
-      //Todo : created routes for quick navigation within app
-      '/decide': (BuildContext context) => HomePage(),
+  runApp(Phoenix(
+    child: MyApp(),
+  ),);
+}
 
-      '/signin': (BuildContext context) => LoginPage(),
+class MyApp extends StatelessWidget {
+  const MyApp({
+    Key key,
+  }) : super(key: key);
 
-      '/signup': (BuildContext context) => SignupPage(),
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
+      routes: {
+        //Todo : created routes for quick navigation within app
+        '/decide': (BuildContext context) => HomePage(),
 
-      '/welcome': (BuildContext context) => Welcome(),
-    },
-  ));
+        '/signin': (BuildContext context) => LoginPage(),
+
+        '/signup': (BuildContext context) => SignupPage(),
+
+        '/welcome': (BuildContext context) => Welcome(),
+      },
+    );
+  }
 }
 
 class HomePage extends StatefulWidget {

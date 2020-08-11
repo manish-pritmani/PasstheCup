@@ -75,7 +75,7 @@ class _inGameState extends State<inGame>
 
     borderColor = Colors.transparent;
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
       simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
     });
     fetchGameDetails();
@@ -92,8 +92,7 @@ class _inGameState extends State<inGame>
     setState(() {
       fetching = true;
     });
-    API()
-        .fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
+    API().fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
         .then((value) {
       onGameFetched(value);
       return null;
@@ -219,14 +218,14 @@ class _inGameState extends State<inGame>
 
   Widget buildColumn() {
     return Container(
-      padding: EdgeInsets.only(top: 20),
+      padding: EdgeInsets.only(top: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Visibility(
             child: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+              padding: const EdgeInsets.only(top: 8.0),
               child: Text(
                 displaymsg,
                 style: TextStyle(color: Colors.white),
@@ -235,7 +234,7 @@ class _inGameState extends State<inGame>
             visible: true,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               getCurrentPlayersInfo(),
               getCurrentInningData(),
@@ -246,13 +245,13 @@ class _inGameState extends State<inGame>
             height: 15,
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 100.0),
-            child: Row(
+            padding: const EdgeInsets.only(left: 15.0),
+            child: Row(     mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 getCupWidget(),
                 SizedBox(
-                  width: 100,
+                  width: 0,
                 ),
                 getPlayersRow(),
               ],
@@ -264,29 +263,34 @@ class _inGameState extends State<inGame>
     );
   }
 
-  Widget getScoreData() {
+  Container getScoreData() {
     try {
-      return Column(
-        children: <Widget>[
-          getPointsColumn(),
-          SizedBox(
-            height: 20,
-          ),
-          simulation ? getBSO() : getBSOLive(),
-          SizedBox(
-            height: 20,
-          ),
-          getPointsTable(),
-        ],
+      return Container(width: MediaQuery.of(context).size.width * .49,
+        alignment: Alignment.center,
+        padding:EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: <Widget>[
+            getPointsColumn(),
+            SizedBox(
+              height: 20,
+            ),
+            simulation ? getBSO() : getBSOLive(),
+            SizedBox(
+              height: 20,
+            ),
+            getPointsTable(),
+          ],
+        ),
       );
     } catch (e) {
       print(e);
-      return Text(e.message);
+      return Container(child: Text(e.message));
     }
   }
 
-  Widget getCurrentInningData() {
-    return Container(
+  Container getCurrentInningData() {
+    return Container(         alignment: Alignment.center,
+        width: MediaQuery.of(context).size.width * .23,
         padding: EdgeInsets.only(top: 3, left: 3),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -337,7 +341,7 @@ class _inGameState extends State<inGame>
           Text(
             "Pitch " + index.toString(),
             style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
           ),
           SizedBox(
             width: 20,
@@ -345,7 +349,7 @@ class _inGameState extends State<inGame>
           Text(
             getResultForPitch(pitch),
             style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -417,117 +421,132 @@ class _inGameState extends State<inGame>
     );
   }
 
-  Column getCurrentPlayersInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                  padding: EdgeInsets.only(top: 3, left: 0),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border(
-                        bottom: BorderSide(color: borderColor),
-                        top: BorderSide(color: borderColor),
-                        left: BorderSide(color: borderColor),
-                        right: BorderSide(color: borderColor),
-                      )),
-                  child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(0),
-                          color: Colors.transparent),
-                      child: Column(
-                        children: <Widget>[
-                          Image.network(
-                            "https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10005716.png",
-                            width: 75,
-                            height: 75,
-                          )
-                        ],
-                      ))),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "Current Hitter",
-                  style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400),
-                ),
-                Text(
-                  gameObjectPlayByPlay == null || gameObjectPlayByPlay == null
-                      ? "Loading..."
-                      : getBatterNameText(),
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            )
-          ],
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                  padding: EdgeInsets.only(top: 3, left: 3),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(0),
-                      border: Border(
-                        bottom: BorderSide(color: borderColor),
-                        top: BorderSide(color: borderColor),
-                        left: BorderSide(color: borderColor),
-                        right: BorderSide(color: borderColor),
-                      )),
-                  child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.transparent),
-                      child: Column(
-                        children: <Widget>[
-                          Image.network(
-                            "https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10000242.png",
-                            width: 75,
-                            height: 75,
-                          )
-                        ],
-                      ))),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "Current Pitcher",
-                  style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400),
-                ),
-                Text(
-                  gameObjectPlayByPlay == null ||
-                          gameObjectPlayByPlay.game == null
-                      ? "Loading..."
-                      : getPitcherNAmeText(),
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            )
-          ],
-        ),
-      ],
+  Container getCurrentPlayersInfo() {
+    return Container(
+      width: MediaQuery.of(context).size.width * .28,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          IconButton(icon: Icon(Icons.close, color: Colors.white,), onPressed:(){
+              Utils().showToast("Are you sure you want to exit the game?", context, ok:(){
+                Navigator.pop(context);
+              }, cancel:true, oktext: "Exit Game");
+          }),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                    padding: EdgeInsets.only(top: 3, left: 0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border(
+                          bottom: BorderSide(color: borderColor),
+                          top: BorderSide(color: borderColor),
+                          left: BorderSide(color: borderColor),
+                          right: BorderSide(color: borderColor),
+                        )),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(0),
+                            color: Colors.transparent),
+                        child: Column(
+                          children: <Widget>[
+                            Image.network(
+                              "https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10005716.png",
+                              width: 50,
+                              height: 50,
+                            )
+                          ],
+                        ))),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Current Hitter",
+                    style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox( width: 100,
+                    child: Text(
+                      gameObjectPlayByPlay == null || gameObjectPlayByPlay == null
+                          ? "Loading..."
+                          : getBatterNameText(),
+                      softWrap: true,
+                      overflow: TextOverflow.fade,
+                      maxLines: 5,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                    padding: EdgeInsets.only(top: 3, left: 3),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(0),
+                        border: Border(
+                          bottom: BorderSide(color: borderColor),
+                          top: BorderSide(color: borderColor),
+                          left: BorderSide(color: borderColor),
+                          right: BorderSide(color: borderColor),
+                        )),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.transparent),
+                        child: Column(
+                          children: <Widget>[
+                            Image.network(
+                              "https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10000242.png",
+                              width: 50,
+                              height: 50,
+                            )
+                          ],
+                        ))),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Current Pitcher",
+                    style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox( width: 100,
+                    child: Text(
+                      gameObjectPlayByPlay == null ||
+                              gameObjectPlayByPlay.game == null
+                          ? "Loading..."
+                          : getPitcherNAmeText(), softWrap: true,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -579,23 +598,25 @@ class _inGameState extends State<inGame>
       child: Column(
         children: <Widget>[
           CircleAvatar(
-            radius: active ? 22 : 20,
+            radius: active ? 17 : 15,
             backgroundColor: Colors.yellow,
             child: CircleAvatar(
-              radius: 20,
-              backgroundImage: AssetImage("assets/user.png"),
+              radius: 15,
+              backgroundImage: NetworkImage(
+                  "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff"),
             ),
           ),
           Text(
             player.name,
             style: TextStyle(
-                color: Colors.white, fontSize: 15, fontWeight: FontWeight.w400),
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
           ),
           Text(
             "${player.gamescore} Points",
             style: TextStyle(
-                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
+                color: Colors.white, fontSize: 10, fontWeight: FontWeight.w400),
           ),
+          active?Image.asset("assets/logo.png", width: 25, height: 25, fit:BoxFit.contain):SizedBox(width: 25, height: 25,),
         ],
       ),
     );
@@ -617,13 +638,13 @@ class _inGameState extends State<inGame>
                     gameObjectPlayByPlay.game.awayTeam,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 14,
                         color: Colors.white),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.redAccent),
@@ -633,7 +654,7 @@ class _inGameState extends State<inGame>
                               getAwayTeamRuns().toString(),
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 40,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -645,7 +666,7 @@ class _inGameState extends State<inGame>
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child: Container(
                     margin: EdgeInsets.only(top: 20),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Utils().getBlue()),
@@ -655,7 +676,7 @@ class _inGameState extends State<inGame>
                           getCurrentInningNumber(),
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -667,13 +688,13 @@ class _inGameState extends State<inGame>
                     gameObjectPlayByPlay.game.homeTeam,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 14,
                         color: Colors.white),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.redAccent),
@@ -683,7 +704,7 @@ class _inGameState extends State<inGame>
                               getHomeTeamRuns(),
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 40,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -710,7 +731,7 @@ class _inGameState extends State<inGame>
 
   String getHomeTeamRuns() {
     if (!simulation) {
-      return gameObjectPlayByPlay.game.homeTeam;
+      return gameObjectPlayByPlay.game.homeTeamRuns.toString();
     } else {
       var score = 0;
       for (int i = 0; i <= currentInnings; i++) {
@@ -737,13 +758,13 @@ class _inGameState extends State<inGame>
       var play = gameObjectPlayByPlay.plays[currentPlay];
       int number = play.inningNumber;
       if (number == 1) {
-        return number.toString() + "st (${play.inningHalf})";
+        return number.toString() + "st(${play.inningHalf})";
       } else if (number == 2) {
-        return number.toString() + "nd  (${play.inningHalf})";
+        return number.toString() + "nd (${play.inningHalf})";
       } else if (number == 3) {
-        return number.toString() + "rd  (${play.inningHalf})";
+        return number.toString() + "rd (${play.inningHalf})";
       } else {
-        return number.toString() + "th  (${play.inningHalf})";
+        return number.toString() + "th (${play.inningHalf})";
       }
     } catch (e) {
       print(e);
@@ -875,9 +896,9 @@ class _inGameState extends State<inGame>
       child: Text(
         text,
         style: TextStyle(
-            fontWeight: bold ? FontWeight.bold : null, color: Colors.white),
+            fontWeight: bold ? FontWeight.bold : null, color: Colors.white, fontSize: 13),
       ),
-      height: 25,
+      height: 23,
       width: wide ? 50 : 25,
     );
   }
@@ -901,7 +922,8 @@ class _inGameState extends State<inGame>
         variable++;
       }
       var outs = pitch.outs + variable;
-      return Row(
+      return Row(  mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           getDotView("BALL", ballsBeforePitch),
           SizedBox(
@@ -921,7 +943,8 @@ class _inGameState extends State<inGame>
   }
 
   Widget getBSOLive() {
-    return Row(
+    return Row( mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         getDotView("BALL", gameObjectPlayByPlay.plays[currentPlay].balls),
         SizedBox(
@@ -946,10 +969,10 @@ class _inGameState extends State<inGame>
         Text(
           title,
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
         ),
         SizedBox(
-          height: 5,
+          height: 0,
         ),
         Text(dots,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -960,8 +983,8 @@ class _inGameState extends State<inGame>
   Widget getCupWidget() {
     return Container(
       margin: EdgeInsets.only(right: 26),
-      width: 100,
-      height: 100,
+      width: 80,
+      height: 80,
       child: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -970,13 +993,13 @@ class _inGameState extends State<inGame>
             Text(
               cupScore.toString(),
               style: TextStyle(
-                fontSize: 50.0,
+                fontSize: 30.0,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             Text(
-              "Cup Points",
+              "Cup\nPoints",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.bold,

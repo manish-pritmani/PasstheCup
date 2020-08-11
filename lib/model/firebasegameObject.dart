@@ -13,6 +13,8 @@ class FirebaseGameObject {
   GameObject selectedGame;
   String createdOn;
   int status;
+  int cupScore;
+  bool simulation;
   List<Player> players;
 
   FirebaseGameObject(
@@ -23,8 +25,8 @@ class FirebaseGameObject {
         this.players,
         this.hostID,
         this.gameCode,
-        this.selectedGame,
-        this.createdOn,
+        this.selectedGame, this.cupScore,
+        this.createdOn, this.simulation,
         this.status});
 
   FirebaseGameObject.fromJson(Map<String, dynamic> json) {
@@ -46,7 +48,9 @@ class FirebaseGameObject {
       selectedTeam = null;
     }
     createdOn = json['createdOn'];
+    simulation = json['simulation'];
     status = json['status'];
+    cupScore = json['cupScore'];
     if (json['players'] != null) {
       players = new List<Player>();
       json['players'].forEach((v) {
@@ -62,7 +66,9 @@ class FirebaseGameObject {
       data['selectedTeam'] = this.selectedTeam.toJson();
     }
     data['creatorId'] = this.creatorId;
+    data['cupScore'] = this.cupScore;
     data['name'] = this.name;
+    data['simulation'] = simulation;
     data['hostID'] = this.hostID;
     data['gameCode'] = this.gameCode;
     if (this.selectedGame != null) {

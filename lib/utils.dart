@@ -29,7 +29,7 @@ class Utils{
     return  Hexcolor("#304ffe");
   }
 
-  showToast(String text, BuildContext context, {Function() ok}) {
+  showToast(String text, BuildContext context, {Function() ok, bool cancel=false, String oktext="OK", String noText="Cancel"}) {
     showDialog(
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
@@ -37,8 +37,8 @@ class Utils{
           content: new Text(text),
           actions: <Widget>[
             CupertinoDialogAction(
-              isDefaultAction: true,
-              child: Text("OK"),
+              isDefaultAction: !cancel,
+              child: Text(oktext),
               onPressed: () {
                 Navigator.pop(context);
                 if (ok != null) {
@@ -46,9 +46,12 @@ class Utils{
                 }
               },
             ),
-//            CupertinoDialogAction(
-//              child: Text("No"),
-//            )
+            cancel?CupertinoDialogAction(
+              child: Text(noText),
+              onPressed: (){
+                Navigator.pop(context);
+              },
+            ):null,
           ],
         ));
   }

@@ -47,7 +47,9 @@ class _LoginPageState extends State<LoginPage> {
           },
         ));
       } catch (e) {
-        showError(e);
+//        showError(e);
+      Navigator.pop(context);       
+      Utils().showToast("Wrong credentials", context);
       }
     }
   }

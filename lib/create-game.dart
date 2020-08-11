@@ -202,8 +202,7 @@ class _CreateGameState extends State<CreateGame> {
     var player = Player(
         name: user.displayName, email: user.email, gamescore: 0, host: true);
     players.add(player.toJson());
-    players.add(player.toJson());
-    players.add(player.toJson());
+    player.host = false;
     players.add(player.toJson());
     String gameID = generateGameID();
     var map = {
@@ -217,6 +216,7 @@ class _CreateGameState extends State<CreateGame> {
       "gameCode": gameID,
       "createdOn": DateTime.now().toString(),
       "players": players,
+      "simulation": false,
     };
     Firestore.instance
         .collection("games")

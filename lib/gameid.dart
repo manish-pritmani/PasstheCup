@@ -51,12 +51,12 @@ class _GameIdState extends State<GameId> {
 //      print(result.data);
 //    });
     if (_enteredGameId.length == 6) {
-      Navigator.of(context).push(new MaterialPageRoute<Lobby>(
+      Navigator.of(context).push(new MaterialPageRoute<bool>(
         builder: (BuildContext context) {
           return new Lobby(_enteredGameId, true, user: user);
         },
       )).then((value) {
-        if(value == null){
+        if(value){
           Utils().showToast("No Game Found", context);
         }
         return null;
@@ -128,15 +128,6 @@ class _GameIdState extends State<GameId> {
                         ],
                       ),
                     ),
-                    FadeAnimation(
-                        1.2,
-                        Text(
-                          "Your Coins : 100",
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold),
-                        )),
                   ],
                 ),
                 FadeAnimation(

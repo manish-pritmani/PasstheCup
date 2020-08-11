@@ -2,10 +2,11 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/create-game.dart';
 import 'package:passthecup/gameid.dart';
-import 'package:passthecup/invite.dart';
+import 'package:passthecup/restartwidget.dart';
 import 'package:passthecup/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share/share.dart';
@@ -65,6 +66,7 @@ class _WelcomeState extends State<Welcome> {
   //TODO: Implement logout button somewhere in welcome screen
   signout() async {
     _auth.signOut();
+//   Phoenix.rebirth(context);
   }
 
   @override
@@ -166,7 +168,7 @@ class _WelcomeState extends State<Welcome> {
                         FadeAnimation(
                           1,
                           Text(
-                            "${firebaseUserObject.data["name"] == null ? user.email : user.displayName}"
+                            "${firebaseUserObject.data["name"] == null ? user.email : firebaseUserObject.data["name"]}"
                                 .toUpperCase(),
                             style: TextStyle(
                                 color: Colors.black,
@@ -352,7 +354,7 @@ class _WelcomeState extends State<Welcome> {
         CircleAvatar(
           radius: 20,
           backgroundImage: NetworkImage(
-              "https://ui-avatars.com/api/?name=${user.displayName}&bold=true&background=$hex&color=ffffff"),
+              "https://ui-avatars.com/api/?name=${firebaseUserObject.data["name"]}&bold=true&background=$hex&color=ffffff"),
         ));
   }
 

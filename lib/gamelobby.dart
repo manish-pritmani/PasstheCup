@@ -49,11 +49,11 @@ class LobbyState extends State<Lobby> {
       if (add) {
         addMeAsAPlayer();
       }
-    }).catchError((e){
-      Utils().showToast(e.toString(), context, ok: (){
-        Navigator.pop(context);
-      });
-
+    }).catchError((e) {
+//      Utils().showToast(e.toString(), context, ok: (){
+//        Navigator.pop(context);
+//      });
+      Navigator.pop(context, false);
     });
   }
 
@@ -69,8 +69,8 @@ class LobbyState extends State<Lobby> {
   void addMeAsAPlayer() {
     var email = user.email;
     if (/*!exists(email) &&*/ !isAdded) {
-      firebaseGameObject.players
-          .add(Player(name: user.displayName, email: email, gamescore: 0, host: false));
+      firebaseGameObject.players.add(Player(
+          name: user.displayName, email: email, gamescore: 0, host: false));
       isAdded = true;
     }
     var document = Firestore.instance.collection('games').document(gameID);
@@ -109,7 +109,7 @@ class LobbyState extends State<Lobby> {
       alignment: Alignment.center,
       child: Column(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -121,10 +121,10 @@ class LobbyState extends State<Lobby> {
               ),
               getGameCodeWidget(),
               SizedBox(
-                height: 50,
+                height: 20,
               ),
               Text(
-                "Players in Lobby",
+                "Players in Lobby (${firebaseGameObject.players.length})",
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 22,
@@ -136,11 +136,13 @@ class LobbyState extends State<Lobby> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 40),
                 child: Container(
+                    height: 220,
+                    alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.redAccent),
-                    child: Column(
+                    child: ListView(
                       children: getAllPlayers(),
                     )),
               ),
@@ -153,14 +155,20 @@ class LobbyState extends State<Lobby> {
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: () {
-                    showAlertDialog(context, "Start in Simulation Mode?", "Simulation", "Yes", "No");
+                    if (!add) {
+                      showAlertDialog(context, "Start in Simulation Mode?",
+                          "Simulation", "Yes", "No");
+                    } else {
+                      Utils().showToast(
+                          "Wait for host to start the game", context);
+                    }
                   },
                   color: Utils().getBlue(),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50)),
                   child: Text(
-                    "START GAME",
+                    add ? "WAITING FOR GAME TO START" : "START GAME",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -212,16 +220,23 @@ class LobbyState extends State<Lobby> {
 
   void openGameScreen(BuildContext context, bool simulation) {
     firebaseGameObject.status = 1;
-    Firestore.instance.collection("games").document(firebaseGameObject.gameCode).setData(firebaseGameObject.toJson(), merge: true).then((value) {
+    firebaseGameObject.simulation=simulation;
+    firebaseGameObject.cupScore = firebaseGameObject.players.length * 5;
+    Firestore.instance
+        .collection("games")
+        .document(firebaseGameObject.gameCode)
+        .setData(firebaseGameObject.toJson(), merge: true)
+        .then((value) {
       Navigator.pop(context);
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => inGame(firebaseGameObject, simulation: simulation,)));
+              builder: (context) => inGame(
+                    firebaseGameObject,
+                    simulation: simulation,
+                  )));
       return null;
-    }).catchError((onError)=>{
-      Utils().showToast(onError.message, context)
-    });
+    }).catchError((onError) => {Utils().showToast(onError.message, context)});
   }
 
   List<Widget> getAllPlayers() {
@@ -362,7 +377,8 @@ class LobbyState extends State<Lobby> {
         children: <Widget>[
           CircleAvatar(
             maxRadius: 15,
-            backgroundImage: AssetImage("assets/user.png"),
+            backgroundImage: NetworkImage(
+                "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff"),
           ),
           SizedBox(
             width: 10,
@@ -422,7 +438,8 @@ class LobbyState extends State<Lobby> {
     setState(() {
       firebaseGameObject = FirebaseGameObject.fromJson(map);
     });
+    if(firebaseGameObject.status==1){
+      openGameScreen(context, firebaseGameObject.simulation);
+    }
   }
-
-
 }

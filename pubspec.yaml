@@ -33,6 +33,7 @@ dependencies:
   sa_stateless_animation: ^1.0.1
   supercharged: ^1.8.2
   share: ^0.6.4+3
+  flutter_phoenix: ^0.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
