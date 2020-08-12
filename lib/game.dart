@@ -59,6 +59,10 @@ class _inGameState extends State<inGame>
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
     if (sim == null) {
       sim = false;
     }
@@ -69,7 +73,7 @@ class _inGameState extends State<inGame>
       simulation = sim;
       activePlayer = 0;
       gameOver = false;
-      cupScore = 25;
+      cupScore = firebaseGameObject.cupScore;
       displaymsg = "";
     });
 
@@ -241,9 +245,10 @@ class _inGameState extends State<inGame>
               getScoreData(),
             ],
           ),
-          SizedBox(
-            height: 15,
-          ),
+//          SizedBox(
+//            height: 15,
+//          ),
+          buildResultWidget(),
           Padding(
             padding: const EdgeInsets.only(left: 15.0),
             child: Row(     mainAxisAlignment: MainAxisAlignment.center,
@@ -261,6 +266,24 @@ class _inGameState extends State<inGame>
         ],
       ),
     );
+  }
+
+  Widget buildResultWidget() {
+    try {
+      return Visibility(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                  child: Text(
+                    gameObjectPlayByPlay.plays[currentPlay-1].description,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                visible: true,
+              );
+    } catch (e) {
+      print(e);
+      return SizedBox();
+    }
   }
 
   Container getScoreData() {
@@ -1031,7 +1054,7 @@ class _inGameState extends State<inGame>
     });
     print(
         "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result");
-    updateFirebaseGameObject();
+   // updateFirebaseGameObject();
   }
 
   int getPointsToBeAwardedByResult(String result) {
