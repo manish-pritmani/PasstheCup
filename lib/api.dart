@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:passthecup/model/gameObjectPlaybyPlay.dart';
 import 'package:passthecup/model/teamobject.dart';
+import 'model/fullplayerobject.dart';
 import 'model/gameObject.dart';
 
 class API {
@@ -58,6 +59,27 @@ class API {
       // If the server did not return a 200 OK response,
       // then throw an exception.
       throw Exception('Failed to load game data');
+    }
+  }
+
+  Future<String> fetchPlayerImage(int hitterID) async {
+    var url = "https://api.sportsdata.io/v3/mlb/scores/json/Player/$hitterID$keyString";
+    final response =
+        await http.get(url);
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        return FullPlayerObject.fromJson(json.decode(response.body)).photoUrl;
+      } catch (e) {
+        print(e);
+        return "";
+      }
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      return "";
     }
   }
 }

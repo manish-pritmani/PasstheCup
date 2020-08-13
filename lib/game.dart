@@ -59,6 +59,9 @@ class _inGameState extends State<inGame>
 
   int awayTeamRuns;
 
+  String hitterImageLink;
+  String pitcherImageLink;
+
   _inGameState(this.firebaseGameObject, this.sim);
 
   @override
@@ -84,6 +87,8 @@ class _inGameState extends State<inGame>
       lastScoreUpdatedinPlay = -1;
       homeTeamRuns = 0;
       awayTeamRuns = 0;
+      hitterImageLink = "";
+      pitcherImageLink = "";
     });
 
     borderColor = Colors.transparent;
@@ -154,6 +159,8 @@ class _inGameState extends State<inGame>
               changeActivePlayer();
               updateAwayTeamRuns();
               updateHomeTeamRuns();
+              fetchHitterProfilePicture();
+              fetchPitcherProfilePicture();
               currentPitch = 1;
               currentInnings = plays[currentPlay].inningNumber - 1;
             } else {
@@ -500,13 +507,7 @@ class _inGameState extends State<inGame>
                             borderRadius: BorderRadius.circular(0),
                             color: Colors.transparent),
                         child: Column(
-                          children: <Widget>[
-                            Image.network(
-                              "https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10005716.png",
-                              width: 50,
-                              height: 50,
-                            )
-                          ],
+                          children: <Widget>[getHitterImage()],
                         ))),
               ),
               Column(
@@ -561,13 +562,7 @@ class _inGameState extends State<inGame>
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.transparent),
                         child: Column(
-                          children: <Widget>[
-                            Image.network(
-                              "https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10000242.png",
-                              width: 50,
-                              height: 50,
-                            )
-                          ],
+                          children: <Widget>[getPitcherImage()],
                         ))),
               ),
               Column(
@@ -601,6 +596,36 @@ class _inGameState extends State<inGame>
         ],
       ),
     );
+  }
+
+  Widget getPitcherImage() {
+    if (true) {
+      return Image.network(
+        pitcherImageLink,
+        width: 50,
+        height: 50,
+      );
+    } else {
+      return SizedBox(
+        width: 50,
+        height: 50,
+      );
+    }
+  }
+
+  Widget getHitterImage() {
+    if (true) {
+      return Image.network(
+        hitterImageLink,
+        width: 50,
+        height: 50,
+      );
+    } else {
+      return SizedBox(
+        width: 50,
+        height: 50,
+      );
+    }
   }
 
   String getImageURLFor() {
@@ -792,7 +817,7 @@ class _inGameState extends State<inGame>
     if (currentPlay != lastScoreUpdatedinPlay) {
       var score = 0;
       for (int i = 0; i <= currentPlay; i++) {
-        if (gameObjectPlayByPlay.plays[i].inningHalf=="B") {
+        if (gameObjectPlayByPlay.plays[i].inningHalf == "B") {
           score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
         }
       }
@@ -804,18 +829,18 @@ class _inGameState extends State<inGame>
   }
 
   void updateAwayTeamRuns() {
-      if (currentPlay != lastScoreUpdatedinPlay) {
-        var score = 0;
-        for (int i = 0; i <= currentPlay; i++) {
-          if (gameObjectPlayByPlay.plays[i].inningHalf=="T") {
-            score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
-          }
+    if (currentPlay != lastScoreUpdatedinPlay) {
+      var score = 0;
+      for (int i = 0; i <= currentPlay; i++) {
+        if (gameObjectPlayByPlay.plays[i].inningHalf == "T") {
+          score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
         }
-        setState(() {
-          awayTeamRuns = score;
-          lastScoreUpdatedinPlay = currentPlay;
-        });
       }
+      setState(() {
+        awayTeamRuns = score;
+        lastScoreUpdatedinPlay = currentPlay;
+      });
+    }
   }
 
   String getCurrentInningNumber() {
@@ -1170,6 +1195,36 @@ class _inGameState extends State<inGame>
         .collection('games')
         .document(firebaseGameObject.gameCode)
         .setData(firebaseGameObject.toJson());
+  }
+
+  void fetchHitterProfilePicture() {
+    try {
+      API()
+          .fetchPlayerImage(gameObjectPlayByPlay.plays[currentPlay].hitterID)
+          .then((value) {
+        setState(() {
+          hitterImageLink = value;
+        });
+        return null;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void fetchPitcherProfilePicture() {
+    try {
+      API()
+          .fetchPlayerImage(gameObjectPlayByPlay.plays[currentPlay].pitcherID)
+          .then((value) {
+        setState(() {
+          pitcherImageLink = value;
+        });
+        return null;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }
 
