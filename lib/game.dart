@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
 import 'package:passthecup/model/gameObjectPlaybyPlay.dart';
+import 'package:passthecup/resultscreen.dart';
 import 'package:passthecup/utils.dart';
 import 'package:sa_stateless_animation/sa_stateless_animation.dart';
 
@@ -82,6 +83,7 @@ class _inGameState extends State<inGame>
       simulation = sim;
       activePlayer = 0;
       gameOver = false;
+      dialogShown = false;
       cupScore = firebaseGameObject.cupScore;
       displaymsg = "";
       lastScoreUpdatedinPlay = -1;
@@ -124,8 +126,13 @@ class _inGameState extends State<inGame>
 
   void onGameFetched(GameObjectPlayByPlay value) {
     if (gameOver) {
-      if (!dialogShown) {
-        Utils().showToast("Game Over", context);
+      if (dialogShown) {
+        //Utils().showToast("Game Over", context, oktext: "Show Results");
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (BuildContext context) {
+            return ResultScreen();
+          },
+        ));
         setState(() {
           dialogShown = true;
         });
@@ -180,7 +187,21 @@ class _inGameState extends State<inGame>
       var result = play.result;
       var description = play.description;
       var runsBattedIn = play.runsBattedIn;
-      //print("Play $counter:\nResult: $result\nDescription: $description\nRuns Batted In: $runsBattedIn\n\n");
+      if (play.inningHalf == "T") {
+        print(
+            "Play $counter:Runs Batted In: $runsBattedIn\nTeam: ${play.inningHalf}");
+      }
+      counter++;
+    }
+
+    for (Plays play in gameObjectPlayByPlay.plays) {
+      var result = play.result;
+      var description = play.description;
+      var runsBattedIn = play.runsBattedIn;
+      if (play.inningHalf == "B") {
+        print(
+            "Play $counter:Runs Batted In: $runsBattedIn\nTeam: ${play.inningHalf}");
+      }
       counter++;
     }
   }
@@ -814,33 +835,29 @@ class _inGameState extends State<inGame>
   }
 
   void updateHomeTeamRuns() {
-    if (currentPlay != lastScoreUpdatedinPlay) {
-      var score = 0;
-      for (int i = 0; i <= currentPlay; i++) {
-        if (gameObjectPlayByPlay.plays[i].inningHalf == "B") {
-          score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
-        }
+    var score = 0;
+    for (int i = 0; i <= currentPlay; i++) {
+      if (gameObjectPlayByPlay.plays[i].inningHalf == "B") {
+        score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
       }
-      setState(() {
-        lastScoreUpdatedinPlay = currentPlay;
-        homeTeamRuns = score;
-      });
     }
+    setState(() {
+      lastScoreUpdatedinPlay = currentPlay;
+      homeTeamRuns = score;
+    });
   }
 
   void updateAwayTeamRuns() {
-    if (currentPlay != lastScoreUpdatedinPlay) {
-      var score = 0;
-      for (int i = 0; i <= currentPlay; i++) {
-        if (gameObjectPlayByPlay.plays[i].inningHalf == "T") {
-          score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
-        }
+    var score = 0;
+    for (int i = 0; i <= currentPlay; i++) {
+      if (gameObjectPlayByPlay.plays[i].inningHalf == "T") {
+        score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
       }
-      setState(() {
-        awayTeamRuns = score;
-        lastScoreUpdatedinPlay = currentPlay;
-      });
     }
+    setState(() {
+      awayTeamRuns = score;
+      lastScoreUpdatedinPlay = currentPlay;
+    });
   }
 
   String getCurrentInningNumber() {
@@ -865,13 +882,16 @@ class _inGameState extends State<inGame>
   getPointsTable() {
     return FittedBox(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
+            alignment: Alignment.centerLeft,
             child: Row(
               children: getInningsUptoNow(),
             ),
           ),
           Container(
+            alignment: Alignment.centerLeft,
             decoration: BoxDecoration(
                 border: Border(
               bottom: BorderSide(color: Colors.white),
@@ -880,8 +900,11 @@ class _inGameState extends State<inGame>
               right: BorderSide(color: Colors.white),
             )),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
+                  alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
                       border: Border(
                     bottom: BorderSide(color: Colors.white),
@@ -894,6 +917,7 @@ class _inGameState extends State<inGame>
                   ),
                 ),
                 Container(
+                  alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
                       border: Border(
                     bottom: BorderSide(color: Colors.white),
@@ -918,9 +942,17 @@ class _inGameState extends State<inGame>
     widgets.add(getTextForTable(gameObjectPlayByPlay.game.awayTeam,
         wide: true, bold: true));
     for (int i = 0; i < 9; i++) {
-      if (i <= currentInnings) {
+      if (i < currentInnings) {
         widgets.add(getTextForTable(
             gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+      } else if (i == currentInnings) {
+        if (gameObjectPlayByPlay.plays[currentPlay].inningHalf == "T") {
+          widgets.add(getTextForTable(
+              gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+        } else {
+          widgets.add(getTextForTable(
+              gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+        }
       } else {
         widgets.add(getTextForTable(""));
       }
@@ -933,9 +965,16 @@ class _inGameState extends State<inGame>
     widgets.add(getTextForTable(gameObjectPlayByPlay.game.homeTeam,
         wide: true, bold: true));
     for (int i = 0; i < 9; i++) {
-      if (i <= currentInnings) {
+      if (i < currentInnings) {
         widgets.add(getTextForTable(
             gameObjectPlayByPlay.game.innings[i].homeTeamRuns.toString()));
+      } else if (i == currentInnings) {
+        if (gameObjectPlayByPlay.plays[currentPlay].inningHalf == "B") {
+          widgets.add(getTextForTable(
+              gameObjectPlayByPlay.game.innings[i].homeTeamRuns.toString()));
+        } else {
+          widgets.add(getTextForTable(""));
+        }
       } else {
         widgets.add(getTextForTable(""));
       }

@@ -156,8 +156,8 @@ class LobbyState extends State<Lobby> {
                   height: 60,
                   onPressed: () {
                     if (!add) {
-                      showAlertDialog(context, "Start in Simulation Mode?",
-                          "Simulation", "Yes", "No");
+                      showAlertDialog(context, "",
+                          "Select Mode", "Simulation", "Live Game");
                     } else {
                       Utils().showToast(
                           "Wait for host to start the game", context);
@@ -202,7 +202,6 @@ class LobbyState extends State<Lobby> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text(heading),
-      content: Text(message),
       actions: [
         cancelButton,
         continueButton,
@@ -228,7 +227,7 @@ class LobbyState extends State<Lobby> {
         .setData(firebaseGameObject.toJson(), merge: true)
         .then((value) {
       Navigator.pop(context);
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => inGame(

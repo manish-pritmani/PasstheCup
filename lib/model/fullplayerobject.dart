@@ -29,7 +29,7 @@ class FullPlayerObject {
   int fantasyAlarmPlayerID;
   int statsPlayerID;
   int sportsDirectPlayerID;
-  Null xmlTeamPlayerID;
+  int xmlTeamPlayerID;
   String injuryStatus;
   String injuryBodyPart;
   String injuryStartDate;
