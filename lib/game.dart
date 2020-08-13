@@ -53,6 +53,12 @@ class _inGameState extends State<inGame>
 
   String displaymsg;
 
+  int lastScoreUpdatedinPlay;
+
+  int homeTeamRuns;
+
+  int awayTeamRuns;
+
   _inGameState(this.firebaseGameObject, this.sim);
 
   @override
@@ -75,11 +81,14 @@ class _inGameState extends State<inGame>
       gameOver = false;
       cupScore = firebaseGameObject.cupScore;
       displaymsg = "";
+      lastScoreUpdatedinPlay = -1;
+      homeTeamRuns = 0;
+      awayTeamRuns = 0;
     });
 
     borderColor = Colors.transparent;
 
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
     });
     fetchGameDetails();
@@ -96,7 +105,8 @@ class _inGameState extends State<inGame>
     setState(() {
       fetching = true;
     });
-    API().fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
+    API()
+        .fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
         .then((value) {
       onGameFetched(value);
       return null;
@@ -142,6 +152,8 @@ class _inGameState extends State<inGame>
             if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
               currentPlay = currentPlay + 1;
               changeActivePlayer();
+              updateAwayTeamRuns();
+              updateHomeTeamRuns();
               currentPitch = 1;
               currentInnings = plays[currentPlay].inningNumber - 1;
             } else {
@@ -247,15 +259,16 @@ class _inGameState extends State<inGame>
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 0,
           ),
           buildResultWidget(),
           SizedBox(
-            height: 10,
+            height: 0,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 15.0),
-            child: Row(     mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 getCupWidget(),
@@ -266,7 +279,6 @@ class _inGameState extends State<inGame>
               ],
             ),
           ),
-
         ],
       ),
     );
@@ -275,15 +287,15 @@ class _inGameState extends State<inGame>
   Widget buildResultWidget() {
     try {
       return Visibility(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  child: Text(
-                    gameObjectPlayByPlay.plays[currentPlay-1].description,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                visible: true,
-              );
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: Text(
+            gameObjectPlayByPlay.plays[currentPlay - 1].description,
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        visible: true,
+      );
     } catch (e) {
       print(e);
       return SizedBox();
@@ -292,9 +304,10 @@ class _inGameState extends State<inGame>
 
   Container getScoreData() {
     try {
-      return Container(width: MediaQuery.of(context).size.width * .49,
+      return Container(
+        width: MediaQuery.of(context).size.width * .49,
         alignment: Alignment.center,
-        padding:EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: <Widget>[
             getPointsColumn(),
@@ -316,7 +329,8 @@ class _inGameState extends State<inGame>
   }
 
   Container getCurrentInningData() {
-    return Container(         alignment: Alignment.center,
+    return Container(
+        alignment: Alignment.center,
         width: MediaQuery.of(context).size.width * .23,
         padding: EdgeInsets.only(top: 3, left: 3),
         decoration: BoxDecoration(
@@ -456,11 +470,17 @@ class _inGameState extends State<inGame>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          IconButton(icon: Icon(Icons.close, color: Colors.white,), onPressed:(){
-              Utils().showToast("Are you sure you want to exit the game?", context, ok:(){
-                Navigator.pop(context);
-              }, cancel:true, oktext: "Exit Game");
-          }),
+          IconButton(
+              icon: Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Utils().showToast(
+                    "Are you sure you want to exit the game?", context, ok: () {
+                  Navigator.pop(context);
+                }, cancel: true, oktext: "Exit Game");
+              }),
           Row(
             children: <Widget>[
               Padding(
@@ -499,9 +519,11 @@ class _inGameState extends State<inGame>
                         fontSize: 14,
                         fontWeight: FontWeight.w400),
                   ),
-                  SizedBox( width: 100,
+                  SizedBox(
+                    width: 100,
                     child: Text(
-                      gameObjectPlayByPlay == null || gameObjectPlayByPlay == null
+                      gameObjectPlayByPlay == null ||
+                              gameObjectPlayByPlay == null
                           ? "Loading..."
                           : getBatterNameText(),
                       softWrap: true,
@@ -558,12 +580,14 @@ class _inGameState extends State<inGame>
                         fontSize: 14,
                         fontWeight: FontWeight.w400),
                   ),
-                  SizedBox( width: 100,
+                  SizedBox(
+                    width: 100,
                     child: Text(
                       gameObjectPlayByPlay == null ||
                               gameObjectPlayByPlay.game == null
                           ? "Loading..."
-                          : getPitcherNAmeText(), softWrap: true,
+                          : getPitcherNAmeText(),
+                      softWrap: true,
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -645,7 +669,13 @@ class _inGameState extends State<inGame>
             style: TextStyle(
                 color: Colors.white, fontSize: 10, fontWeight: FontWeight.w400),
           ),
-          active?Image.asset("assets/logo.png", width: 25, height: 25, fit:BoxFit.contain):SizedBox(width: 25, height: 25,),
+          active
+              ? Image.asset("assets/logo.png",
+                  width: 25, height: 25, fit: BoxFit.contain)
+              : SizedBox(
+                  width: 25,
+                  height: 25,
+                ),
         ],
       ),
     );
@@ -680,7 +710,7 @@ class _inGameState extends State<inGame>
                         child: Column(
                           children: <Widget>[
                             Text(
-                              getAwayTeamRuns().toString(),
+                              awayTeamRuns.toString(),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 30,
@@ -730,7 +760,7 @@ class _inGameState extends State<inGame>
                         child: Column(
                           children: <Widget>[
                             Text(
-                              getHomeTeamRuns(),
+                              homeTeamRuns.toString(),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 30,
@@ -758,28 +788,34 @@ class _inGameState extends State<inGame>
     }
   }
 
-  String getHomeTeamRuns() {
-    if (!simulation) {
-      return gameObjectPlayByPlay.game.homeTeamRuns.toString();
-    } else {
+  void updateHomeTeamRuns() {
+    if (currentPlay != lastScoreUpdatedinPlay) {
       var score = 0;
-      for (int i = 0; i <= currentInnings; i++) {
-        score = gameObjectPlayByPlay.game.innings[i].homeTeamRuns + score;
+      for (int i = 0; i <= currentPlay; i++) {
+        if (gameObjectPlayByPlay.plays[i].inningHalf=="B") {
+          score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
+        }
       }
-      return score.toString();
+      setState(() {
+        lastScoreUpdatedinPlay = currentPlay;
+        homeTeamRuns = score;
+      });
     }
   }
 
-  int getAwayTeamRuns() {
-    if (!simulation) {
-      return gameObjectPlayByPlay.game.awayTeamRuns;
-    } else {
-      var score = 0;
-      for (int i = 0; i <= currentInnings; i++) {
-        score = gameObjectPlayByPlay.game.innings[i].awayTeamRuns + score;
+  void updateAwayTeamRuns() {
+      if (currentPlay != lastScoreUpdatedinPlay) {
+        var score = 0;
+        for (int i = 0; i <= currentPlay; i++) {
+          if (gameObjectPlayByPlay.plays[i].inningHalf=="T") {
+            score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
+          }
+        }
+        setState(() {
+          awayTeamRuns = score;
+          lastScoreUpdatedinPlay = currentPlay;
+        });
       }
-      return score;
-    }
   }
 
   String getCurrentInningNumber() {
@@ -925,7 +961,9 @@ class _inGameState extends State<inGame>
       child: Text(
         text,
         style: TextStyle(
-            fontWeight: bold ? FontWeight.bold : null, color: Colors.white, fontSize: 13),
+            fontWeight: bold ? FontWeight.bold : null,
+            color: Colors.white,
+            fontSize: 13),
       ),
       height: 23,
       width: wide ? 50 : 25,
@@ -951,7 +989,8 @@ class _inGameState extends State<inGame>
         variable++;
       }
       var outs = pitch.outs + variable;
-      return Row(  mainAxisSize: MainAxisSize.max,
+      return Row(
+        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           getDotView("BALL", ballsBeforePitch),
@@ -972,7 +1011,8 @@ class _inGameState extends State<inGame>
   }
 
   Widget getBSOLive() {
-    return Row( mainAxisAlignment: MainAxisAlignment.center,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         getDotView("BALL", gameObjectPlayByPlay.plays[currentPlay].balls),
@@ -1056,11 +1096,12 @@ class _inGameState extends State<inGame>
           firebaseGameObject.players[activePlayer].gamescore +
               pointsToBeAwarded;
       cupScore = cupScore - pointsToBeAwarded;
-      displaymsg = "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result";
+      displaymsg =
+          "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result";
     });
     print(
         "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result");
-   // updateFirebaseGameObject();
+    // updateFirebaseGameObject();
   }
 
   int getPointsToBeAwardedByResult(String result) {
@@ -1125,7 +1166,10 @@ class _inGameState extends State<inGame>
   }
 
   void updateFirebaseGameObject() {
-    Firestore.instance.collection('games').document(firebaseGameObject.gameCode).setData(firebaseGameObject.toJson());
+    Firestore.instance
+        .collection('games')
+        .document(firebaseGameObject.gameCode)
+        .setData(firebaseGameObject.toJson());
   }
 }
 
