@@ -70,7 +70,7 @@ class LobbyState extends State<Lobby> {
     var email = user.email;
     if (/*!exists(email) &&*/ !isAdded) {
       firebaseGameObject.players.add(Player(
-          name: user.displayName, email: email, gamescore: 0, host: false));
+          name: user.displayName, email: email, gamescore: -5, host: false));
       isAdded = true;
     }
     var document = Firestore.instance.collection('games').document(gameID);
@@ -108,7 +108,7 @@ class LobbyState extends State<Lobby> {
     return Container(
       alignment: Alignment.center,
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Column(

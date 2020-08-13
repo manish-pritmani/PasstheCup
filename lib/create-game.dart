@@ -200,7 +200,7 @@ class _CreateGameState extends State<CreateGame> {
   void createGameAndEnter(BuildContext context) {
     List<Map<String, dynamic>> players = List();
     var player = Player(
-        name: user.displayName, email: user.email, gamescore: 0, host: true);
+        name: user.displayName, email: user.email, gamescore: -5, host: true);
     players.add(player.toJson());
     player.host = false;
     players.add(player.toJson());

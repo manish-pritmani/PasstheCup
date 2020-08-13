@@ -224,6 +224,7 @@ class _inGameState extends State<inGame>
     return Container(
       padding: EdgeInsets.only(top: 5),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
@@ -245,10 +246,13 @@ class _inGameState extends State<inGame>
               getScoreData(),
             ],
           ),
-//          SizedBox(
-//            height: 15,
-//          ),
+          SizedBox(
+            height: 10,
+          ),
           buildResultWidget(),
+          SizedBox(
+            height: 10,
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 15.0),
             child: Row(     mainAxisAlignment: MainAxisAlignment.center,
@@ -323,12 +327,14 @@ class _inGameState extends State<inGame>
               left: BorderSide(color: borderColor),
               right: BorderSide(color: borderColor),
             )),
-        child: Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Utils().getBlue()),
-            child: getPitchColumn()));
+        child: FittedBox(
+          child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Utils().getBlue()),
+              child: getPitchColumn()),
+        ));
   }
 
   Column getPitchColumn() {
@@ -796,7 +802,7 @@ class _inGameState extends State<inGame>
   }
 
   getPointsTable() {
-    return Container(
+    return FittedBox(
       child: Column(
         children: <Widget>[
           Container(
