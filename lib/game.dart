@@ -65,6 +65,8 @@ class _inGameState extends State<inGame>
 
   _inGameState(this.firebaseGameObject, this.sim);
 
+  bool printed = false;
+
   @override
   void initState() {
     super.initState();
@@ -95,7 +97,7 @@ class _inGameState extends State<inGame>
 
     borderColor = Colors.transparent;
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
       simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
     });
     fetchGameDetails();
@@ -182,28 +184,50 @@ class _inGameState extends State<inGame>
       }
     });
 
-    var counter = 1;
-    for (Plays play in gameObjectPlayByPlay.plays) {
-      var result = play.result;
-      var description = play.description;
-      var runsBattedIn = play.runsBattedIn;
-      if (play.inningHalf == "T") {
+    if (!printed) {
+      bool isFirstActive = true;
+      int player1score = -5;
+      int player2score = -5;
+      int cupscore = 10;
+      var counter = 1;
+      for (Plays play in gameObjectPlayByPlay.plays) {
         print(
-            "Play $counter:Runs Batted In: $runsBattedIn\nTeam: ${play.inningHalf}");
+            "\n\nPlay $counter:\nRuns Batted In: ${play.runsBattedIn}\nInnings: ${play.inningNumber}${play.inningHalf}\nDescription: ${play.description}\nResult:${play.result}");
+        int pitchcounter = 0;
+        for (Pitches pitch in play.pitches) {
+          print("\Pitch $pitchcounter: ${getResultForPitch(pitch)}");
+          pitchcounter++;
+        }
+
+
+
+
+        var pointsToBeAwardedByResult =
+            getPointsToBeAwardedByResult(play.result);
+        cupscore = cupscore - pointsToBeAwardedByResult;
+        if (isFirstActive) {
+          player1score = player1score + pointsToBeAwardedByResult;
+        } else {
+          player2score = player2score + pointsToBeAwardedByResult;
+        }
+        print(
+            "\n$pointsToBeAwardedByResult awarded to ${isFirstActive ? "Player 1" : "Player 2"} from the cup points\nPlayer 1 Score:$player1score\nPlayer 2 Score:$player2score\nCup Points:$cupscore");
+        counter++;
+        isFirstActive = !isFirstActive;
       }
-      counter++;
+      printed = true;
     }
 
-    for (Plays play in gameObjectPlayByPlay.plays) {
-      var result = play.result;
-      var description = play.description;
-      var runsBattedIn = play.runsBattedIn;
-      if (play.inningHalf == "B") {
-        print(
-            "Play $counter:Runs Batted In: $runsBattedIn\nTeam: ${play.inningHalf}");
-      }
-      counter++;
-    }
+//    for (Plays play in gameObjectPlayByPlay.plays) {
+//      var result = play.result;
+//      var description = play.description;
+//      var runsBattedIn = play.runsBattedIn;
+//      if (play.inningHalf == "B") {
+//        print(
+//            "Play $counter:Runs Batted In: $runsBattedIn\nTeam: ${play.inningHalf}");
+//      }
+//      counter++;
+//    }
   }
 
   void changeActivePlayer() {
