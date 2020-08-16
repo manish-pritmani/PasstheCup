@@ -94,7 +94,7 @@ class _WelcomeState extends State<Welcome> {
               padding: const EdgeInsets.only(right: 16.0),
               child: Center(
                 child: Text(
-                  "Your coins💰: ${firebaseUserObject.data["score"]}",
+                  "Your Points💰: ${firebaseUserObject.data["score"]}",
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

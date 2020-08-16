@@ -51,6 +51,8 @@ class _inGameState extends State<inGame>
   bool dialogShown;
 
   int cupScore;
+  int lastPlayID;
+  int lastPitchID;
 
   String displaymsg;
 
@@ -62,6 +64,9 @@ class _inGameState extends State<inGame>
 
   String hitterImageLink;
   String pitcherImageLink;
+  Plays latestPlay;
+  Pitches latestPitches;
+  List<Plays> plays;
 
   _inGameState(this.firebaseGameObject, this.sim);
 
@@ -93,6 +98,9 @@ class _inGameState extends State<inGame>
       awayTeamRuns = 0;
       hitterImageLink = "";
       pitcherImageLink = "";
+      lastPlayID = -1;
+      lastPitchID = -1;
+      plays = new List();
     });
 
     borderColor = Colors.transparent;
@@ -113,6 +121,7 @@ class _inGameState extends State<inGame>
   void fetchGameDetails() {
     setState(() {
       fetching = true;
+      // displaymsg = "refreshing...";
     });
     API()
         .fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
@@ -127,6 +136,7 @@ class _inGameState extends State<inGame>
   }
 
   void onGameFetched(GameObjectPlayByPlay value) {
+    //FLOW 1  ---- IF GAME IS OVER RUN THIS
     if (gameOver) {
       if (dialogShown) {
         //Utils().showToast("Game Over", context, oktext: "Show Results");
@@ -137,54 +147,111 @@ class _inGameState extends State<inGame>
         ));
         setState(() {
           dialogShown = true;
+          fetching = false;
+          displaymsg = "Game is completed";
         });
       }
       return;
     }
 
+    //FLOW 2  ---- IF GAME IS NULL RUN THIS
     if (value == null) {
-      print("Null Game Object");
+      print("Null Game Object received");
+      setState(() {
+        fetching = false;
+        displaymsg = "Game has not started yet";
+      });
       return;
     }
+
+    //FLOW 3  ---- IF GAME IS PLAYING RUN THIS
     setState(() {
       gameObjectPlayByPlay = value;
       fetching = false;
-      List<Plays> plays = gameObjectPlayByPlay.plays;
+      plays = gameObjectPlayByPlay.plays;
+      //displaymsg = "Received";
+    });
 
-      //check if there are plays available or not
-      if (plays.length > 0) {
-        var latestPlay = plays[plays.length - 1];
+    //check if there are plays available or not
+    if (plays.length > 0) {
+      //Updating last play and pitch ID
+      if (latestPlay != null) {
+        setState(() {
+          lastPlayID = latestPlay.playID;
+        });
+      }
+      if (latestPitches != null) {
+        setState(() {
+          lastPitchID = latestPitches.pitchID;
+        });
+      }
 
-        if (!simulation) {
+      //Updating latest pitch and play
+      setState(() {
+        latestPlay = plays[plays.length - 1];
+        latestPitches = latestPlay.pitches[latestPlay.pitches.length - 1];
+      });
+
+      //initializing last playID and last pitchID if they are -1
+      if (lastPlayID == -1) {
+        setState(() {
+          lastPlayID = latestPlay.playID;
+        });
+      }
+      if (lastPitchID == -1) {
+        setState(() {
+          lastPitchID = latestPitches.playID;
+        });
+      }
+
+      if (!simulation) {
+        if (latestPitches.pitchID != lastPitchID) {
+          //awardScoresToPlayers(plays[currentPlay]);
+        }
+        if (latestPlay.playID != lastPlayID) {
+          awardScoresToPlayers(plays[currentPlay]);
+          changeActivePlayer();
+        }
+        updateAwayTeamRuns();
+        updateHomeTeamRuns();
+        fetchHitterProfilePicture();
+        fetchPitcherProfilePicture();
+        setState(() {
           currentPlay = plays.length - 1;
           currentInnings = latestPlay.inningNumber - 1;
           currentPitch = latestPlay.pitches.length - 1;
-        } else {
-          var sizeOfPitchesInCurrentPlay = plays[currentPlay].pitches.length;
-          if (sizeOfPitchesInCurrentPlay - 1 < currentPitch) {
-            awardScoresToPlayers(plays[currentPlay]);
-            if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
+        });
+      } else {
+        var sizeOfPitchesInCurrentPlay = plays[currentPlay].pitches.length;
+        if (sizeOfPitchesInCurrentPlay - 1 < currentPitch) {
+          awardScoresToPlayers(plays[currentPlay]);
+          if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
+            setState(() {
               currentPlay = currentPlay + 1;
-              changeActivePlayer();
-              updateAwayTeamRuns();
-              updateHomeTeamRuns();
-              fetchHitterProfilePicture();
-              fetchPitcherProfilePicture();
+            });
+            changeActivePlayer();
+            updateAwayTeamRuns();
+            updateHomeTeamRuns();
+            fetchHitterProfilePicture();
+            fetchPitcherProfilePicture();
+            setState(() {
               currentPitch = 1;
               currentInnings = plays[currentPlay].inningNumber - 1;
-            } else {
-              setState(() {
-                gameOver = true;
-              });
-            }
+            });
           } else {
-            currentPitch++;
+            setState(() {
+              gameOver = true;
+            });
           }
+        } else {
+          setState(() {
+            currentPitch = currentPitch + 1;
+          });
         }
       }
-    });
+    }
 
-    if (!printed) {
+    if (false /*!printed*/) {
       bool isFirstActive = true;
       int player1score = -5;
       int player2score = -5;
@@ -198,9 +265,6 @@ class _inGameState extends State<inGame>
           print("\Pitch $pitchcounter: ${getResultForPitch(pitch)}");
           pitchcounter++;
         }
-
-
-
 
         var pointsToBeAwardedByResult =
             getPointsToBeAwardedByResult(play.result);
@@ -285,54 +349,73 @@ class _inGameState extends State<inGame>
   }
 
   Widget buildColumn() {
-    return Container(
-      padding: EdgeInsets.only(top: 5),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Visibility(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                displaymsg,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            visible: true,
+    return Stack(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Theme(
+                data: ThemeData(
+                    cupertinoOverrideTheme:
+                        CupertinoThemeData(brightness: Brightness.dark)),
+                child: Visibility(
+                  child: CupertinoActivityIndicator(),
+                  visible: fetching,
+                )),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+        ),
+        Container(
+          padding: EdgeInsets.only(top: 5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              getCurrentPlayersInfo(),
-              getCurrentInningData(),
-              getScoreData(),
+              Visibility(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    displaymsg,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                visible: true,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+//              getJSONLogs(),
+                  getCurrentPlayersInfo(),
+                  getCurrentInningData(),
+                  getScoreData(),
+                ],
+              ),
+              SizedBox(
+                height: 0,
+              ),
+              buildResultWidget(),
+              SizedBox(
+                height: 0,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    getCupWidget(),
+                    SizedBox(
+                      width: 0,
+                    ),
+                    getPlayersRow(),
+                  ],
+                ),
+              ),
             ],
           ),
-          SizedBox(
-            height: 0,
-          ),
-          buildResultWidget(),
-          SizedBox(
-            height: 0,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                getCupWidget(),
-                SizedBox(
-                  width: 0,
-                ),
-                getPlayersRow(),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -342,7 +425,7 @@ class _inGameState extends State<inGame>
         child: Padding(
           padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
           child: Text(
-            gameObjectPlayByPlay.plays[currentPlay - 1].description,
+            getResultText(),
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -351,6 +434,22 @@ class _inGameState extends State<inGame>
     } catch (e) {
       print(e);
       return SizedBox();
+    }
+  }
+
+  String getResultText() {
+    if (simulation) {
+      return gameObjectPlayByPlay.plays[currentPlay - 1].description;
+    } else {
+      if (latestPitches.looking ||
+          latestPitches.swinging ||
+          latestPitches.foul ||
+          latestPitches.ball ||
+          latestPitches.strike) {
+        return gameObjectPlayByPlay.plays[currentPlay].description;
+      } else {
+        return "";
+      }
     }
   }
 
@@ -405,11 +504,11 @@ class _inGameState extends State<inGame>
 
   Column getPitchColumn() {
     List<Widget> pitches = new List();
-    if (simulation) {
-//      pitches.add(Text(
-//        "Play No.   " + (currentPlay + 1).toString(),
-//        style: TextStyle(color: Colors.white),
-//      ));
+    if (false) {
+      pitches.add(Text(
+        "Play No.   " + (currentPlay + 1).toString(),
+        style: TextStyle(color: Colors.white),
+      ));
     }
     if (gameObjectPlayByPlay != null && gameObjectPlayByPlay.plays.length > 0) {
       for (int i = 0; i < currentPitch; i++) {
@@ -888,14 +987,15 @@ class _inGameState extends State<inGame>
     try {
       var play = gameObjectPlayByPlay.plays[currentPlay];
       int number = play.inningNumber;
+      var inningHalf = play.inningHalf=="T"?"▲":"▼";
       if (number == 1) {
-        return number.toString() + "st(${play.inningHalf})";
+        return number.toString() + "st ${inningHalf}";
       } else if (number == 2) {
-        return number.toString() + "nd (${play.inningHalf})";
+        return number.toString() + "nd ${inningHalf}";
       } else if (number == 3) {
-        return number.toString() + "rd (${play.inningHalf})";
+        return number.toString() + "rd ${inningHalf}";
       } else {
-        return number.toString() + "th (${play.inningHalf})";
+        return number.toString() + "th ${inningHalf}";
       }
     } catch (e) {
       print(e);
@@ -1184,19 +1284,33 @@ class _inGameState extends State<inGame>
           firebaseGameObject.players[activePlayer].gamescore +
               pointsToBeAwarded;
       cupScore = cupScore - pointsToBeAwarded;
+      var s = (pointsToBeAwarded == 1 || pointsToBeAwarded == -1) ? "" : "s";
       displaymsg =
-          "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result";
+          "$pointsToBeAwarded point$s for ${firebaseGameObject.players[activePlayer].name} for $result";
     });
-    print(
-        "$pointsToBeAwarded points awarded to ${firebaseGameObject.players[activePlayer].name} for $result");
-    // updateFirebaseGameObject();
+
+    //IF RESULT IS HOMERUN, THEN RE-FILL CUP
+    if (cupScore == 0) {
+      setState(() {
+        cupScore = firebaseGameObject.players.length * 5;
+        displaymsg =
+            displaymsg + "\nCup Refilled, 5 points deducted from each player";
+      });
+    }
+
+//    print(
+//        "$pointsToBeAwarded points for ${firebaseGameObject.players[activePlayer].name} for $result");
+//    // updateFirebaseGameObject();
   }
 
   int getPointsToBeAwardedByResult(String result) {
     int points = 0;
     switch (result) {
-      case "Ground out":
+      case "Ground Out":
         points = -1;
+        break;
+      case "Ground Into Double Play":
+        points = -2;
         break;
       case "Single":
         points = 1;
@@ -1249,6 +1363,13 @@ class _inGameState extends State<inGame>
       case "Triple":
         points = 5;
         break;
+      case "Fly Out":
+      case "Flyout":
+        points = -1;
+        break;
+      case "Double Play":
+        points = -1;
+        break;
     }
     return points;
   }
@@ -1288,6 +1409,10 @@ class _inGameState extends State<inGame>
     } catch (e) {
       print(e);
     }
+  }
+
+  Widget getJSONLogs() {
+    // return Text(gameObjectPlayByPlay.plays[currentPlay].);
   }
 }
 
