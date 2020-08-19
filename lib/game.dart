@@ -209,7 +209,8 @@ class _inGameState extends State<inGame>
           //awardScoresToPlayers(plays[currentPlay]);
         }
         if (latestPlay.playID != lastPlayID) {
-          awardScoresToPlayers(plays[currentPlay]);
+//          awardScoresToPlayers(plays[currentPlay]);
+          awardScoresToPlayers(latestPlay);
           changeActivePlayer();
         }
         updateAwayTeamRuns();
@@ -251,18 +252,17 @@ class _inGameState extends State<inGame>
       }
     }
 
-    if (false /*!printed*/) {
+    if (/*false*/ !printed) {
       bool isFirstActive = true;
       int player1score = -5;
       int player2score = -5;
       int cupscore = 10;
       var counter = 1;
       for (Plays play in gameObjectPlayByPlay.plays) {
-        print(
-            "\n\nPlay $counter:\nRuns Batted In: ${play.runsBattedIn}\nInnings: ${play.inningNumber}${play.inningHalf}\nDescription: ${play.description}\nResult:${play.result}");
+        print("Result:${play.result}");
         int pitchcounter = 0;
         for (Pitches pitch in play.pitches) {
-          print("\Pitch $pitchcounter: ${getResultForPitch(pitch)}");
+          // print("\Pitch $pitchcounter: ${getResultForPitch(pitch)}");
           pitchcounter++;
         }
 
@@ -274,8 +274,8 @@ class _inGameState extends State<inGame>
         } else {
           player2score = player2score + pointsToBeAwardedByResult;
         }
-        print(
-            "\n$pointsToBeAwardedByResult awarded to ${isFirstActive ? "Player 1" : "Player 2"} from the cup points\nPlayer 1 Score:$player1score\nPlayer 2 Score:$player2score\nCup Points:$cupscore");
+//        print(
+//            "\n$pointsToBeAwardedByResult awarded to ${isFirstActive ? "Player 1" : "Player 2"} from the cup points\nPlayer 1 Score:$player1score\nPlayer 2 Score:$player2score\nCup Points:$cupscore");
         counter++;
         isFirstActive = !isFirstActive;
       }
@@ -387,7 +387,8 @@ class _inGameState extends State<inGame>
                 children: <Widget>[
 //              getJSONLogs(),
                   getCurrentPlayersInfo(),
-                  getCurrentInningData(),
+                  getEmptyArea(),
+//                  getCurrentInningData(),
                   getScoreData(),
                 ],
               ),
@@ -441,12 +442,18 @@ class _inGameState extends State<inGame>
     if (simulation) {
       return gameObjectPlayByPlay.plays[currentPlay - 1].description;
     } else {
-      if (latestPitches.looking ||
+      if (true /*latestPitches.looking ||
           latestPitches.swinging ||
           latestPitches.foul ||
           latestPitches.ball ||
-          latestPitches.strike) {
-        return gameObjectPlayByPlay.plays[currentPlay].description;
+          latestPitches.strike*/
+          ) {
+        try {
+          return gameObjectPlayByPlay.plays[currentPlay].description;
+        } catch (e) {
+          return "";
+          print(e);
+        }
       } else {
         return "";
       }
@@ -475,7 +482,7 @@ class _inGameState extends State<inGame>
       );
     } catch (e) {
       print(e);
-      return Container(child: Text(e.message));
+      return Container(child: Text("e.message"));
     }
   }
 
@@ -777,26 +784,34 @@ class _inGameState extends State<inGame>
   }
 
   String getBatterNameText() {
-    try {
-      return gameObjectPlayByPlay.plays[currentPlay].hitterName.toString() +
-          " (" +
-          gameObjectPlayByPlay.plays[currentPlay].hitterPosition +
-          ")";
-    } catch (e) {
-      print(e);
-      return "";
+    if (simulation) {
+      try {
+        return gameObjectPlayByPlay.plays[currentPlay].hitterName.toString() +
+            " (" +
+            gameObjectPlayByPlay.plays[currentPlay].hitterPosition +
+            ")";
+      } catch (e) {
+        print(e);
+        return "";
+      }
+    } else {
+      return gameObjectPlayByPlay.game.currentHitter.toString();
     }
   }
 
   String getPitcherNAmeText() {
-    try {
-      return gameObjectPlayByPlay.plays[currentPlay].pitcherName.toString() +
-          " (" +
-          gameObjectPlayByPlay.plays[currentPlay].pitcherThrowHand +
-          ")";
-    } catch (e) {
-      print(e);
-      return "";
+    if (simulation) {
+      try {
+        return gameObjectPlayByPlay.plays[currentPlay].pitcherName.toString() +
+            " (" +
+            gameObjectPlayByPlay.plays[currentPlay].pitcherThrowHand +
+            ")";
+      } catch (e) {
+        print(e);
+        return "";
+      }
+    } else {
+      return gameObjectPlayByPlay.game.currentPitcher.toString();
     }
   }
 
@@ -958,36 +973,48 @@ class _inGameState extends State<inGame>
   }
 
   void updateHomeTeamRuns() {
-    var score = 0;
-    for (int i = 0; i <= currentPlay; i++) {
-      if (gameObjectPlayByPlay.plays[i].inningHalf == "B") {
-        score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
+    if (simulation) {
+      var score = 0;
+      for (int i = 0; i <= currentPlay; i++) {
+        if (gameObjectPlayByPlay.plays[i].inningHalf == "B") {
+          score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
+        }
       }
+      setState(() {
+        lastScoreUpdatedinPlay = currentPlay;
+        homeTeamRuns = score;
+      });
+    } else {
+      setState(() {
+        homeTeamRuns = gameObjectPlayByPlay.game.homeTeamRuns;
+      });
     }
-    setState(() {
-      lastScoreUpdatedinPlay = currentPlay;
-      homeTeamRuns = score;
-    });
   }
 
   void updateAwayTeamRuns() {
-    var score = 0;
-    for (int i = 0; i <= currentPlay; i++) {
-      if (gameObjectPlayByPlay.plays[i].inningHalf == "T") {
-        score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
+    if (simulation) {
+      var score = 0;
+      for (int i = 0; i <= currentPlay; i++) {
+        if (gameObjectPlayByPlay.plays[i].inningHalf == "T") {
+          score = gameObjectPlayByPlay.plays[i].runsBattedIn + score;
+        }
       }
+      setState(() {
+        awayTeamRuns = score;
+        lastScoreUpdatedinPlay = currentPlay;
+      });
+    } else {
+      setState(() {
+        awayTeamRuns = gameObjectPlayByPlay.game.awayTeamRuns;
+      });
     }
-    setState(() {
-      awayTeamRuns = score;
-      lastScoreUpdatedinPlay = currentPlay;
-    });
   }
 
   String getCurrentInningNumber() {
     try {
       var play = gameObjectPlayByPlay.plays[currentPlay];
       int number = play.inningNumber;
-      var inningHalf = play.inningHalf=="T"?"▲":"▼";
+      var inningHalf = play.inningHalf == "T" ? "▲" : "▼";
       if (number == 1) {
         return number.toString() + "st ${inningHalf}";
       } else if (number == 2) {
@@ -1063,45 +1090,53 @@ class _inGameState extends State<inGame>
 
   List<Widget> getInningsScoreUptoNowTeamAway() {
     List<Widget> widgets = List<Widget>();
-    widgets.add(getTextForTable(gameObjectPlayByPlay.game.awayTeam,
-        wide: true, bold: true));
-    for (int i = 0; i < 9; i++) {
-      if (i < currentInnings) {
-        widgets.add(getTextForTable(
-            gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
-      } else if (i == currentInnings) {
-        if (gameObjectPlayByPlay.plays[currentPlay].inningHalf == "T") {
+    try {
+      widgets.add(getTextForTable(gameObjectPlayByPlay.game.awayTeam,
+          wide: true, bold: true));
+      for (int i = 0; i < 9; i++) {
+        if (i < currentInnings) {
           widgets.add(getTextForTable(
               gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+        } else if (i == currentInnings) {
+          if (gameObjectPlayByPlay.plays[currentPlay].inningHalf == "T") {
+            widgets.add(getTextForTable(
+                gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+          } else {
+            widgets.add(getTextForTable(
+                gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+          }
         } else {
-          widgets.add(getTextForTable(
-              gameObjectPlayByPlay.game.innings[i].awayTeamRuns.toString()));
+          widgets.add(getTextForTable(""));
         }
-      } else {
-        widgets.add(getTextForTable(""));
       }
+    } catch (e) {
+      print(e);
     }
     return widgets;
   }
 
   List<Widget> getInningsScoreUptoNow() {
     List<Widget> widgets = List<Widget>();
-    widgets.add(getTextForTable(gameObjectPlayByPlay.game.homeTeam,
-        wide: true, bold: true));
-    for (int i = 0; i < 9; i++) {
-      if (i < currentInnings) {
-        widgets.add(getTextForTable(
-            gameObjectPlayByPlay.game.innings[i].homeTeamRuns.toString()));
-      } else if (i == currentInnings) {
-        if (gameObjectPlayByPlay.plays[currentPlay].inningHalf == "B") {
+    try {
+      widgets.add(getTextForTable(gameObjectPlayByPlay.game.homeTeam,
+          wide: true, bold: true));
+      for (int i = 0; i < 9; i++) {
+        if (i < currentInnings) {
           widgets.add(getTextForTable(
               gameObjectPlayByPlay.game.innings[i].homeTeamRuns.toString()));
+        } else if (i == currentInnings) {
+          if (gameObjectPlayByPlay.plays[currentPlay].inningHalf == "B") {
+            widgets.add(getTextForTable(
+                gameObjectPlayByPlay.game.innings[i].homeTeamRuns.toString()));
+          } else {
+            widgets.add(getTextForTable(""));
+          }
         } else {
           widgets.add(getTextForTable(""));
         }
-      } else {
-        widgets.add(getTextForTable(""));
       }
+    } catch (e) {
+      print(e);
     }
     return widgets;
 //    return <Widget>[
@@ -1199,24 +1234,32 @@ class _inGameState extends State<inGame>
   }
 
   Widget getBSOLive() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        getDotView("BALL", gameObjectPlayByPlay.plays[currentPlay].balls),
-        SizedBox(
-          width: 30,
-        ),
-        getDotView("STRIKE", gameObjectPlayByPlay.plays[currentPlay].strikes),
-        SizedBox(
-          width: 30,
-        ),
-        getDotView("OUT", gameObjectPlayByPlay.plays[currentPlay].outs),
-      ],
-    );
+    try {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          getDotView("BALL", gameObjectPlayByPlay.game.balls),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("STRIKE", gameObjectPlayByPlay.game.strikes),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("OUT", gameObjectPlayByPlay.game.outs),
+        ],
+      );
+    } catch (e) {
+      print(e);
+      return SizedBox();
+    }
   }
 
   Column getDotView(String title, int count) {
+    if (count == null) {
+      count = 0;
+    }
     String dots = "";
     for (int i = 0; i < count; i++) {
       dots = dots + "⚪ ";
@@ -1293,6 +1336,9 @@ class _inGameState extends State<inGame>
     if (cupScore == 0) {
       setState(() {
         cupScore = firebaseGameObject.players.length * 5;
+        for (Player p in firebaseGameObject.players) {
+          p.gamescore = p.gamescore - 5;
+        }
         displaymsg =
             displaymsg + "\nCup Refilled, 5 points deducted from each player";
       });
@@ -1309,7 +1355,7 @@ class _inGameState extends State<inGame>
       case "Ground Out":
         points = -1;
         break;
-      case "Ground Into Double Play":
+      case "Ground into Double Play":
         points = -2;
         break;
       case "Single":
@@ -1318,6 +1364,7 @@ class _inGameState extends State<inGame>
       case "Foul Out":
         points = -1;
         break;
+      case "Strikeout Looking":
       case "Strikeout Swinging":
         points = -2;
         break;
@@ -1382,37 +1429,74 @@ class _inGameState extends State<inGame>
   }
 
   void fetchHitterProfilePicture() {
-    try {
-      API()
-          .fetchPlayerImage(gameObjectPlayByPlay.plays[currentPlay].hitterID)
-          .then((value) {
-        setState(() {
-          hitterImageLink = value;
+    if (simulation) {
+      try {
+        API()
+            .fetchPlayerImage(gameObjectPlayByPlay.plays[currentPlay].hitterID)
+            .then((value) {
+          setState(() {
+            hitterImageLink = value;
+          });
+          return null;
         });
-        return null;
-      });
-    } catch (e) {
-      print(e);
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      try {
+        API()
+            .fetchPlayerImage(gameObjectPlayByPlay.game.currentHitterID)
+            .then((value) {
+          setState(() {
+            hitterImageLink = value;
+          });
+          return null;
+        });
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
   void fetchPitcherProfilePicture() {
-    try {
-      API()
-          .fetchPlayerImage(gameObjectPlayByPlay.plays[currentPlay].pitcherID)
-          .then((value) {
-        setState(() {
-          pitcherImageLink = value;
+    if (simulation) {
+      try {
+        API()
+            .fetchPlayerImage(gameObjectPlayByPlay.plays[currentPlay].pitcherID)
+            .then((value) {
+          setState(() {
+            pitcherImageLink = value;
+          });
+          return null;
         });
-        return null;
-      });
-    } catch (e) {
-      print(e);
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      try {
+        API()
+            .fetchPlayerImage(gameObjectPlayByPlay.game.currentPitcherID)
+            .then((value) {
+          setState(() {
+            pitcherImageLink = value;
+          });
+          return null;
+        });
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
   Widget getJSONLogs() {
     // return Text(gameObjectPlayByPlay.plays[currentPlay].);
+  }
+
+  Widget getEmptyArea() {
+    return Container(
+      alignment: Alignment.center,
+      width: MediaQuery.of(context).size.width * .23,
+    );
   }
 }
 
