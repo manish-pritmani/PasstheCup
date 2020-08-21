@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -68,6 +69,8 @@ class _inGameState extends State<inGame>
   Pitches latestPitches;
   List<Plays> plays;
 
+  String bgImage;
+
   _inGameState(this.firebaseGameObject, this.sim);
 
   bool printed = false;
@@ -105,10 +108,21 @@ class _inGameState extends State<inGame>
 
     borderColor = Colors.transparent;
 
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+    timer = Timer.periodic(Duration(seconds: 3), (Timer t) {
       simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
     });
     fetchGameDetails();
+
+    Firestore.instance
+        .collection("images")
+        .document(firebaseGameObject.selectedGame.homeTeam)
+        .get()
+        .then((value) {
+      var src = value.data["link"];
+      setState(() {
+        bgImage = src;
+      });
+    }).catchError((e) {});
   }
 
   @override
@@ -225,6 +239,8 @@ class _inGameState extends State<inGame>
       } else {
         var sizeOfPitchesInCurrentPlay = plays[currentPlay].pitches.length;
         if (sizeOfPitchesInCurrentPlay - 1 < currentPitch) {
+          print(
+              "\n\nPlay $currentPlay}:\nRuns Batted In: ${plays[currentPlay].runsBattedIn}\nInnings: ${plays[currentPlay].inningNumber}${plays[currentPlay].inningHalf}\nDescription: ${plays[currentPlay].description}\nResult:${plays[currentPlay].result}");
           awardScoresToPlayers(plays[currentPlay]);
           if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
             setState(() {
@@ -252,35 +268,36 @@ class _inGameState extends State<inGame>
       }
     }
 
-    if (/*false*/ !printed) {
-      bool isFirstActive = true;
-      int player1score = -5;
-      int player2score = -5;
-      int cupscore = 10;
-      var counter = 1;
-      for (Plays play in gameObjectPlayByPlay.plays) {
-        print("Result:${play.result}");
-        int pitchcounter = 0;
-        for (Pitches pitch in play.pitches) {
-          // print("\Pitch $pitchcounter: ${getResultForPitch(pitch)}");
-          pitchcounter++;
-        }
-
-        var pointsToBeAwardedByResult =
-            getPointsToBeAwardedByResult(play.result);
-        cupscore = cupscore - pointsToBeAwardedByResult;
-        if (isFirstActive) {
-          player1score = player1score + pointsToBeAwardedByResult;
-        } else {
-          player2score = player2score + pointsToBeAwardedByResult;
-        }
+//    if (/*false*/ !printed) {
+//      bool isFirstActive = true;
+//      int player1score = -5;
+//      int player2score = -5;
+//      int cupscore = 10;
+//      var counter = 1;
+//      for (Plays play in gameObjectPlayByPlay.plays) {
+//        print(
+//            "\n\nPlay $counter:\nRuns Batted In: ${play.runsBattedIn}\nInnings: ${play.inningNumber}${play.inningHalf}\nDescription: ${play.description}\nResult:${play.result}");
+//        int pitchcounter = 0;
+//        for (Pitches pitch in play.pitches) {
+//           print("\Pitch $pitchcounter: ${getResultForPitch(pitch)}");
+//          pitchcounter++;
+//        }
+//
+//        var pointsToBeAwardedByResult =
+//            getPointsToBeAwardedByResult(play.result);
+//        cupscore = cupscore - pointsToBeAwardedByResult;
+//        if (isFirstActive) {
+//          player1score = player1score + pointsToBeAwardedByResult;
+//        } else {
+//          player2score = player2score + pointsToBeAwardedByResult;
+//        }
 //        print(
 //            "\n$pointsToBeAwardedByResult awarded to ${isFirstActive ? "Player 1" : "Player 2"} from the cup points\nPlayer 1 Score:$player1score\nPlayer 2 Score:$player2score\nCup Points:$cupscore");
-        counter++;
-        isFirstActive = !isFirstActive;
-      }
-      printed = true;
-    }
+//        counter++;
+//        isFirstActive = !isFirstActive;
+//      }
+//      printed = true;
+//    }
 
 //    for (Plays play in gameObjectPlayByPlay.plays) {
 //      var result = play.result;
@@ -312,7 +329,7 @@ class _inGameState extends State<inGame>
     super.build(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Utils().getBGColor(),
+      backgroundColor: Colors.black,
       body: gameObjectPlayByPlay == null
           ? Center(
               child: CircularProgressIndicator(),
@@ -322,17 +339,29 @@ class _inGameState extends State<inGame>
   }
 
   Widget buildSafeArea() {
-    return Container(
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/stadium.jpg"),
-            fit: BoxFit.cover,
-            colorFilter: new ColorFilter.mode(
-                Colors.black.withOpacity(0.75), BlendMode.srcOver)),
+    return FadeAnimation(
+      1,
+      Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          image: DecorationImage(
+              image: getBackgroundImage(),
+              fit: BoxFit.cover,
+              colorFilter: new ColorFilter.mode(
+                  Colors.black.withOpacity(0.75), BlendMode.srcOver)),
+        ),
+        child: buildColumn(),
       ),
-      child: buildColumn(),
     );
+  }
+
+  ImageProvider<dynamic> getBackgroundImage() {
+    if (bgImage == null) {
+      return AssetImage("assets/stadium.jpg");
+    } else {
+      return NetworkImage(bgImage);
+    }
   }
 
   getAnimatedWidget() {
@@ -351,6 +380,24 @@ class _inGameState extends State<inGame>
   Widget buildColumn() {
     return Stack(
       children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Game ID: ${firebaseGameObject.gameCode}",
+                style: TextStyle(color: Hexcolor("#99FFFFFF")),
+              )),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Align(
+              alignment: Alignment.topRight,
+              child: Text(
+                "Channel: ${gameObjectPlayByPlay.game.channel}",
+                style: TextStyle(color: Hexcolor("#99FFFFFF")),
+              )),
+        ),
         Padding(
           padding: const EdgeInsets.all(40.0),
           child: Align(
@@ -1344,8 +1391,14 @@ class _inGameState extends State<inGame>
       });
     }
 
-//    print(
-//        "$pointsToBeAwarded points for ${firebaseGameObject.players[activePlayer].name} for $result");
+    print(
+        "$pointsToBeAwarded points for ${firebaseGameObject.players[activePlayer].name} for $result");
+    int counter = 0;
+    for (Player p in firebaseGameObject.players) {
+      print("Player $counter: ${p.gamescore}");
+      counter++;
+    }
+    print("Cupscore: $cupScore");
 //    // updateFirebaseGameObject();
   }
 
