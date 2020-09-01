@@ -9,6 +9,8 @@ import 'model/gameObject.dart';
 class API {
   static const String BaseUrl = "https://api.sportsdata.io/v3/mlb/scores/json/";
   static const String keyString = "?key=be3c8c7f48c742a68a47e87a3bc3d1c3";
+  static const String startURL =
+      "https://us-central1-passthecup-1b762.cloudfunctions.net/app/listUsers/Start/";
 
   Future<List<GameObject>> fetchGames() async {
     List<GameObject> list;
@@ -47,9 +49,9 @@ class API {
   }
 
   Future<GameObjectPlayByPlay> fetchGamePlayByPlay(String gamid) async {
-    var url = "https://api.sportsdata.io/v3/mlb/pbp/json/PlayByPlay/$gamid$keyString";
-    final response =
-        await http.get(url);
+    var url =
+        "https://api.sportsdata.io/v3/mlb/pbp/json/PlayByPlay/$gamid$keyString";
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -64,9 +66,9 @@ class API {
   }
 
   Future<String> fetchPlayerImage(int hitterID) async {
-    var url = "https://api.sportsdata.io/v3/mlb/scores/json/Player/$hitterID$keyString";
-    final response =
-        await http.get(url);
+    var url =
+        "https://api.sportsdata.io/v3/mlb/scores/json/Player/$hitterID$keyString";
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -81,6 +83,24 @@ class API {
       // If the server did not return a 200 OK response,
       // then throw an exception.
       return "";
+    }
+  }
+
+  Future<bool> startGame(int gameID, String gameCode) async {
+    var url = "$startURL/$gameID/$gameCode";
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      try {
+        return true;
+      } catch (e) {
+        print(e);
+        return false;
+      }
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      return false;
     }
   }
 }

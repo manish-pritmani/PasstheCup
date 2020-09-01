@@ -16,18 +16,40 @@ class FirebaseGameObject {
   int cupScore;
   bool simulation;
   List<Player> players;
+  String lastResult;
+  int lastResultPointsAwarded;
+  String currentHitter;
+  String currentPitcher;
+  int currentHitterID;
+  int currentPitcherID;
+  int currentInningNumber;
+  String currentInningHalf;
+  int currentActivePlayer;
+  String lastUpdatedAt;
 
   FirebaseGameObject(
       {this.joinPlayers,
-        this.selectedTeam,
-        this.creatorId,
-        this.name,
-        this.players,
-        this.hostID,
-        this.gameCode,
-        this.selectedGame, this.cupScore,
-        this.createdOn, this.simulation,
-        this.status});
+      this.selectedTeam,
+      this.creatorId,
+      this.name,
+      this.players,
+      this.hostID,
+      this.gameCode,
+      this.selectedGame,
+      this.cupScore,
+      this.createdOn,
+      this.simulation,
+      this.status,
+      this.lastResult,
+      this.lastResultPointsAwarded,
+      this.currentHitter,
+      this.currentPitcher,
+      this.currentHitterID,
+      this.currentPitcherID,
+      this.currentInningNumber,
+      this.currentInningHalf,
+      this.currentActivePlayer,
+      this.lastUpdatedAt});
 
   FirebaseGameObject.fromJson(Map<String, dynamic> json) {
     joinPlayers = json['joinPlayers'];
@@ -57,6 +79,16 @@ class FirebaseGameObject {
         players.add(new Player.fromJson(v));
       });
     }
+    lastResult = json['lastResult'];
+    lastResultPointsAwarded = json['lastResultPointsAwarded'];
+    currentHitter = json['currentHitter'];
+    currentPitcher = json['currentPitcher'];
+    currentHitterID = json['currentHitterID'];
+    currentPitcherID = json['currentPitcherID'];
+    currentInningNumber = json['currentInningNumber'];
+    currentInningHalf = json['currentInningHalf'];
+    currentActivePlayer = json['currentActivePlayer'];
+    lastUpdatedAt = json['lastUpdatedAt'];
   }
 
   Map<String, dynamic> toJson() {
@@ -79,8 +111,16 @@ class FirebaseGameObject {
     if (this.players != null) {
       data['players'] = this.players.map((v) => v.toJson()).toList();
     }
+    data['lastResult'] = this.lastResult;
+    data['lastResultPointsAwarded'] = this.lastResultPointsAwarded;
+    data['currentHitter'] = this.currentHitter;
+    data['currentPitcher'] = this.currentPitcher;
+    data['currentHitterID'] = this.currentHitterID;
+    data['currentPitcherID'] = this.currentPitcherID;
+    data['currentInningNumber'] = this.currentInningNumber;
+    data['currentInningHalf'] = this.currentInningHalf;
+    data['currentActivePlayer'] = this.currentActivePlayer;
+    data['lastUpdatedAt'] = this.lastUpdatedAt;
     return data;
   }
 }
-
-

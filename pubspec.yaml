@@ -34,6 +34,7 @@ dependencies:
   supercharged: ^1.8.2
   share: ^0.6.4+3
   flutter_phoenix: ^0.1.0
+  screen: ^0.0.5
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -217,6 +217,17 @@ class _CreateGameState extends State<CreateGame> {
       "createdOn": DateTime.now().toString(),
       "players": players,
       "simulation": false,
+      "lastResult": "",
+      "lastResultPointsAwarded": 0,
+      "currentHitter": "",
+      "currentPitcher": "",
+      "currentHitterID": 0,
+      "currentPitcherID":0,
+      "currentInningNumber": 0,
+      "currentInningHalf": "T",
+      "currentActivePlayer": 0,
+      "cupScore":0,
+      "lastUpdatedAt":""
     };
     Firestore.instance
         .collection("games")

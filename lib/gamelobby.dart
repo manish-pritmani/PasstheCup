@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/api.dart';
 import 'package:passthecup/game.dart';
 import 'package:passthecup/model/gameObject.dart';
 import 'package:passthecup/model/teamobject.dart';
@@ -156,8 +157,9 @@ class LobbyState extends State<Lobby> {
                   height: 60,
                   onPressed: () {
                     if (!add) {
-                      showAlertDialog(context, "",
-                          "Select Mode", "Simulation", "Live Game");
+//                      showAlertDialog(context, "", "Select Mode", "Simulation",
+//                          "Live Game");
+                      openGameScreen(context, false);
                     } else {
                       Utils().showToast(
                           "Wait for host to start the game", context);
@@ -218,23 +220,28 @@ class LobbyState extends State<Lobby> {
   }
 
   void openGameScreen(BuildContext context, bool simulation) {
+    Utils().showLoaderDialog(context);
     firebaseGameObject.status = 1;
-    firebaseGameObject.simulation=simulation;
+    firebaseGameObject.simulation = simulation;
     firebaseGameObject.cupScore = firebaseGameObject.players.length * 5;
     Firestore.instance
         .collection("games")
         .document(firebaseGameObject.gameCode)
         .setData(firebaseGameObject.toJson(), merge: true)
         .then((value) {
-      Navigator.pop(context);
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => inGame(
-                    firebaseGameObject,
-                    simulation: simulation,
-                  )));
-      return null;
+      API()
+          .startGame(firebaseGameObject.selectedGame.gameID,
+              firebaseGameObject.gameCode)
+          .then((value) {
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => inGame(
+                      firebaseGameObject,
+                      simulation: simulation,
+                    )));
+      }).catchError((onError) => {Utils().showToast(onError.message, context)});
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
   }
 
@@ -437,7 +444,7 @@ class LobbyState extends State<Lobby> {
     setState(() {
       firebaseGameObject = FirebaseGameObject.fromJson(map);
     });
-    if(firebaseGameObject.status==1){
+    if (firebaseGameObject.status == 1) {
       openGameScreen(context, firebaseGameObject.simulation);
     }
   }
