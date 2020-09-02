@@ -130,221 +130,235 @@ class _WelcomeState extends State<Welcome> {
     }
   }
 
-  Container buildContainer(BuildContext context) {
+  Widget buildContainer(BuildContext context) {
     Color color = Colors.primaries[Random().nextInt(Colors.primaries.length)];
     String hex = "808080"; // color.value.toRadixString(16).substring(2);
-    return Container(
-      color: Utils().getBGColor(),
-      height: MediaQuery.of(context).size.height,
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+    return Stack(
+      children: <Widget>[
+        Container(
+          color: Utils().getBGColor(),
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    getAvatarWidget(hex),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Column(
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
+                        getAvatarWidget(hex),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Column(
+                          children: <Widget>[
 //                    getAvatar(),
-                        FadeAnimation(
-                            1,
-                            Text(
-                              "Welcome",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold),
-                            )),
-                        FadeAnimation(
-                          1,
-                          Text(
-                            "${firebaseUserObject.data["name"] == null ? user.email : firebaseUserObject.data["name"]}"
-                                .toUpperCase(),
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          height: 0,
+                            FadeAnimation(
+                                1,
+                                Text(
+                                  "Welcome",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                            FadeAnimation(
+                              1,
+                              Text(
+                                "${firebaseUserObject.data["name"] == null ? user.email : firebaseUserObject.data["name"]}"
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            SizedBox(
+                              height: 0,
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-                FadeAnimation(
-                    1.4,
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Container(
-                        padding: EdgeInsets.only(top: 3, left: 3),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border(
-                              bottom: BorderSide(color: borderColor),
-                              top: BorderSide(color: borderColor),
-                              left: BorderSide(color: borderColor),
-                              right: BorderSide(color: borderColor),
-                            )),
-                        child: MaterialButton(
-                          minWidth: double.infinity,
-                          height: 60,
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => GameId()));
-                          },
-                          color: Colors.redAccent,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          child: Text(
-                            "Join Game",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
+                    FadeAnimation(
+                        1.4,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Container(
+                            padding: EdgeInsets.only(top: 3, left: 3),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border(
+                                  bottom: BorderSide(color: borderColor),
+                                  top: BorderSide(color: borderColor),
+                                  left: BorderSide(color: borderColor),
+                                  right: BorderSide(color: borderColor),
+                                )),
+                            child: MaterialButton(
+                              minWidth: double.infinity,
+                              height: 60,
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => GameId()));
+                              },
+                              color: Colors.redAccent,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Text(
+                                "Join Game",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )),
-                FadeAnimation(
-                    1.4,
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Container(
-                        padding: EdgeInsets.only(top: 3, left: 3),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border(
-                              bottom: BorderSide(color: borderColor),
-                              top: BorderSide(color: borderColor),
-                              left: BorderSide(color: borderColor),
-                              right: BorderSide(color: borderColor),
-                            )),
-                        child: MaterialButton(
-                          minWidth: double.infinity,
-                          height: 60,
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CreateGame()));
-                          },
-                          color: Colors.redAccent,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          child: Text(
-                            "Create Game",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
+                        )),
+                    FadeAnimation(
+                        1.4,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Container(
+                            padding: EdgeInsets.only(top: 3, left: 3),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border(
+                                  bottom: BorderSide(color: borderColor),
+                                  top: BorderSide(color: borderColor),
+                                  left: BorderSide(color: borderColor),
+                                  right: BorderSide(color: borderColor),
+                                )),
+                            child: MaterialButton(
+                              minWidth: double.infinity,
+                              height: 60,
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CreateGame()));
+                              },
+                              color: Colors.redAccent,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Text(
+                                "Create Game",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )),
-                FadeAnimation(
-                    1.4,
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Container(
-                        padding: EdgeInsets.only(top: 3, left: 3),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border(
-                              bottom: BorderSide(color: borderColor),
-                              top: BorderSide(color: borderColor),
-                              left: BorderSide(color: borderColor),
-                              right: BorderSide(color: borderColor),
-                            )),
-                        child: MaterialButton(
-                          minWidth: double.infinity,
-                          height: 60,
-                          onPressed: () {
-                            Share.share(
-                                'Download the PassTheCup App from AppStore: https://apps.apple.com/in/app/facebook/id284882215');
+                        )),
+                    FadeAnimation(
+                        1.4,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Container(
+                            padding: EdgeInsets.only(top: 3, left: 3),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border(
+                                  bottom: BorderSide(color: borderColor),
+                                  top: BorderSide(color: borderColor),
+                                  left: BorderSide(color: borderColor),
+                                  right: BorderSide(color: borderColor),
+                                )),
+                            child: MaterialButton(
+                              minWidth: double.infinity,
+                              height: 60,
+                              onPressed: () {
+                                Share.share(
+                                    'Download the PassTheCup App from AppStore: https://apps.apple.com/in/app/facebook/id284882215');
 //                            Navigator.push(
 //                                context,
 //                                MaterialPageRoute(
 //                                    builder: (context) => Invite()));
-                          },
-                          color: Utils().getBlue(),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          child: Text(
-                            "Invite Friends",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
+                              },
+                              color: Utils().getBlue(),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Text(
+                                "Invite Friends",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )),
-                FadeAnimation(
-                    1.4,
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Container(
-                        padding: EdgeInsets.only(top: 3, left: 3),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border(
-                              bottom: BorderSide(color: borderColor),
-                              top: BorderSide(color: borderColor),
-                              left: BorderSide(color: borderColor),
-                              right: BorderSide(color: borderColor),
-                            )),
-                        child: MaterialButton(
-                          minWidth: double.infinity,
-                          height: 60,
-                          onPressed: signout,
-                          color: Utils().getBlue(),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          child: Text(
-                            "Signout",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
+                        )),
+                    FadeAnimation(
+                        1.4,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Container(
+                            padding: EdgeInsets.only(top: 3, left: 3),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border(
+                                  bottom: BorderSide(color: borderColor),
+                                  top: BorderSide(color: borderColor),
+                                  left: BorderSide(color: borderColor),
+                                  right: BorderSide(color: borderColor),
+                                )),
+                            child: MaterialButton(
+                              minWidth: double.infinity,
+                              height: 60,
+                              onPressed: signout,
+                              color: Utils().getBlue(),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Text(
+                                "Signout",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )),
-              ],
+                        )),
+                  ],
+                ),
+              ),
+              FadeAnimation(
+                  1.2,
+                  Container(
+                    height: MediaQuery.of(context).size.height / 2.9,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/people.png'),
+                            fit: BoxFit.cover)),
+                  ))
+            ],
+          ),
+        ),
+        Align(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "V.0.2",
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          FadeAnimation(
-              1.2,
-              Container(
-                height: MediaQuery.of(context).size.height / 2.9,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/people.png'),
-                        fit: BoxFit.cover)),
-              ))
-        ],
-      ),
+          alignment: Alignment.bottomRight,
+        )
+      ],
     );
   }
 
