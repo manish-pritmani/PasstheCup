@@ -470,7 +470,7 @@ class _inGameState extends State<inGame>
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
-                    displaymsg,
+                    displaymsg.toString(),
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
