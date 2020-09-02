@@ -142,7 +142,10 @@ class _inGameState extends State<inGame>
         setState(() {
           firebaseGameObject = FirebaseGameObject.fromJson(map);
           gameObjectPlayByPlay = firebaseGameObject.selectedGame;
+          displaymsg = firebaseGameObject.selectedGame.lastPlay;
         });
+        fetchHitterProfilePicture();
+        fetchPitcherProfilePicture();
       } catch (e) {
         print(e);
       }
@@ -887,7 +890,7 @@ class _inGameState extends State<inGame>
 //        return "";
 //      }
     } else {
-      return firebaseGameObject.currentHitter.toString();
+      return firebaseGameObject.selectedGame.currentHitter.toString();
     }
   }
 
@@ -903,7 +906,7 @@ class _inGameState extends State<inGame>
 //        return "";
 //      }
     } else {
-      return firebaseGameObject.currentPitcher.toString();
+      return firebaseGameObject.selectedGame.currentPitcher.toString();
     }
   }
 
