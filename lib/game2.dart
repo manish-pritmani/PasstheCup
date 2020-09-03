@@ -149,7 +149,7 @@ class _GameScreenState extends State<GameScreen>
         children: <Widget>[
           Align(
             child: getExitButton(),
-            alignment: Alignment.topLeft,
+            alignment: Alignment.topRight,
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -159,16 +159,16 @@ class _GameScreenState extends State<GameScreen>
           ),
           Align(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(0.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   getGameIDText(),
                   getChannelNameText(),
                 ],
               ),
             ),
-            alignment: Alignment.topRight,
+            alignment: Alignment.topLeft,
           ),
         ],
       ),
@@ -266,7 +266,7 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             bottom: 75,
-            left: 70,
+            left: 55,
             child: Column(
               children: <Widget>[
                 getPitcherImage(),
@@ -282,7 +282,7 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             bottom: -10,
-            left: 70,
+            left: 50,
             child: Column(
               children: <Widget>[
                 getHitterImage(),
@@ -316,8 +316,8 @@ class _GameScreenState extends State<GameScreen>
         left: 95,
         child: Image.asset(
           "assets/dot.png",
-          width: 10,
-          height: 10,
+          width: 15,
+          height: 15,
           color: Colors.white,
         ),
       ),
@@ -336,8 +336,8 @@ class _GameScreenState extends State<GameScreen>
         right: 27,
         child: Image.asset(
           "assets/dot.png",
-          width: 10,
-          height: 10,
+          width: 15,
+          height: 15,
           color: Colors.white,
         ),
       ),
@@ -356,8 +356,8 @@ class _GameScreenState extends State<GameScreen>
         left: 27,
         child: Image.asset(
           "assets/dot.png",
-          width: 10,
-          height: 10,
+          width: 15,
+          height: 15,
           color: Colors.white,
         ),
       ),
