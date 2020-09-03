@@ -1112,7 +1112,7 @@ class _inGameState extends State<inGame>
     try {
 //      var play = firebaseGameObject.currentInningNumber[currentPlay];
       int number = firebaseGameObject.selectedGame.inning;
-      var inningHalf = firebaseGameObject.currentInningHalf == "T" ? "▲" : "▼";
+      var inningHalf = firebaseGameObject.selectedGame.inningHalf == "T" ? "▲" : "▼";
       if (number == 1) {
         return number.toString() + "st ${inningHalf}";
       } else if (number == 2) {

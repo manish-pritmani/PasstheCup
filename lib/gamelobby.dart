@@ -11,6 +11,7 @@ import 'package:passthecup/model/gameObject.dart';
 import 'package:passthecup/model/teamobject.dart';
 import 'package:passthecup/utils.dart';
 
+import 'game2.dart';
 import 'model/Player.dart';
 import 'model/firebasegameObject.dart';
 
@@ -237,9 +238,8 @@ class LobbyState extends State<Lobby> {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => inGame(
+                builder: (context) => GameScreen(
                       firebaseGameObject,
-                      simulation: simulation,
                     )));
       }).catchError((onError) => {Utils().showToast(onError.message, context)});
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
