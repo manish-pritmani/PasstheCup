@@ -226,15 +226,13 @@ class _GameScreenState extends State<GameScreen>
   Widget getRightWidget() {
     return Container(
       width: MediaQuery.of(context).size.width * .2,
-      child: Flexible(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            getPointsAwardedWidget(),
-          ],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          getPointsAwardedWidget(),
+        ],
       ),
     );
   }
