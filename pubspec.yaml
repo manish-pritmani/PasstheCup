@@ -36,6 +36,7 @@ dependencies:
   flutter_phoenix: ^0.1.0
   screen: ^0.0.5
   auto_size_text: ^2.1.0
+  confetti: ^0.5.4+1
 
 
   # The following adds the Cupertino Icons font to your application.

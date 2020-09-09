@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
+import 'package:passthecup/resultscreen.dart';
 import 'package:passthecup/utils.dart';
 import 'package:screen/screen.dart';
 
@@ -72,10 +73,22 @@ class _GameScreenState extends State<GameScreen>
         });
         fetchHitterProfilePicture();
         fetchPitcherProfilePicture();
+
+        if (firebaseGameObject.status == -1) {
+          openResultScreen();
+        }
       } catch (e) {
         print(e);
       }
     });
+  }
+
+  void openResultScreen() {
+    Navigator.of(context).pushReplacement(new MaterialPageRoute<void>(
+      builder: (BuildContext context) {
+        return new ResultScreen(firebaseGameObject);
+      },
+    ));
   }
 
   void fetchBackgroundImage() {
@@ -191,6 +204,10 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getCupWidget() {
+    var scoreToShow = firebaseGameObject.cupScore.toString();
+    if (firebaseGameObject.cupScore > 10 && firebaseGameObject.cupScore < 10) {
+      scoreToShow = "0" + firebaseGameObject.cupScore.toString();
+    }
     return Stack(
       children: <Widget>[
         Image.asset(
@@ -202,7 +219,8 @@ class _GameScreenState extends State<GameScreen>
           top: 35,
           left: 25,
           child: Text(
-            firebaseGameObject.cupScore.toString() + "",
+            scoreToShow + "",
+            textAlign: TextAlign.center,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
@@ -272,7 +290,10 @@ class _GameScreenState extends State<GameScreen>
                   height: 5,
                 ),
                 Text(
-                  firebaseGameObject.selectedGame.currentPitcher.toString(),
+                  firebaseGameObject.selectedGame.currentPitcher == null
+                      ? ""
+                      : firebaseGameObject.selectedGame.currentPitcher
+                          .toString(),
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 )
               ],
@@ -288,7 +309,10 @@ class _GameScreenState extends State<GameScreen>
                   height: 5,
                 ),
                 Text(
-                  firebaseGameObject.selectedGame.currentHitter.toString(),
+                  firebaseGameObject.selectedGame.currentHitter == null
+                      ? ""
+                      : firebaseGameObject.selectedGame.currentHitter
+                          .toString(),
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ],
@@ -1076,6 +1100,34 @@ class _GameScreenState extends State<GameScreen>
       });
       return null;
     });
+  }
+
+  showQDialog() {
+    showGeneralDialog(
+      barrierLabel: "Barrier",
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.7),
+      transitionDuration: Duration(milliseconds: 200),
+      context: context,
+      pageBuilder: (_, __, ___) {
+        return Align(
+          alignment: Alignment.bottomRight,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Scaffold(
+              backgroundColor: Colors.redAccent,
+              body: Container(
+                child: Stack(
+                  children: <Widget>[],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

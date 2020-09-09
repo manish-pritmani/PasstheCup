@@ -198,12 +198,14 @@ class _CreateGameState extends State<CreateGame> {
   }
 
   void createGameAndEnter(BuildContext context) {
+    Utils().showLoaderDialog(context);
     List<Map<String, dynamic>> players = List();
+    List<Map<String, dynamic>> playersLobby = List();
     var player = Player(
         name: user.displayName, email: user.email, gamescore: -5, host: true);
-    players.add(player.toJson());
-    player.host = false;
-    players.add(player.toJson());
+    playersLobby.add(player.toJson());
+    //player.host = false;
+    //playersLobby.add(player.toJson());
     String gameID = generateGameID();
     var map = {
       "selectedGame": _currengame.toJson(),
@@ -222,12 +224,15 @@ class _CreateGameState extends State<CreateGame> {
       "currentHitter": "",
       "currentPitcher": "",
       "currentHitterID": 0,
-      "currentPitcherID":0,
+      "currentPitcherID": 0,
       "currentInningNumber": 0,
       "currentInningHalf": "T",
       "currentActivePlayer": 0,
-      "cupScore":0,
-      "lastUpdatedAt":""
+      "cupScore": 0,
+      "lastUpdatedAt": ""
+    };
+    var lobbymap = {
+      "players": playersLobby,
     };
     Firestore.instance
         .collection("games")
@@ -235,12 +240,23 @@ class _CreateGameState extends State<CreateGame> {
         .setData(map)
         .then((_) {
       print("Game Created Successfully!");
-      Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
-        builder: (BuildContext context) {
-          return new Lobby(gameID, false);
-        },
-      ));
+      Firestore.instance
+          .collection("players")
+          .document(gameID)
+          .setData(lobbymap)
+          .then((value) {
+        Navigator.pop(context);
+        openLoabbyScreen(context, gameID);
+      });
     });
+  }
+
+  void openLoabbyScreen(BuildContext context, String gameID) {
+    Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
+      builder: (BuildContext context) {
+        return new Lobby(gameID, false);
+      },
+    ));
   }
 
   void openTeamSelectScreen(BuildContext context) {

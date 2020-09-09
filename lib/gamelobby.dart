@@ -8,6 +8,7 @@ import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/api.dart';
 import 'package:passthecup/game.dart';
 import 'package:passthecup/model/gameObject.dart';
+import 'package:passthecup/model/lobbyobject.dart';
 import 'package:passthecup/model/teamobject.dart';
 import 'package:passthecup/utils.dart';
 
@@ -33,7 +34,10 @@ class LobbyState extends State<Lobby> {
   bool add;
 
   FirebaseGameObject firebaseGameObject;
+  LobbyObject lobbyObject;
   FirebaseUser user;
+  var gameDocumentRef;
+  var lobbyDocumentRef;
 
   LobbyState(this.gameID, this.add, this.user);
 
@@ -42,20 +46,80 @@ class LobbyState extends State<Lobby> {
     // TODO: implement initState
     super.initState();
     isAdded = false;
-    var document = Firestore.instance.collection('games').document(gameID);
-    document.snapshots().listen((event) {
+    gameDocumentRef = Firestore.instance.collection('games').document(gameID);
+    lobbyDocumentRef =
+        Firestore.instance.collection('players').document(gameID);
+
+    startFetching();
+  }
+
+  void startFetching() async {
+    try {
+      //fetch gameObject and LobbyObject first
+      var value = await gameDocumentRef.get();
+      onGetObject(value);
+      var valueLobby = await lobbyDocumentRef.get();
+      onGetObjectLobby(valueLobby);
+
+      //Once Fetched, listen for any changes in gameObject and lobbyObject
+      listenToGameObjectChanges();
+      listenLobby();
+    } catch (e) {
+      print(e);
+      Navigator.pop(context, false);
+    }
+
+//     gameDocumentRef.get().then((value) {
+//      onGetObject(value);
+//      lobbyDocumentRef.get().then((value) {
+//        onGetObjectLobby(value);
+//        listenToGameObjectChanges();
+//        if (add) {
+//          addMeAsAPlayer();
+//        }
+//      });
+//      if (firebaseGameObject.status == 1) {
+//        joinGameInBetween(context, firebaseGameObject.simulation);
+//      } else {
+//        listenLobby();
+//      }
+//    }).catchError((e) {
+//    //      Utils().showToast(e.toString(), context, ok: (){
+//    //        Navigator.pop(context);
+//    //      });
+//      Navigator.pop(context, false);
+//    });
+  }
+
+  void performActionBasedOnGameStatus() {
+     switch (firebaseGameObject.status) {
+      case 0: //not started
+        if (add) {
+          addMeAsAPlayer();
+        }
+        break;
+      case 1: //in Progress
+        joinGameInBetween(context, firebaseGameObject.simulation);
+        break;
+      case -1: // game ended
+        Utils().showToast(
+            "Game has ended", context);
+        break;
+      default:
+        Utils().showToast(
+            "Unknown Game status: ${firebaseGameObject.status}", context);
+    }
+  }
+
+  void listenToGameObjectChanges() {
+    gameDocumentRef.snapshots().listen((event) {
       onGetUpdates(event);
     });
-    document.get().then((value) {
-      onGetObject(value);
-      if (add) {
-        addMeAsAPlayer();
-      }
-    }).catchError((e) {
-//      Utils().showToast(e.toString(), context, ok: (){
-//        Navigator.pop(context);
-//      });
-      Navigator.pop(context, false);
+  }
+
+  void listenLobby() {
+    lobbyDocumentRef.snapshots().listen((event) {
+      onGetUpdatesLobby(event);
     });
   }
 
@@ -68,15 +132,24 @@ class LobbyState extends State<Lobby> {
     });
   }
 
+  void onGetObjectLobby(DocumentSnapshot event) {
+    var map = event.data;
+    var encode = jsonEncode(map);
+    print(encode);
+    setState(() {
+      lobbyObject = LobbyObject.fromJson(map);
+    });
+  }
+
   void addMeAsAPlayer() {
     var email = user.email;
-    if (/*!exists(email) &&*/ !isAdded) {
-      firebaseGameObject.players.add(Player(
+    if (!exists(email) && !isAdded) {
+      lobbyObject.players.add(Player(
           name: user.displayName, email: email, gamescore: -5, host: false));
       isAdded = true;
     }
-    var document = Firestore.instance.collection('games').document(gameID);
-    document.setData(firebaseGameObject.toJson());
+    var document = Firestore.instance.collection('players').document(gameID);
+    document.setData(lobbyObject.toJson());
   }
 
   @override
@@ -99,7 +172,7 @@ class LobbyState extends State<Lobby> {
             ),
           ),
         ),
-        body: firebaseGameObject == null
+        body: lobbyObject == null
             ? Center(
                 child: CircularProgressIndicator(),
               )
@@ -126,7 +199,7 @@ class LobbyState extends State<Lobby> {
                 height: 20,
               ),
               Text(
-                "Players in Lobby (${firebaseGameObject.players.length})",
+                "Players in Lobby (${lobbyObject.players.length})",
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 22,
@@ -220,11 +293,24 @@ class LobbyState extends State<Lobby> {
     );
   }
 
+  void joinGameInBetween(BuildContext context, bool simulation) {
+    if (add) {
+      addMeAsAPlayer();
+    }
+    Navigator.pop(context, false);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => GameScreen(
+                  firebaseGameObject,
+                )));
+  }
+
   void openGameScreen(BuildContext context, bool simulation) {
     Utils().showLoaderDialog(context);
     firebaseGameObject.status = 1;
     firebaseGameObject.simulation = simulation;
-    firebaseGameObject.cupScore = firebaseGameObject.players.length * 5;
+    firebaseGameObject.cupScore = lobbyObject.players.length * 5;
     Firestore.instance
         .collection("games")
         .document(firebaseGameObject.gameCode)
@@ -247,7 +333,7 @@ class LobbyState extends State<Lobby> {
 
   List<Widget> getAllPlayers() {
     List<Widget> widgets = List();
-    for (Player player in firebaseGameObject.players) {
+    for (Player player in lobbyObject.players) {
       widgets.add(getPlayerWidget(player));
     }
     return widgets;
@@ -429,7 +515,7 @@ class LobbyState extends State<Lobby> {
   }
 
   bool exists(String email) {
-    for (Player player in firebaseGameObject.players) {
+    for (Player player in lobbyObject.players) {
       if (player.email == email) {
         return true;
       }
@@ -444,8 +530,16 @@ class LobbyState extends State<Lobby> {
     setState(() {
       firebaseGameObject = FirebaseGameObject.fromJson(map);
     });
-    if (firebaseGameObject.status == 1) {
-      openGameScreen(context, firebaseGameObject.simulation);
-    }
+    //Now, check the status of game to know weather game has started, inProgress, or ended.
+    performActionBasedOnGameStatus();
+  }
+
+  void onGetUpdatesLobby(DocumentSnapshot event) {
+    var map = event.data;
+    var encode = jsonEncode(map);
+    print(encode);
+    setState(() {
+      lobbyObject = LobbyObject.fromJson(map);
+    });
   }
 }
