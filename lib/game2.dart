@@ -250,6 +250,13 @@ class _GameScreenState extends State<GameScreen>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           getPointsAwardedWidget(),
+          Padding(
+            padding: const EdgeInsets.only(right: 26.0, top: 8),
+            child: Text(
+              "${firebaseGameObject.lastResult}",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
@@ -1049,7 +1056,7 @@ class _GameScreenState extends State<GameScreen>
               textAlign: TextAlign.center,
             ),
             Text(
-              "Points",
+              getPointText(pointsAwarded),
               style: TextStyle(
                 fontSize: 12.0,
                 color: pointsAwarded >= 0 ? Colors.black : Colors.white,
@@ -1068,6 +1075,14 @@ class _GameScreenState extends State<GameScreen>
         color: getColorByPointsAwarded(pointsAwarded),
       ),
     );
+  }
+
+  String getPointText(int pointsAwarded) {
+    if ((pointsAwarded == 1 || pointsAwarded == -1)) {
+      return "Point";
+    } else {
+      return "Points";
+    }
   }
 
   Color getColorByPointsAwarded(int pointsAwarded) {

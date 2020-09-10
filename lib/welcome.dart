@@ -352,7 +352,7 @@ class _WelcomeState extends State<Welcome> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "V.0.2",
+              "V.0.5",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
