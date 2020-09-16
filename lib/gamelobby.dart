@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -36,8 +37,10 @@ class LobbyState extends State<Lobby> {
   FirebaseGameObject firebaseGameObject;
   LobbyObject lobbyObject;
   FirebaseUser user;
-  var gameDocumentRef;
-  var lobbyDocumentRef;
+  DocumentReference gameDocumentRef;
+  DocumentReference lobbyDocumentRef;
+  StreamSubscription<DocumentSnapshot> gameDocumentSubscription;
+  StreamSubscription<DocumentSnapshot> lobbyDocumentSubscription;
 
   LobbyState(this.gameID, this.add, this.user);
 
@@ -92,7 +95,7 @@ class LobbyState extends State<Lobby> {
   }
 
   void performActionBasedOnGameStatus() {
-     switch (firebaseGameObject.status) {
+    switch (firebaseGameObject.status) {
       case 0: //not started
         if (add) {
           addMeAsAPlayer();
@@ -102,8 +105,7 @@ class LobbyState extends State<Lobby> {
         joinGameInBetween(context, firebaseGameObject.simulation);
         break;
       case -1: // game ended
-        Utils().showToast(
-            "Game has ended", context);
+        Utils().showToast("Game has ended", context);
         break;
       default:
         Utils().showToast(
@@ -112,13 +114,13 @@ class LobbyState extends State<Lobby> {
   }
 
   void listenToGameObjectChanges() {
-    gameDocumentRef.snapshots().listen((event) {
+    gameDocumentSubscription = gameDocumentRef.snapshots().listen((event) {
       onGetUpdates(event);
     });
   }
 
   void listenLobby() {
-    lobbyDocumentRef.snapshots().listen((event) {
+    lobbyDocumentSubscription = lobbyDocumentRef.snapshots().listen((event) {
       onGetUpdatesLobby(event);
     });
   }
@@ -139,6 +141,13 @@ class LobbyState extends State<Lobby> {
     setState(() {
       lobbyObject = LobbyObject.fromJson(map);
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    lobbyDocumentSubscription?.cancel();
+    gameDocumentSubscription?.cancel();
   }
 
   void addMeAsAPlayer() {
@@ -526,7 +535,7 @@ class LobbyState extends State<Lobby> {
   void onGetUpdates(DocumentSnapshot event) {
     var map = event.data;
     var encode = jsonEncode(map);
-    print(encode);
+    //print(encode);
     setState(() {
       firebaseGameObject = FirebaseGameObject.fromJson(map);
     });

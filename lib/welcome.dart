@@ -1,12 +1,15 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/create-game.dart';
 import 'package:passthecup/gameid.dart';
+import 'package:passthecup/mygames.dart';
 import 'package:passthecup/restartwidget.dart';
+import 'package:passthecup/resultscreen.dart';
 import 'package:passthecup/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share/share.dart';
@@ -188,151 +191,11 @@ class _WelcomeState extends State<Welcome> {
                         ),
                       ],
                     ),
-                    FadeAnimation(
-                        1.4,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Container(
-                            padding: EdgeInsets.only(top: 3, left: 3),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border(
-                                  bottom: BorderSide(color: borderColor),
-                                  top: BorderSide(color: borderColor),
-                                  left: BorderSide(color: borderColor),
-                                  right: BorderSide(color: borderColor),
-                                )),
-                            child: MaterialButton(
-                              minWidth: double.infinity,
-                              height: 60,
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => GameId()));
-                              },
-                              color: Colors.redAccent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: Text(
-                                "Join Game",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        )),
-                    FadeAnimation(
-                        1.4,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Container(
-                            padding: EdgeInsets.only(top: 3, left: 3),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border(
-                                  bottom: BorderSide(color: borderColor),
-                                  top: BorderSide(color: borderColor),
-                                  left: BorderSide(color: borderColor),
-                                  right: BorderSide(color: borderColor),
-                                )),
-                            child: MaterialButton(
-                              minWidth: double.infinity,
-                              height: 60,
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CreateGame()));
-                              },
-                              color: Colors.redAccent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: Text(
-                                "Create Game",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        )),
-                    FadeAnimation(
-                        1.4,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Container(
-                            padding: EdgeInsets.only(top: 3, left: 3),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border(
-                                  bottom: BorderSide(color: borderColor),
-                                  top: BorderSide(color: borderColor),
-                                  left: BorderSide(color: borderColor),
-                                  right: BorderSide(color: borderColor),
-                                )),
-                            child: MaterialButton(
-                              minWidth: double.infinity,
-                              height: 60,
-                              onPressed: () {
-                                Share.share(
-                                    'Download the PassTheCup App from AppStore: https://apps.apple.com/in/app/facebook/id284882215');
-//                            Navigator.push(
-//                                context,
-//                                MaterialPageRoute(
-//                                    builder: (context) => Invite()));
-                              },
-                              color: Utils().getBlue(),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: Text(
-                                "Invite Friends",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        )),
-                    FadeAnimation(
-                        1.4,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Container(
-                            padding: EdgeInsets.only(top: 3, left: 3),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border(
-                                  bottom: BorderSide(color: borderColor),
-                                  top: BorderSide(color: borderColor),
-                                  left: BorderSide(color: borderColor),
-                                  right: BorderSide(color: borderColor),
-                                )),
-                            child: MaterialButton(
-                              minWidth: double.infinity,
-                              height: 60,
-                              onPressed: signout,
-                              color: Utils().getBlue(),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: Text(
-                                "Signout",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        )),
+                    getJoinGameButton(context),
+                    getCreateGameButton(context),
+                    getMyGamesButton(),
+                    getInviteFriendsButton(),
+                    getSignoutButton(),
                   ],
                 ),
               ),
@@ -360,6 +223,199 @@ class _WelcomeState extends State<Welcome> {
         )
       ],
     );
+  }
+
+  FadeAnimation getSignoutButton() {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: signout,
+              color: Utils().getBlue(),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "Signout",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
+  }
+
+  FadeAnimation getMyGamesButton() {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: () {
+                            Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (context) => MyGamesScreen()));
+              },
+              color: Colors.redAccent,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "My Games",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
+  }
+
+  FadeAnimation getInviteFriendsButton() {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: () {
+                Share.share(
+                    'Download the PassTheCup App from AppStore: https://apps.apple.com/in/app/facebook/id284882215');
+//                            Navigator.push(
+//                                context,
+//                                MaterialPageRoute(
+//                                    builder: (context) => Invite()));
+              },
+              color: Utils().getBlue(),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "Invite Friends",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
+  }
+
+  FadeAnimation getCreateGameButton(BuildContext context) {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CreateGame()));
+              },
+              color: Colors.redAccent,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "Create Game",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
+  }
+
+  FadeAnimation getJoinGameButton(BuildContext context) {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => GameId()));
+              },
+              color: Colors.redAccent,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "Join Game",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
   }
 
   FadeAnimation getAvatarWidget(String hex) {

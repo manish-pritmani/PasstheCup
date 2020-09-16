@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -33,6 +34,12 @@ class _GameScreenState extends State<GameScreen>
   String pitcherImageLink;
   String bgImage;
 
+  int lastSnapshotReceivedTime = 0;
+  List<int> updateDurationArray = List();
+  Timer timer;
+
+  Duration timeSinceLastUpdate = Duration(seconds: 0);
+
   _GameScreenState(this.firebaseGameObject);
 
   @override
@@ -55,6 +62,13 @@ class _GameScreenState extends State<GameScreen>
 
     fetchBackgroundImage();
     listenGameObject();
+
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      setState(() {
+        timeSinceLastUpdate = DateTime.now().difference(
+            DateTime.fromMillisecondsSinceEpoch(lastSnapshotReceivedTime));
+      });
+    });
   }
 
   void listenGameObject() {
@@ -66,15 +80,17 @@ class _GameScreenState extends State<GameScreen>
       try {
         var map = event.data;
         var encode = jsonEncode(map);
-        print(encode);
+        print("Snapshot Received: " + encode);
         setState(() {
           firebaseGameObject = FirebaseGameObject.fromJson(map);
           displayMsg = firebaseGameObject.selectedGame.lastPlay.toString();
+          lastSnapshotReceivedTime = DateTime.now().millisecondsSinceEpoch;
+          updateDurationArray.add(timeSinceLastUpdate.inSeconds);
         });
         fetchHitterProfilePicture();
         fetchPitcherProfilePicture();
 
-        if (firebaseGameObject.status == -1) {
+        if (firebaseGameObject.selectedGame.status == "Final") {
           openResultScreen();
         }
       } catch (e) {
@@ -107,6 +123,7 @@ class _GameScreenState extends State<GameScreen>
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    timer?.cancel();
     super.dispose();
   }
 
@@ -178,6 +195,7 @@ class _GameScreenState extends State<GameScreen>
                 children: <Widget>[
                   getGameIDText(),
                   getChannelNameText(),
+                  getLastSnapshotTimeText(),
                 ],
               ),
             ),
@@ -421,6 +439,16 @@ class _GameScreenState extends State<GameScreen>
   Text getChannelNameText() {
     return Text(
       "Channel: ${firebaseGameObject.selectedGame.channel}",
+      style: TextStyle(color: Hexcolor("#99FFFFFF")),
+    );
+  }
+
+  Text getLastSnapshotTimeText() {
+    return Text(
+      "Last Updated: ${timeSinceLastUpdate.inSeconds.toString()} sec ago\nShortest Time: ${getSmallest()} sec"
+      "\nLongest Time: ${getLargest()} sec"
+      "\nAverage Time: ${getAvg()} sec"
+      "\n${updateDurationArray.toString()}",
       style: TextStyle(color: Hexcolor("#99FFFFFF")),
     );
   }
@@ -1143,6 +1171,47 @@ class _GameScreenState extends State<GameScreen>
         );
       },
     );
+  }
+
+  int getSmallest() {
+    int smallest = 1000000;
+    updateDurationArray.removeWhere((element) => element == 0);
+
+    updateDurationArray = updateDurationArray.toSet().toList();
+
+    for (int i in updateDurationArray) {
+      if (i < smallest) {
+        smallest = i;
+      }
+    }
+    return smallest == 1000000 ? 0 : smallest;
+  }
+
+  int getLargest() {
+    int largest = 0;
+    for (int i in updateDurationArray) {
+      if (i > largest) {
+        largest = i;
+      }
+    }
+    return largest;
+  }
+
+  int getAvg() {
+    int sum = 0;
+    for (int i in updateDurationArray) {
+      try {
+        sum += updateDurationArray[i];
+      } catch (e) {
+        print(e);
+      }
+    }
+    var d = sum / updateDurationArray.length;
+    try {
+      return d.round();
+    } catch (e) {
+      return 0;
+    }
   }
 }
 
