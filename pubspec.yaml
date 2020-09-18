@@ -37,6 +37,7 @@ dependencies:
   screen: ^0.0.5
   auto_size_text: ^2.1.0
   confetti: ^0.5.4+1
+  flutter_native_timezone: ^1.0.4
 
 
   # The following adds the Cupertino Icons font to your application.

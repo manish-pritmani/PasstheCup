@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,6 +28,7 @@ class _WelcomeState extends State<Welcome> {
   String gamerImage;
   DocumentSnapshot firebaseUserObject;
   Color borderColor;
+  StreamSubscription<DocumentSnapshot> listen;
 
   //Todo : check if authenticated
   checkAuthentication() async {
@@ -64,12 +66,29 @@ class _WelcomeState extends State<Welcome> {
     }
     print(
         "${user.displayName} is the gamer name with profile image url ${user.photoUrl}");
+
+    listen = Firestore.instance
+        .collection("user")
+        .document(user.email)
+        .snapshots()
+        .listen((event) {
+      setState(() {
+        firebaseUserObject = event;
+      });
+    });
   }
 
   //TODO: Implement logout button somewhere in welcome screen
   signout() async {
     _auth.signOut();
 //   Phoenix.rebirth(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    listen?.cancel();
   }
 
   @override
@@ -279,10 +298,8 @@ class _WelcomeState extends State<Welcome> {
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                            Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                    builder: (context) => MyGamesScreen()));
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (context) => MyGamesScreen()));
               },
               color: Colors.redAccent,
               elevation: 0,

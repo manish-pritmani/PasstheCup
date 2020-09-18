@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 
@@ -23,12 +25,17 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
   bool fetching;
   TeamObject currenteam;
 
+  bool showPastGames;
+
+  String _timezone;
+
   _GameSelectScreenState(this.currenteam);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    initPlatformState();
     futureResult = API().fetchGames().then((value) {
       List<GameObject> filtered = getByTeam(value);
       setState(() {
@@ -38,8 +45,29 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
       return null;
     });
     setState(() {
+      showPastGames = false;
       fetching = true;
       gamesList = List<GameObject>();
+    });
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    String timezone;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      timezone = await FlutterNativeTimezone.getLocalTimezone();
+    } on PlatformException {
+      timezone = 'Failed to get the timezone.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _timezone = timezone;
     });
   }
 
@@ -48,6 +76,20 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Select a Game"),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                showPastGames = !showPastGames;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child:
+                  Center(child: Text(!showPastGames ? "Show past games" : "Hide past games")),
+            ),
+          )
+        ],
       ),
       body: getBody(),
     );
@@ -63,16 +105,21 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
         child: ListView.builder(
             itemCount: gamesList.length,
             itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pop(context, gamesList[index]);
-                },
-                child: Card(
-                  elevation: 1,
-                  margin: EdgeInsets.all(4),
-                  child: ListTile(
-                    title: getTitleText(index),
-                    subtitle: getSubTitleText(index),
+              bool before = getDateTime(gamesList[index].dateTime)
+                  .isBefore(DateTime.now());
+              return Visibility(
+                visible: !before || showPastGames,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context, gamesList[index]);
+                  },
+                  child: Card(
+                    elevation: 1,
+                    margin: EdgeInsets.all(4),
+                    child: ListTile(
+                      title: getTitleText(index),
+                      subtitle: getSubTitleText(index),
+                    ),
                   ),
                 ),
               );
@@ -83,14 +130,14 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
 
   Text getTitleText(int index) {
     bool before =
-    getDateTime(gamesList[index].dateTime).isBefore(DateTime.now());
+        getDateTime(gamesList[index].dateTime).isBefore(DateTime.now());
     return Text(
-                    gamesList[index].awayTeam +
-                        " vs." +
-                        gamesList[index].homeTeam +(before?" (Simulated)":""),
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  );
+      gamesList[index].awayTeam +
+          " vs." +
+          gamesList[index].homeTeam +
+          (before ? " (Simulated)" : ""),
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+    );
   }
 
   Text getSubTitleText(int index) {

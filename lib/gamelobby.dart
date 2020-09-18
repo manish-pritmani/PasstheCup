@@ -303,6 +303,7 @@ class LobbyState extends State<Lobby> {
   }
 
   void joinGameInBetween(BuildContext context, bool simulation) {
+    addToMyGames();
     if (add) {
       addMeAsAPlayer();
     }
@@ -316,6 +317,7 @@ class LobbyState extends State<Lobby> {
   }
 
   void openGameScreen(BuildContext context, bool simulation) {
+    addToMyGames();
     Utils().showLoaderDialog(context);
     firebaseGameObject.status = 1;
     firebaseGameObject.simulation = simulation;
@@ -550,5 +552,21 @@ class LobbyState extends State<Lobby> {
     setState(() {
       lobbyObject = LobbyObject.fromJson(map);
     });
+  }
+
+  void addToMyGames() async {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    FirebaseUser firebaseUser = await _auth.currentUser();
+    await firebaseUser?.reload();
+    firebaseUser = await _auth.currentUser();
+
+    await Firestore.instance
+        .collection("user")
+        .document(firebaseUser.email)
+        .collection("mygames")
+        .document(gameID)
+        .setData(firebaseGameObject.toJson());
+
+    print("Done");
   }
 }

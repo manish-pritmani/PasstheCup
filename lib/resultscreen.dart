@@ -356,7 +356,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
   String getWinningPlayerName() {
     Player winner;
-    int max = 0;
+    int max = -10000;
     for (Player player in firebaseGameObject.players) {
       if (player.gamescore > max) {
         max = player.gamescore;
