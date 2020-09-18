@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
 
+import 'game2.dart';
+
 class OnGoingGames extends StatefulWidget {
   @override
   _OnGoingGamesState createState() => _OnGoingGamesState();
@@ -126,51 +128,67 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       eventDate =
           gameObject.createdOn.substring(0, gameObject.createdOn.indexOf("."));
     }
-    return Card(
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data2["AwayTeam"].toString() +
-                      " vs. " +
-                      data2["HomeTeam"].toString(),
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                ),
-                Text("Created on: " + getinUserFormat(eventDate)),
-                SizedBox(
-                  height: 4,
-                ),
-                gameObject == null
-                    ? Text("fetching status")
-                    : buildStatusText(),
-                SizedBox(
-                  height: 2,
-                ),
-                gameObject == null
-                    ? Text("fetching status")
-                    : buildMyPointsText(),
-              ],
-            ),
-            Column(
-              children: [
-                Text(
-                  gameObject == null ? "0" : gameObject.cupScore.toString(),
-                  style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "Cupscore",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                )
-              ],
-            )
-          ],
+    return GestureDetector(
+      onTap: (){
+        if (gameObject.status==1) {
+          Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GameScreen(
+                            gameObject,
+                          )));
+        }
+      },
+      child: Card(
+        elevation: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("GameID: " + gameObject.gameCode),
+                  SizedBox(
+                    height: 4,
+                  ),
+                  Text(
+                    data2["AwayTeam"].toString() +
+                        " vs. " +
+                        data2["HomeTeam"].toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
+                  Text("Created on: " + getinUserFormat(eventDate)),
+                  SizedBox(
+                    height: 4,
+                  ),
+                  gameObject == null
+                      ? Text("fetching status")
+                      : buildStatusText(),
+                  SizedBox(
+                    height: 2,
+                  ),
+                  gameObject == null
+                      ? Text("fetching status")
+                      : buildMyPointsText(),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    gameObject == null ? "0" : gameObject.cupScore.toString(),
+                    style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Cupscore",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
