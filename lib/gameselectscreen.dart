@@ -105,8 +105,8 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
         child: ListView.builder(
             itemCount: gamesList.length,
             itemBuilder: (context, index) {
-              bool before = getDateTime(gamesList[index].dateTime)
-                  .isBefore(DateTime.now());
+              bool before =
+                  gamesList[index].status=="Final";
               return Visibility(
                 visible: !before || showPastGames,
                 child: GestureDetector(
@@ -130,7 +130,7 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
 
   Text getTitleText(int index) {
     bool before =
-        getDateTime(gamesList[index].dateTime).isBefore(DateTime.now());
+        gamesList[index].status=="Final";//getDateTime(gamesList[index].dateTime).isBefore(DateTime.now());
     return Text(
       gamesList[index].awayTeam +
           " vs." +
@@ -142,7 +142,7 @@ class _GameSelectScreenState extends State<GameSelectScreen> {
 
   Text getSubTitleText(int index) {
     bool before =
-        getDateTime(gamesList[index].dateTime).isBefore(DateTime.now());
+        gamesList[index].status=="Final";
     return Text(
       getinUserFormat(gamesList[index].dateTime) +
           ", " +

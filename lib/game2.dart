@@ -161,7 +161,7 @@ class _GameScreenState extends State<GameScreen>
               image: getBackgroundImage(),
               fit: BoxFit.cover,
               colorFilter: new ColorFilter.mode(
-                  Colors.black.withOpacity(0.75), BlendMode.srcOver)),
+                  Colors.black.withOpacity(0.5), BlendMode.srcOver)),
         ),
         child: buildColumn(context),
       ),

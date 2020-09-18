@@ -150,7 +150,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("GameID: " + gameObject.gameCode),
+                  Text("GameID: " + (gameObject==null?"":gameObject.gameCode)),
                   SizedBox(
                     height: 4,
                   ),
