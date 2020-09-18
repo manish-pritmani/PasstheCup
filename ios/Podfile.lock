@@ -57,6 +57,8 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 6.7)
     - PromisesObjC (~> 1.2)
   - Flutter (1.0.0)
+  - flutter_native_timezone (0.0.1):
+    - Flutter
   - GoogleAppMeasurement (6.7.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
     - GoogleUtilities/MethodSwizzler (~> 6.7)
@@ -107,6 +109,7 @@ DEPENDENCIES:
   - firebase_core_web (from `.symlinks/plugins/firebase_core_web/ios`)
   - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `6.29.0`)
   - Flutter (from `Flutter`)
+  - flutter_native_timezone (from `.symlinks/plugins/flutter_native_timezone/ios`)
   - hexcolor (from `.symlinks/plugins/hexcolor/ios`)
   - screen (from `.symlinks/plugins/screen/ios`)
   - share (from `.symlinks/plugins/share/ios`)
@@ -144,6 +147,8 @@ EXTERNAL SOURCES:
     :tag: 6.29.0
   Flutter:
     :path: Flutter
+  flutter_native_timezone:
+    :path: ".symlinks/plugins/flutter_native_timezone/ios"
   hexcolor:
     :path: ".symlinks/plugins/hexcolor/ios"
   screen:
@@ -171,6 +176,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: e95d124edaee6c2b71b64df0cb228f74bee5f7e0
   FirebaseInstallations: 3c520c951305cbf9ca54eb891ff9e6d1fd384881
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_native_timezone: e72ff1900460ff57cfd331d1758050c9269f3e99
   GoogleAppMeasurement: 345d365fd105e6682bf5084783a5352a3db26820
   GoogleDataTransport: af0c79193dc59acd37630b4833d0dc6912ae6bd5
   GoogleUtilities: e121a3867449ce16b0e35ddf1797ea7a389ffdf2

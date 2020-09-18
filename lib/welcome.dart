@@ -157,79 +157,77 @@ class _WelcomeState extends State<Welcome> {
     String hex = "808080"; // color.value.toRadixString(16).substring(2);
     return Stack(
       children: <Widget>[
+        Align(child: FadeAnimation(
+            1.2,
+            Container(
+              height: MediaQuery.of(context).size.height / 2.9,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/people.png'),
+                      fit: BoxFit.cover)),
+            )), alignment: Alignment.bottomCenter,),
         Container(
-          color: Utils().getBGColor(),
           height: MediaQuery.of(context).size.height,
           width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        getAvatarWidget(hex),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      getAvatarWidget(hex),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        children: <Widget>[
 //                    getAvatar(),
-                            FadeAnimation(
-                                1,
-                                Text(
-                                  "Welcome",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold),
-                                )),
-                            FadeAnimation(
+                          FadeAnimation(
                               1,
                               Text(
-                                "${firebaseUserObject.data["name"] == null ? user.email : firebaseUserObject.data["name"]}"
-                                    .toUpperCase(),
+                                "Welcome",
                                 style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 18,
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold),
-                              ),
+                              )),
+                          FadeAnimation(
+                            1,
+                            Text(
+                              "${firebaseUserObject.data["name"] == null ? user.email : firebaseUserObject.data["name"]}"
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            SizedBox(
-                              height: 0,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    getJoinGameButton(context),
-                    getCreateGameButton(context),
-                    getMyGamesButton(),
-                    getInviteFriendsButton(),
-                    getSignoutButton(),
-                  ],
-                ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          SizedBox(
+                            height: 0,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  getJoinGameButton(context),
+                  getCreateGameButton(context),
+                  getMyGamesButton(),
+                  getInviteFriendsButton(),
+                  getSignoutButton(),
+                ],
               ),
-              FadeAnimation(
-                  1.2,
-                  Container(
-                    height: MediaQuery.of(context).size.height / 2.9,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/people.png'),
-                            fit: BoxFit.cover)),
-                  ))
             ],
           ),
         ),
+
         Align(
           child: Padding(
             padding: const EdgeInsets.all(8.0),

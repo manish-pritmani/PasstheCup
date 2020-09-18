@@ -449,10 +449,11 @@ class _GameScreenState extends State<GameScreen>
 
   Text getLastSnapshotTimeText() {
     return Text(
-      "Last Updated: ${timeSinceLastUpdate.inSeconds.toString()} sec ago\nShortest Time: ${getSmallest()} sec"
-      "\nLongest Time: ${getLargest()} sec"
-      "\nAverage Time: ${getAvg()} sec"
-      "\n${updateDurationArray.toString()}",
+      "Last Updated: ${timeSinceLastUpdate.inSeconds.toString()} sec ago",
+          //"\nShortest Time: ${getSmallest()} sec"
+      //"\nLongest Time: ${getLargest()} sec"
+     // "\nAverage Time: ${getAvg()} sec"
+      //"\n${updateDurationArray.toString()}",
       style: TextStyle(color: Hexcolor("#99FFFFFF")),
     );
   }
