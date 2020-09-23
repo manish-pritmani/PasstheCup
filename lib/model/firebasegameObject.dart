@@ -10,6 +10,7 @@ class FirebaseGameObject {
   String name;
   String hostID;
   String gameCode;
+  String gameID;
   GameObject selectedGame;
   String createdOn;
   int status;
@@ -34,7 +35,7 @@ class FirebaseGameObject {
       this.name,
       this.players,
       this.hostID,
-      this.gameCode,
+      this.gameCode, this.gameID,
       this.selectedGame,
       this.cupScore,
       this.createdOn,
@@ -57,6 +58,7 @@ class FirebaseGameObject {
     name = json['name'];
     hostID = json['hostID'];
     gameCode = json['gameCode'];
+    gameID = json["gameID"].toString();
     if (json['selectedGame'] != null) {
       var jsonSelectedGame = json['selectedGame'];
       selectedGame = new GameObject.fromJson(jsonSelectedGame);
@@ -103,6 +105,7 @@ class FirebaseGameObject {
     data['simulation'] = simulation;
     data['hostID'] = this.hostID;
     data['gameCode'] = this.gameCode;
+    data['gameID'] = this.gameID;
     if (this.selectedGame != null) {
       data['selectedGame'] = this.selectedGame.toJson();
     }

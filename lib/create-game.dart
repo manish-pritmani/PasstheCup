@@ -208,6 +208,7 @@ class _CreateGameState extends State<CreateGame> {
     //playersLobby.add(player.toJson());
     String gameID = generateGameID();
     var map = {
+      "gameID": _currengame.gameID,
       "selectedGame": _currengame.toJson(),
       "selectedTeam": _currenteam.toJson(),
       "name": user.displayName,
