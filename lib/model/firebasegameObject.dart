@@ -10,7 +10,7 @@ class FirebaseGameObject {
   String name;
   String hostID;
   String gameCode;
-  String gameID;
+  int gameID;
   GameObject selectedGame;
   String createdOn;
   int status;
@@ -59,7 +59,7 @@ class FirebaseGameObject {
     name = json['name'];
     hostID = json['hostID'];
     gameCode = json['gameCode'];
-    gameID = json["gameID"].toString();
+    gameID = json["gameID"];
     if (json['selectedGame'] != null) {
       var jsonSelectedGame = json['selectedGame'];
       selectedGame = new GameObject.fromJson(jsonSelectedGame);

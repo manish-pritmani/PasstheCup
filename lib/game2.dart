@@ -37,6 +37,15 @@ class _GameScreenState extends State<GameScreen>
   int lastSnapshotReceivedTime = 0;
   List<int> updateDurationArray = List();
   Timer timer;
+  DateTime lastchanged = DateTime.now();
+  int currentIndex = 0;
+  var ads = [
+    "assets/ad1.png",
+    "assets/ad2.png",
+    "assets/ad3.png",
+    "assets/ad4.png",
+    "assets/ad5.png"
+  ];
 
   Duration timeSinceLastUpdate = Duration(seconds: 0);
 
@@ -90,12 +99,12 @@ class _GameScreenState extends State<GameScreen>
         fetchHitterProfilePicture();
         fetchPitcherProfilePicture();
 
-        if (firebaseGameObject.status==-1) {
+        if (firebaseGameObject.status == -1) {
           openResultScreen();
         }
 
-        if(firebaseGameObject.selectedGame.status == "Scheduled"){
-         //showGameNotStartedDialog();
+        if (firebaseGameObject.selectedGame.status == "Scheduled") {
+          //showGameNotStartedDialog();
         }
       } catch (e) {
         print(e);
@@ -206,9 +215,33 @@ class _GameScreenState extends State<GameScreen>
             ),
             alignment: Alignment.topLeft,
           ),
+          Align(
+            child: Image.asset(
+              getAdImageName(),
+              width: 250,
+              height: 40,
+              fit: BoxFit.fitWidth,
+            ),
+            alignment: Alignment.topCenter,
+          ),
         ],
       ),
     );
+  }
+
+  String getAdImageName() {
+    var seconds = DateTime.now().difference(lastchanged).inSeconds;
+    if (seconds > 15) {
+      var i = currentIndex + 1;
+      var j = ads.length - 1;
+      if (i < j) {
+        currentIndex = currentIndex + 1;
+      } else {
+        currentIndex = 0;
+      }
+      lastchanged = DateTime.now();
+    }
+    return ads[currentIndex];
   }
 
   Padding getBottomRow() {
@@ -451,9 +484,9 @@ class _GameScreenState extends State<GameScreen>
   Text getLastSnapshotTimeText() {
     return Text(
       "Last Updated: ${timeSinceLastUpdate.inSeconds.toString()} sec ago",
-          //"\nShortest Time: ${getSmallest()} sec"
+      //"\nShortest Time: ${getSmallest()} sec"
       //"\nLongest Time: ${getLargest()} sec"
-     // "\nAverage Time: ${getAvg()} sec"
+      // "\nAverage Time: ${getAvg()} sec"
       //"\n${updateDurationArray.toString()}",
       style: TextStyle(color: Hexcolor("#99FFFFFF")),
     );
@@ -470,7 +503,6 @@ class _GameScreenState extends State<GameScreen>
       //"\n${updateDurationArray.toString()}",
       style: TextStyle(color: Hexcolor("#99FFFFFF")),
     );
-
   }
 
   Text getGameIDText() {

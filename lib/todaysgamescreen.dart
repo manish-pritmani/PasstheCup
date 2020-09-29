@@ -54,7 +54,7 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
         child: ListView.builder(
             itemCount: gamesList.length,
             itemBuilder: (context, index) {
-              bool before = gamesList[index].status == "Final";
+             // bool before = gamesList[index].status == "Final";
               return Visibility(
                 child: GestureDetector(
                   onTap: () {
