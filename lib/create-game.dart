@@ -9,6 +9,7 @@ import 'package:passthecup/gamelobby.dart';
 import 'package:passthecup/model/gameObject.dart';
 import 'package:passthecup/model/teamobject.dart';
 import 'package:passthecup/teamselectscreen.dart';
+import 'package:passthecup/todaysgamescreen.dart';
 import 'package:passthecup/utils.dart';
 
 import 'gameselectscreen.dart';
@@ -47,6 +48,21 @@ class _CreateGameState extends State<CreateGame> {
     setState(() {
       _currenteam = null;
       _currengame = null;
+    });
+
+    //openTodaysGame();
+  }
+
+  void openTodaysGame() {
+    Navigator.of(context).push(new MaterialPageRoute<GameObject>(
+      builder: (BuildContext context) {
+        return new TodaysGameScreen();
+      },
+    )).then((value) {
+      setState(() {
+        _currengame = value;
+      });
+      return null;
     });
   }
 
@@ -108,25 +124,25 @@ class _CreateGameState extends State<CreateGame> {
                         padding: EdgeInsets.symmetric(horizontal: 40),
                         child: Column(
                           children: <Widget>[
-                            FadeAnimation(
-                                1.2,
-                                makeInput(
-                                    enabled: false,
-                                    value: _currenteam == null
-                                        ? "No Team Selected"
-                                        : _currenteam.name,
-                                    label: "Select Team",
-                                    onPress: () {
-                                      openTeamSelectScreen(context);
-                                    })),
-                            OutlineButton(
-                                child: Text("Select a Team"),
-                                onPressed: () => openTeamSelectScreen(context))
+//                            FadeAnimation(
+//                                1.2,
+//                                makeInput(
+//                                    enabled: false,
+//                                    value: _currenteam == null
+//                                        ? "No Team Selected"
+//                                        : _currenteam.name,
+//                                    label: "Select Team",
+//                                    onPress: () {
+//                                      openTeamSelectScreen(context);
+//                                    })),
+//                            OutlineButton(
+//                                child: Text("Select a Team"),
+//                                onPressed: () => openTeamSelectScreen(context))
                           ],
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                         child: Column(
                           children: <Widget>[
                             FadeAnimation(
@@ -144,7 +160,7 @@ class _CreateGameState extends State<CreateGame> {
                                     label: "Select Game")),
                             OutlineButton(
                                 child: Text("Select a Game"),
-                                onPressed: () => openGameSelectscreen(context))
+                                onPressed: () => openTodaysGame())//openGameSelectscreen(context))
                           ],
                         ),
                       ),
@@ -158,7 +174,7 @@ class _CreateGameState extends State<CreateGame> {
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
-                            if (_currenteam != null && _currengame != null) {
+                            if (_currengame != null /*&& _currengame != null*/) {
                               createGameAndEnter(context);
                             } else {
                               Utils().showToast(
@@ -204,13 +220,13 @@ class _CreateGameState extends State<CreateGame> {
     var player = Player(
         name: user.displayName, email: user.email, gamescore: -5, host: true);
     playersLobby.add(player.toJson());
-    //player.host = false;
-    //playersLobby.add(player.toJson());
+//    player.host = false;
+//    playersLobby.add(player.toJson());
     String gameID = generateGameID();
     var map = {
       "gameID": _currengame.gameID,
       "selectedGame": _currengame.toJson(),
-      "selectedTeam": _currenteam.toJson(),
+      "selectedTeam": null,//_currenteam.toJson(),
       "name": user.displayName,
       "hostID": user.email,
       "joinPlayers": 0,
@@ -218,7 +234,7 @@ class _CreateGameState extends State<CreateGame> {
       "status": 0,
       "gameCode": gameID,
       "createdOn": DateTime.now().toString(),
-      "players": players,
+      "players": playersLobby,
       "simulation": false,
       "lastResult": "",
       "lastResultPointsAwarded": 0,

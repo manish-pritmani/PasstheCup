@@ -45,6 +45,7 @@ class _OnGoingGamesState extends State<OnGoingGames> {
         .document(firebaseUser.email)
         .collection("mygames")
         .orderBy("createdOn", descending: true)
+        .limit(10)
         .getDocuments();
     return documents;
   }
@@ -129,14 +130,14 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
           gameObject.createdOn.substring(0, gameObject.createdOn.indexOf("."));
     }
     return GestureDetector(
-      onTap: (){
-        if (gameObject.status==1) {
+      onTap: () {
+        if (gameObject.status == 1) {
           Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GameScreen(
-                            gameObject,
-                          )));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => GameScreen(
+                        gameObject,
+                      )));
         }
       },
       child: Card(
@@ -150,7 +151,8 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("GameID: " + (gameObject==null?"":gameObject.gameCode)),
+                  Text("GameID: " +
+                      (gameObject == null ? "" : gameObject.gameCode)),
                   SizedBox(
                     height: 4,
                   ),

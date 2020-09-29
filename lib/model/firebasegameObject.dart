@@ -19,6 +19,7 @@ class FirebaseGameObject {
   List<Player> players;
   String lastResult;
   int lastResultPointsAwarded;
+  int lastPlayID;
   String currentHitter;
   String currentPitcher;
   int currentHitterID;
@@ -41,7 +42,7 @@ class FirebaseGameObject {
       this.createdOn,
       this.simulation,
       this.status,
-      this.lastResult,
+      this.lastResult, this.lastPlayID,
       this.lastResultPointsAwarded,
       this.currentHitter,
       this.currentPitcher,
@@ -82,6 +83,7 @@ class FirebaseGameObject {
       });
     }
     lastResult = json['lastResult'];
+    lastPlayID = json['lastPlayID'];
     lastResultPointsAwarded = json['lastResultPointsAwarded'];
     currentHitter = json['currentHitter'];
     currentPitcher = json['currentPitcher'];
@@ -115,6 +117,7 @@ class FirebaseGameObject {
       data['players'] = this.players.map((v) => v.toJson()).toList();
     }
     data['lastResult'] = this.lastResult;
+    data['lastPlayID'] = this.lastPlayID;
     data['lastResultPointsAwarded'] = this.lastResultPointsAwarded;
     data['currentHitter'] = this.currentHitter;
     data['currentPitcher'] = this.currentPitcher;

@@ -41,27 +41,50 @@ class Utils {
         builder: (BuildContext context) => CupertinoAlertDialog(
 //          title: new Text("Message"),
               content: new Text(text),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  isDefaultAction: !cancel,
-                  child: Text(oktext),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    if (ok != null) {
-                      ok();
-                    }
-                  },
-                ),
-                cancel
-                    ? CupertinoDialogAction(
-                        child: Text(noText),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      )
-                    : null,
-              ],
+              actions: cancel
+                  ? getActions(cancel, oktext, context, ok, noText)
+                  : getOKActions(cancel, oktext, context, ok, noText),
             ));
+  }
+
+  List<Widget> getActions(
+      bool cancel, String oktext, BuildContext context, ok(), String noText) {
+    return <Widget>[
+      CupertinoDialogAction(
+        isDefaultAction: !cancel,
+        child: Text(oktext),
+        onPressed: () {
+          Navigator.pop(context);
+          if (ok != null) {
+            ok();
+          }
+        },
+      ),
+      cancel
+          ? CupertinoDialogAction(
+              child: Text(noText),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          : null,
+    ];
+  }
+
+  List<Widget> getOKActions(
+      bool cancel, String oktext, BuildContext context, ok(), String noText) {
+    return <Widget>[
+      CupertinoDialogAction(
+        isDefaultAction: true,
+        child: Text(oktext),
+        onPressed: () {
+          Navigator.pop(context);
+          if (ok != null) {
+            ok();
+          }
+        },
+      ),
+    ];
   }
 
   showLoaderDialog(BuildContext context) {

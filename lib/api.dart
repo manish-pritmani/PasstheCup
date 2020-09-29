@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:passthecup/model/gameObjectPlaybyPlay.dart';
 import 'package:passthecup/model/teamobject.dart';
+import 'instant.dart';
 import 'model/fullplayerobject.dart';
 import 'model/gameObject.dart';
 
@@ -14,8 +16,17 @@ class API {
 
   Future<List<GameObject>> fetchGames() async {
     List<GameObject> list;
-    var url = BaseUrl + "Games/2020REG" + keyString;
-    final response = await http.get(url);
+    DateTime EastCoast = DateTime.now().toUtc().add(Duration(hours: -4));
+//    curDateTimeByZone(zone: "EST");
+    var date = DateFormat("yyyy-MMM-dd").format(EastCoast); //"2020-SEP-27";
+    var url =
+        "https://api.sportsdata.io/v3/mlb/scores/json/GamesByDate/$date?key=5863b9d2fa7746cd8495fb3cc4b53743"; //BaseUrl + "Games/2020REG" + keyString;
+    final response =
+        await http.get(url).timeout(Duration(seconds: 300), onTimeout: () {
+      throw Exception('TimedOut');
+    }).catchError((onError) {
+      print(onError);
+    });
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);

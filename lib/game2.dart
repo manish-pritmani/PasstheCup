@@ -90,12 +90,12 @@ class _GameScreenState extends State<GameScreen>
         fetchHitterProfilePicture();
         fetchPitcherProfilePicture();
 
-        if (firebaseGameObject.selectedGame.status == "Final") {
+        if (firebaseGameObject.status==-1) {
           openResultScreen();
         }
 
         if(firebaseGameObject.selectedGame.status == "Scheduled"){
-         showGameNotStartedDialog();
+         //showGameNotStartedDialog();
         }
       } catch (e) {
         print(e);
@@ -200,6 +200,7 @@ class _GameScreenState extends State<GameScreen>
                   getGameIDText(),
                   getChannelNameText(),
                   getLastSnapshotTimeText(),
+                  //getPlayID(),
                 ],
               ),
             ),
@@ -456,6 +457,20 @@ class _GameScreenState extends State<GameScreen>
       //"\n${updateDurationArray.toString()}",
       style: TextStyle(color: Hexcolor("#99FFFFFF")),
     );
+  }
+
+  Text getPlayID() {
+    var string = firebaseGameObject.toJson().toString();
+    print(string);
+    return Text(
+      "Last PlayID: ${firebaseGameObject.lastPlayID}",
+      //"\nShortest Time: ${getSmallest()} sec"
+      //"\nLongest Time: ${getLargest()} sec"
+      // "\nAverage Time: ${getAvg()} sec"
+      //"\n${updateDurationArray.toString()}",
+      style: TextStyle(color: Hexcolor("#99FFFFFF")),
+    );
+
   }
 
   Text getGameIDText() {
@@ -1151,31 +1166,31 @@ class _GameScreenState extends State<GameScreen>
   }
 
   showQDialog() {
-    showGeneralDialog(
-      barrierLabel: "Barrier",
-      barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.7),
-      transitionDuration: Duration(milliseconds: 200),
-      context: context,
-      pageBuilder: (_, __, ___) {
-        return Align(
-          alignment: Alignment.bottomRight,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Scaffold(
-              backgroundColor: Colors.redAccent,
-              body: Container(
-                child: Stack(
-                  children: <Widget>[],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+//    showGeneralDialog(
+//      barrierLabel: "Barrier",
+//      barrierDismissible: true,
+//      barrierColor: Colors.black.withOpacity(0.7),
+//      transitionDuration: Duration(milliseconds: 200),
+//      context: context,
+//      pageBuilder: (_, __, ___) {
+//        return Align(
+//          alignment: Alignment.bottomRight,
+//          child: GestureDetector(
+//            onTap: () {
+//              Navigator.pop(context);
+//            },
+//            child: Scaffold(
+//              backgroundColor: Colors.redAccent,
+//              body: Container(
+//                child: Stack(
+//                  children: <Widget>[],
+//                ),
+//              ),
+//            ),
+//          ),
+//        );
+//      },
+//    );
   }
 
   int getSmallest() {
