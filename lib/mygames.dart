@@ -7,23 +7,47 @@ class MyGamesScreen extends StatefulWidget {
   _MyGamesScreenState createState() => _MyGamesScreenState();
 }
 
+class _MyGamesScreenState extends State<MyGamesScreen>
+    with SingleTickerProviderStateMixin {
+  TabController _tabController;
 
-class _MyGamesScreenState extends State<MyGamesScreen> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _tabController = new TabController(length: 3, vsync: this);
   }
 
-
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("My Games"),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("My Games"),
+          bottom: TabBar(
+            tabs: [
+              new Tab(
+                text: "Ongoing Games",
+              ),
+              new Tab(
+                text: "Scheduled Games",
+              ),
+              new Tab(
+                text: "Past Games",
+              ),
+            ],
+            controller: _tabController,
+          ),
+        ),
+        body: TabBarView(
+          children: [OnGoingGames("InProgress"), OnGoingGames("Scheduled"), OnGoingGames("Final")],
+          controller: _tabController,
+        ),
       ),
-      body: OnGoingGames(),
     );
   }
 }

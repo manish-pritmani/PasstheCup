@@ -9,14 +9,19 @@ import 'package:passthecup/model/firebasegameObject.dart';
 import 'game2.dart';
 
 class OnGoingGames extends StatefulWidget {
+  final String status;
+
+  OnGoingGames(this.status);
+
   @override
   _OnGoingGamesState createState() => _OnGoingGamesState();
 }
 
-class _OnGoingGamesState extends State<OnGoingGames> {
+class _OnGoingGamesState extends State<OnGoingGames>
+    with AutomaticKeepAliveClientMixin<OnGoingGames> {
   FirebaseUser firebaseUser;
 
-  List<DocumentSnapshot> documents;
+  List<DocumentSnapshot> documents = List();
 
   bool loaded;
 
@@ -58,10 +63,12 @@ class _OnGoingGamesState extends State<OnGoingGames> {
             itemCount: documents.length,
             itemBuilder: (context, index) {
               return OnGoingGameWidget(
-                  document: documents[index], user: firebaseUser);
+                  document: documents[index],
+                  user: firebaseUser,
+                  status: widget.status);
             });
       } else {
-        return Center(child: Text("You have no ongoing games"));
+        return Center(child: Text("No games found"));
       }
     } else {
       return Center(
@@ -69,13 +76,20 @@ class _OnGoingGamesState extends State<OnGoingGames> {
       );
     }
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class OnGoingGameWidget extends StatefulWidget {
+  final String status;
+
   const OnGoingGameWidget({
     Key key,
     @required this.document,
     @required this.user,
+    this.status,
   }) : super(key: key);
 
   final DocumentSnapshot document;
@@ -129,67 +143,76 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       eventDate =
           gameObject.createdOn.substring(0, gameObject.createdOn.indexOf("."));
     }
-    return GestureDetector(
-      onTap: () {
-        if (gameObject.status == 1) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => GameScreen(
-                        gameObject,
-                      )));
-        }
-      },
-      child: Card(
-        elevation: 3,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("GameID: " +
-                      (gameObject == null ? "" : gameObject.gameCode)),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Text(
-                    data2["AwayTeam"].toString() +
-                        " vs. " +
-                        data2["HomeTeam"].toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                  ),
-                  Text("Created on: " + getinUserFormat(eventDate)),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  gameObject == null
-                      ? Text("fetching status")
-                      : buildStatusText(),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  gameObject == null
-                      ? Text("fetching status")
-                      : buildMyPointsText(),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    gameObject == null ? "0" : gameObject.cupScore.toString(),
-                    style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Cupscore",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  )
-                ],
-              )
-            ],
+    return Visibility(
+      visible: gameObject != null && gameObject.selectedGame.status == widget.status,
+      child: GestureDetector(
+        onTap: () {
+          if (gameObject.selectedGame.status != "Final") {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GameScreen(
+                          gameObject,
+                        )));
+          }
+        },
+        child: Card(
+          elevation: 3,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("GameID: " +
+                        (gameObject == null ? "" : gameObject.gameCode)),
+                    SizedBox(
+                      height: 4,
+                    ),
+                    Text(
+                      data2["AwayTeam"].toString() +
+                          " vs. " +
+                          data2["HomeTeam"].toString(),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                    ),
+                    SizedBox(
+                      height: 4,
+                    ),
+                    gameObject == null
+                        ? Text("fetching status")
+                        : buildStatusText(),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    gameObject == null
+                        ? Text("fetching status")
+                        : buildMyPointsText(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text("Created on: " + getinUserFormat(eventDate), style: TextStyle(color: Colors.grey),),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Text(
+                      gameObject == null ? "0" : gameObject.cupScore.toString(),
+                      style:
+                          TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Cupscore",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -207,10 +230,12 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
   }
 
   Text buildStatusText() {
-    if (gameObject.status == 1) {
+    if (gameObject.selectedGame.status == "InProgress") {
       return getOngoingText();
-    } else if (gameObject.status == -1) {
+    } else if (gameObject.selectedGame.status == "Final") {
       return getGameEndedText();
+    } else if (gameObject.selectedGame.status== "Scheduled") {
+      return getGameScheduledText();
     } else {
       return Text("Status: " + gameObject.status.toString());
     }
@@ -227,6 +252,13 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
     return Text(
       "Game Ended",
       style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Text getGameScheduledText() {
+    return Text(
+      "Scheduled",
+      style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
     );
   }
 

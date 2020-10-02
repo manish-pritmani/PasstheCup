@@ -58,11 +58,11 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
               return Visibility(
                 child: GestureDetector(
                   onTap: () {
-//                    if (gamesList[index].status=="InProgress") {
+                    if (gamesList[index].status!="Canceled") {
                       Navigator.pop(context, gamesList[index]);
-//                    } else {
-//                      Utils().showToast("Game not started yet", context);
-//                    }
+                    } else {
+                      Utils().showToast("Canceled games cannot be selected", context);
+                    }
                   },
                   child: Card(
                     elevation: 1,
@@ -80,8 +80,6 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
   }
 
   Text getTitleText(int index) {
-    bool before = gamesList[index].status ==
-        "Sche"; //getDateTime(gamesList[index].dateTime).isBefore(DateTime.now());
     return Text(
       gamesList[index].awayTeam +
           " vs." +

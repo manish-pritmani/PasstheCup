@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:intl/intl.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
 import 'package:passthecup/resultscreen.dart';
@@ -104,7 +105,9 @@ class _GameScreenState extends State<GameScreen>
         }
 
         if (firebaseGameObject.selectedGame.status == "Scheduled") {
-          //showGameNotStartedDialog();
+          showGameNotStartedDialog();
+        } else {
+          Navigator.pop(context);
         }
       } catch (e) {
         print(e);
@@ -744,6 +747,62 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
+  Widget getPlayersInLobby() {
+//    List<Widget> playersW = List();
+//    //playersW.add(getCupWidget());
+//    var count = 0;
+//    for (Player player in firebaseGameObject.players) {
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      playersW.add(getPlayerWidgetLobby(player, active: player.host));
+//      count++;
+//    }
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: firebaseGameObject.players.length,
+        itemBuilder: (context, index) {
+          return getPlayerWidgetLobby(firebaseGameObject.players[index],
+              active: firebaseGameObject.players[index].host);
+        },
+      ),
+    );
+  }
+
+  Widget getPlayerWidgetLobby(Player player, {bool active = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 24.0),
+      child: Column(
+        children: <Widget>[
+          CircleAvatar(
+            radius: active ? 17 : 15,
+            backgroundColor: Colors.redAccent,
+            child: CircleAvatar(
+              radius: 15,
+              backgroundImage: NetworkImage(
+                  "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff"),
+            ),
+          ),
+          Text(
+            player.name.substring(0, player.name.indexOf(" ")),
+            style: TextStyle(
+                color: Colors.black, fontSize: 12, fontWeight: FontWeight.w400),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget getPlayerWidget(Player player, {bool active = false}) {
     return Padding(
       padding: const EdgeInsets.only(right: 24.0),
@@ -866,6 +925,124 @@ class _GameScreenState extends State<GameScreen>
                                   color: Colors.white,
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )),
+                  ),
+                  /* Text(
+                        "Balls",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),*/
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+    } catch (e) {
+      print(e);
+      return Text(e.toString());
+    }
+  }
+
+  Widget getVersusWidget() {
+    try {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Text(
+                    firebaseGameObject.selectedGame.awayTeam,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.white),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 0),
+                    child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.redAccent),
+                        child: Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                firebaseGameObject.selectedGame.awayTeam
+                                    .toString(),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        )),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Utils().getBlue()),
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "VS",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    )),
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    firebaseGameObject.selectedGame.homeTeam,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.white),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 0),
+                    child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.redAccent),
+                        child: Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                firebaseGameObject.selectedGame.homeTeam
+                                    .toString(),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ],
                         )),
@@ -1266,33 +1443,130 @@ class _GameScreenState extends State<GameScreen>
     }
   }
 
-  void showGameNotStartedDialog() {
-    showGeneralDialog(
+  void showGameNotStartedDialog() async {
+    await showGeneralDialog(
       barrierLabel: "Barrier",
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: Duration(milliseconds: 700),
+      transitionDuration: Duration(milliseconds: 500),
       context: context,
       pageBuilder: (_, __, ___) {
-        return Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            height: 300,
-            child: SizedBox.expand(child: FlutterLogo()),
-            margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(40),
+        return WillPopScope(
+          onWillPop: () {},
+          child: Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              height: MediaQuery.of(context).size.height * 0.75,
+              child: getGameInfoWidget(),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(1),
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
         );
       },
       transitionBuilder: (_, anim, __, child) {
         return SlideTransition(
-          position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+          position: Tween(
+            begin: Offset(0, 1),
+            end: Offset(0, 0),
+          ).animate(anim),
           child: child,
         );
       },
+    );
+  }
+
+  Widget getGameInfoWidget() {
+    return Material(
+      color: Colors.white.withOpacity(0.0),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        alignment: Alignment.center,
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text("Waiting for the Game to Start",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  decoration: TextDecoration.none,
+                )),
+            getVersusWidget(),
+            getGameTimeText(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                getChannelInfor(),
+                getWeatherInfo(),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(
+                firebaseGameObject.players.length == 1
+                    ? "${firebaseGameObject.players.length} Player Joined"
+                    : "${firebaseGameObject.players.length} Players Joined",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+//            Padding(
+//              padding: const EdgeInsets.all(8.0),
+//              child: getPlayersInLobby(),
+//            ),
+            OutlineButton(
+              borderSide: BorderSide(color: Colors.black26),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: Text(
+                "OK",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Text getWeatherInfo() {
+    return Text(
+      "Weather: ${firebaseGameObject.selectedGame.forecastDescription}",
+      style: TextStyle(
+          color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 16),
+    );
+  }
+
+  Text getChannelInfor() {
+    return Text(
+      "Channel: ${firebaseGameObject.selectedGame.channel}",
+      style: TextStyle(
+          color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 16),
+    );
+  }
+
+  Widget getGameTimeText() {
+    var dateFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    var dateTime = firebaseGameObject.selectedGame.dateTime;
+    var parsedDate = dateFormat.parse(dateTime);
+    var dateFormat2 = DateFormat("dd MMM yyyy hh:mm a");
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Text(
+        "Game Time: ${dateFormat2.format(parsedDate)}",
+        style: TextStyle(
+            color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
     );
   }
 }

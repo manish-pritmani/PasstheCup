@@ -36,13 +36,15 @@ class FirebaseGameObject {
       this.name,
       this.players,
       this.hostID,
-      this.gameCode, this.gameID,
+      this.gameCode,
+      this.gameID,
       this.selectedGame,
       this.cupScore,
       this.createdOn,
       this.simulation,
       this.status,
-      this.lastResult, this.lastPlayID,
+      this.lastResult,
+      this.lastPlayID,
       this.lastResultPointsAwarded,
       this.currentHitter,
       this.currentPitcher,
@@ -59,7 +61,11 @@ class FirebaseGameObject {
     name = json['name'];
     hostID = json['hostID'];
     gameCode = json['gameCode'];
-    gameID = json["gameID"];
+    if (json["gameID"] is String) {
+      gameID = int.parse(json["gameID"]);
+    } else {
+      gameID = json["gameID"];
+    }
     if (json['selectedGame'] != null) {
       var jsonSelectedGame = json['selectedGame'];
       selectedGame = new GameObject.fromJson(jsonSelectedGame);
