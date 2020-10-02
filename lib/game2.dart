@@ -50,6 +50,8 @@ class _GameScreenState extends State<GameScreen>
 
   Duration timeSinceLastUpdate = Duration(seconds: 0);
 
+  bool dialogVisible = false;
+
   _GameScreenState(this.firebaseGameObject);
 
   @override
@@ -107,7 +109,9 @@ class _GameScreenState extends State<GameScreen>
         if (firebaseGameObject.selectedGame.status == "Scheduled") {
           showGameNotStartedDialog();
         } else {
-          Navigator.pop(context);
+          if (dialogVisible) {
+            Navigator.pop(context);
+          }
         }
       } catch (e) {
         print(e);
@@ -1444,6 +1448,7 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void showGameNotStartedDialog() async {
+    dialogVisible = true;
     await showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: false,
