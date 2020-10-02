@@ -974,7 +974,6 @@ class _GameScreenState extends State<GameScreen>
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.redAccent),
@@ -987,7 +986,7 @@ class _GameScreenState extends State<GameScreen>
                                     .toString(),
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 30,
+                                    fontSize: 28,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -997,7 +996,7 @@ class _GameScreenState extends State<GameScreen>
                 ],
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: Container(
                     margin: EdgeInsets.only(top: 20),
                     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
@@ -1012,7 +1011,7 @@ class _GameScreenState extends State<GameScreen>
                             "VS",
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -1031,7 +1030,6 @@ class _GameScreenState extends State<GameScreen>
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.redAccent),
@@ -1044,7 +1042,7 @@ class _GameScreenState extends State<GameScreen>
                                     .toString(),
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 30,
+                                    fontSize: 28,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -1498,7 +1496,7 @@ class _GameScreenState extends State<GameScreen>
             Text("Waiting for the Game to Start",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 28,
+                  fontSize: 24,
                   decoration: TextDecoration.none,
                 )),
             getVersusWidget(),
