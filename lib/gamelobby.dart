@@ -7,14 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/api.dart';
-import 'package:passthecup/game.dart';
-import 'package:passthecup/model/gameObject.dart';
-import 'package:passthecup/model/lobbyobject.dart';
-import 'package:passthecup/model/teamobject.dart';
 import 'package:passthecup/utils.dart';
 
 import 'game2.dart';
-import 'gamescreen.dart';
 import 'model/Player.dart';
 import 'model/firebasegameObject.dart';
 
@@ -273,7 +268,7 @@ class LobbyState extends State<Lobby> {
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                if (!add) {
+                if (!add || isHost()) {
 //                      showAlertDialog(context, "", "Select Mode", "Simulation",
 //                          "Live Game");
                   openGameScreen(context, false);
@@ -286,7 +281,7 @@ class LobbyState extends State<Lobby> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50)),
               child: Text(
-                add ? "WAITING FOR GAME TO START" : "START GAME",
+                add && !isHost() ? "WAITING FOR GAME TO START" : "START GAME",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.white,
@@ -614,5 +609,15 @@ class LobbyState extends State<Lobby> {
         .setData(firebaseGameObject.toJson());
 
     print("Done");
+  }
+
+  bool isHost() {
+    Player hostPlayer = null;
+    for (Player player in firebaseGameObject.players) {
+      if (player.host) {
+        hostPlayer = player;
+      }
+    }
+    return user.email == hostPlayer.email;
   }
 }
