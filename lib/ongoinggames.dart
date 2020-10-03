@@ -5,13 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
+import 'package:passthecup/resultscreen.dart';
 
 import 'game2.dart';
 
 class OnGoingGames extends StatefulWidget {
   final String status;
 
-  OnGoingGames(this.status);
+  final Function(FirebaseGameObject) onClick;
+
+  OnGoingGames(this.status, {this.onClick});
 
   @override
   _OnGoingGamesState createState() => _OnGoingGamesState();
@@ -50,7 +53,6 @@ class _OnGoingGamesState extends State<OnGoingGames>
         .document(firebaseUser.email)
         .collection("mygames")
         .orderBy("createdOn", descending: true)
-        .limit(10)
         .getDocuments();
     return documents;
   }
@@ -65,7 +67,8 @@ class _OnGoingGamesState extends State<OnGoingGames>
               return OnGoingGameWidget(
                   document: documents[index],
                   user: firebaseUser,
-                  status: widget.status);
+                  status: widget.status,
+                  onClick: widget.onClick);
             });
       } else {
         return Center(child: Text("No games found"));
@@ -85,11 +88,14 @@ class _OnGoingGamesState extends State<OnGoingGames>
 class OnGoingGameWidget extends StatefulWidget {
   final String status;
 
+  final Function(FirebaseGameObject) onClick;
+
   const OnGoingGameWidget({
     Key key,
     @required this.document,
     @required this.user,
     this.status,
+    this.onClick,
   }) : super(key: key);
 
   final DocumentSnapshot document;
@@ -144,16 +150,28 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
           gameObject.createdOn.substring(0, gameObject.createdOn.indexOf("."));
     }
     return Visibility(
-      visible: gameObject != null && gameObject.selectedGame.status == widget.status,
+      visible:
+          gameObject != null && gameObject.selectedGame.status == widget.status,
       child: GestureDetector(
         onTap: () {
           if (gameObject.selectedGame.status != "Final") {
+            if (widget.onClick == null) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GameScreen(
+                            gameObject,
+                          )));
+            } else {
+              widget.onClick.call(gameObject);
+            }
+          }else{
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => GameScreen(
-                          gameObject,
-                        )));
+                    builder: (context) => ResultScreen(
+                      gameObject, celibrate:false
+                    )));
           }
         },
         child: Card(
@@ -193,29 +211,51 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
                         : buildMyPointsText(),
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
-                      child: Text("Created on: " + getinUserFormat(eventDate), style: TextStyle(color: Colors.grey),),
+                      child: Text(
+                        "Created on: " + getinUserFormat(eventDate),
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     ),
                   ],
                 ),
-                Column(
-                  children: [
-                    Text(
-                      gameObject == null ? "0" : gameObject.cupScore.toString(),
-                      style:
-                          TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "Cupscore",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                )
+                widget.status == "Final"
+                    ? buildMyScoreColumn()
+                    : buildCupScoreColumn()
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Column buildMyScoreColumn() {
+    return Column(
+      children: [
+        Text(
+          gameObject == null ? "0" : getmyscore(),
+          style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "My Score",
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        )
+      ],
+    );
+  }
+
+  Column buildCupScoreColumn() {
+    return Column(
+      children: [
+        Text(
+          gameObject == null ? "0" : gameObject.cupScore.toString(),
+          style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "Cupscore",
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        )
+      ],
     );
   }
 
@@ -234,7 +274,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       return getOngoingText();
     } else if (gameObject.selectedGame.status == "Final") {
       return getGameEndedText();
-    } else if (gameObject.selectedGame.status== "Scheduled") {
+    } else if (gameObject.selectedGame.status == "Scheduled") {
       return getGameScheduledText();
     } else {
       return Text("Status: " + gameObject.status.toString());
@@ -263,10 +303,17 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
   }
 
   buildMyPointsText() {
-    return Text(
-      "My score: " + getmyscore(),
-      style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
-    );
+    if (widget.status != "Final") {
+      return Text(
+        "My score: " + getmyscore(),
+        style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+      );
+    } else {
+      return Text(
+        "Final Result: " + getWinner(),
+        style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+      );
+    }
   }
 
   String getmyscore() {
@@ -277,5 +324,21 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       }
     }
     return myscore.toString();
+  }
+
+  String getWinner() {
+    int myscore = 0;
+    int winnerIndex = 0;
+    for (int i = 0; i < gameObject.players.length; i++) {
+      if (gameObject.players[i].gamescore >myscore) {
+        myscore = gameObject.players[i].gamescore;
+        winnerIndex = i;
+      }
+    }
+    if (gameObject.players[winnerIndex].email==widget.user.email) {
+      return "You Won";
+    } else {
+     return  gameObject.players[winnerIndex].name +" won. You lost";
+    }
   }
 }

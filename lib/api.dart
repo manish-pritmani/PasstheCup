@@ -97,6 +97,27 @@ class API {
     }
   }
 
+  Future<FullPlayerObject> fetchPlayerProfile(int hitterID) async {
+    var url =
+        "https://api.sportsdata.io/v3/mlb/scores/json/Player/$hitterID$keyString";
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        return FullPlayerObject.fromJson(json.decode(response.body));
+      } catch (e) {
+        print(e);
+        throw e;
+      }
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception("");
+    }
+  }
+
   Future<bool> startGame(int gameID, String gameCode) async {
     var url = "$startURL/$gameID/$gameCode";
     final response = await http.get(url);
@@ -112,6 +133,30 @@ class API {
       // If the server did not return a 200 OK response,
       // then throw an exception.
       return false;
+    }
+  }
+
+  Future<List<TeamObject>> fetchTeamImage() async {
+    var url =
+        "https://api.sportsdata.io/v3/mlb/scores/json/teams$keyString";
+    final response = await http.get(url);
+    List<TeamObject> teams = List();
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        teams = (json.decode(response.body) as List)
+            .map((i) => TeamObject.fromJson(i))
+            .toList();
+        return teams;
+      } catch (e) {
+        print(e);
+        return List<TeamObject>();
+      }
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      return List<TeamObject>();
     }
   }
 }

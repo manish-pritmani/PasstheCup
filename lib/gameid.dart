@@ -7,6 +7,8 @@ import 'package:passthecup/utils.dart';
 import 'gamelobby.dart';
 
 class GameId extends StatefulWidget {
+
+
   @override
   _GameIdState createState() => _GameIdState();
 }
@@ -56,7 +58,7 @@ class _GameIdState extends State<GameId> {
           return new Lobby(_enteredGameId, true, user: user);
         },
       )).then((value) {
-        if(value){
+        if (!value) {
           Utils().showToast("No Game Found", context);
         }
         return null;

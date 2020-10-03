@@ -378,7 +378,7 @@ class _WelcomeState extends State<Welcome> {
               height: 60,
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CreateGame()));
+                    MaterialPageRoute(builder: (context) => TodaysGameScreen()));
               },
               color: Colors.redAccent,
               elevation: 0,

@@ -11,7 +11,9 @@ import 'package:passthecup/utils.dart';
 class ResultScreen extends StatefulWidget {
   final FirebaseGameObject firebaseGameObject;
 
-  ResultScreen(this.firebaseGameObject);
+  final bool celibrate;
+
+  ResultScreen(this.firebaseGameObject, {this.celibrate = true});
 
   @override
   _ResultScreenState createState() => _ResultScreenState(firebaseGameObject);
@@ -55,7 +57,9 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget getBody() {
-    _controllerBottomCenter.play();
+    if (widget.celibrate) {
+      _controllerBottomCenter.play();
+    }
     return Stack(
       children: <Widget>[
         Container( height: double.maxFinite,

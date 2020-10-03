@@ -86,7 +86,7 @@ class _CreateGameState extends State<CreateGame> {
             ),
           ),
         ),
-        body: user == null
+        body: true
             ? Center(
                 child: CircularProgressIndicator(),
               )
@@ -276,18 +276,18 @@ class _CreateGameState extends State<CreateGame> {
     ));
   }
 
-  void openTeamSelectScreen(BuildContext context) {
-    Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
-      builder: (BuildContext context) {
-        return new TeamSelectScreen();
-      },
-    )).then((value) {
-      setState(() {
-        _currenteam = value;
-      });
-      return null;
-    });
-  }
+//  void openTeamSelectScreen(BuildContext context) {
+//    Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
+//      builder: (BuildContext context) {
+//        return new TeamSelectScreen();
+//      },
+//    )).then((value) {
+//      setState(() {
+//        _currenteam = value;
+//      });
+//      return null;
+//    });
+//  }
 
   String generateGameID() {
     var rng = new Random();

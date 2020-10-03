@@ -6,11 +6,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
+import 'package:passthecup/model/teamobject.dart';
+import 'package:passthecup/ongoinggames.dart';
 import 'package:passthecup/resultscreen.dart';
+import 'package:passthecup/traingle.dart';
 import 'package:passthecup/utils.dart';
 import 'package:screen/screen.dart';
 
@@ -20,7 +24,12 @@ import 'model/Player.dart';
 class GameScreen extends StatefulWidget {
   final FirebaseGameObject firebaseGameObject;
 
-  GameScreen(this.firebaseGameObject);
+  final bool doubleClose;
+
+  final bool tripleClose;
+
+  GameScreen(this.firebaseGameObject,
+      {this.doubleClose = false, this.tripleClose = false});
 
   @override
   State<StatefulWidget> createState() => _GameScreenState(firebaseGameObject);
@@ -31,9 +40,9 @@ class _GameScreenState extends State<GameScreen>
   FirebaseGameObject firebaseGameObject;
   bool gameOver;
   String displayMsg;
-  String hitterImageLink;
-  String pitcherImageLink;
-  String bgImage;
+  String hitterImageLink = "";
+  String pitcherImageLink = "";
+  String bgImage = "";
 
   int lastSnapshotReceivedTime = 0;
   List<int> updateDurationArray = List();
@@ -51,6 +60,20 @@ class _GameScreenState extends State<GameScreen>
   Duration timeSinceLastUpdate = Duration(seconds: 0);
 
   bool dialogVisible = false;
+
+  String homeTeamLogoURL = "";
+
+  String awayTeamLogoURL = "";
+
+  String dueUpHitterID1Link = "";
+
+  String dueUpHitterID2Link = "";
+
+  String dueUpHitterID3Link = "";
+
+  String dueUpHitterID1Name;
+  String dueUpHitterID2Name;
+  String dueUpHitterID3Name;
 
   _GameScreenState(this.firebaseGameObject);
 
@@ -74,6 +97,7 @@ class _GameScreenState extends State<GameScreen>
 
     fetchBackgroundImage();
     listenGameObject();
+    fetchTeams();
 
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
@@ -101,6 +125,9 @@ class _GameScreenState extends State<GameScreen>
         });
         fetchHitterProfilePicture();
         fetchPitcherProfilePicture();
+        fetchDueUpHitter1Picture();
+        fetchDueUpHitter2Picture();
+        fetchDueUpHitter3Picture();
 
         if (firebaseGameObject.status == -1) {
           openResultScreen();
@@ -147,13 +174,16 @@ class _GameScreenState extends State<GameScreen>
     super.dispose();
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
+      drawer: buildDrawer(context),
       body: firebaseGameObject == null
           ? Center(
               child: CircularProgressIndicator(),
@@ -162,8 +192,47 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
+  Widget buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Container(
+        key: const PageStorageKey<String>('pagestore'),
+        width: MediaQuery.of(context).size.width * 0.4,
+        color: Colors.white.withOpacity(0.88),
+        height: MediaQuery.of(context).size.height,
+        child: OnGoingGames(
+          "InProgress",
+          onClick: (gameObject) {
+            Utils.doNotRotate = true;
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GameScreen(
+                      gameObject,
+                    )));
+          },
+        ),
+      ),
+    );
+  }
+
   Widget buildBuildSafeArea() {
-    return buildSafeArea();
+    return Stack(
+      children: [
+        SafeArea(child: buildSafeArea()),
+        Align(
+          child: GestureDetector(
+              onTap: () {
+                _scaffoldKey.currentState.openDrawer();
+              },
+              child: Image.asset(
+                "assets/slider1.png",
+                width: 40,
+                height: 100,
+              )),
+          alignment: Alignment.centerLeft,
+        ),
+      ],
+    );
   }
 
   Widget buildSafeArea() {
@@ -211,16 +280,16 @@ class _GameScreenState extends State<GameScreen>
             child: Padding(
               padding: const EdgeInsets.all(0.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  getLastSnapshotTimeText(),
                   getGameIDText(),
                   getChannelNameText(),
-                  getLastSnapshotTimeText(),
                   //getPlayID(),
                 ],
               ),
             ),
-            alignment: Alignment.topLeft,
+            alignment: Alignment.topCenter,
           ),
           Align(
             child: Image.asset(
@@ -229,7 +298,7 @@ class _GameScreenState extends State<GameScreen>
               height: 40,
               fit: BoxFit.fitWidth,
             ),
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topLeft,
           ),
         ],
       ),
@@ -253,14 +322,16 @@ class _GameScreenState extends State<GameScreen>
 
   Padding getBottomRow() {
     return Padding(
-      padding: const EdgeInsets.only(left: 15.0),
+      padding: const EdgeInsets.only(left: 15.0, right: 15),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           getLastPlayDescriptionWidget(),
-          getPlayersRow(),
-          getCupWidget()
+          Row(children: [
+            getRightWidget(),
+            getPlayersRow(),
+          ]),
         ],
       ),
     );
@@ -295,9 +366,14 @@ class _GameScreenState extends State<GameScreen>
     return Row(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        getRightWidget(),
+        Container(
+          alignment: Alignment.centerRight,
+          child: getCupWidget(),
+          width: MediaQuery.of(context).size.width * .2,
+        ),
+//        getRightWidget(),
         getFieldWidget(),
         getScoreData(),
       ],
@@ -306,7 +382,6 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getRightWidget() {
     return Container(
-      width: MediaQuery.of(context).size.width * .2,
       child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -340,13 +415,20 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getFieldWidget() {
+    var imgName = "assets/d____.png";
+    var r1 = firebaseGameObject.selectedGame.runnerOnFirst ?? false ? "1" : "_";
+    var r2 =
+        firebaseGameObject.selectedGame.runnerOnSecond ?? false ? "2" : "_";
+    var r3 = firebaseGameObject.selectedGame.runnerOnThird ?? false ? "3" : "_";
+    imgName = "assets/d$r1$r2$r3.png";
     return Container(
+      alignment: Alignment.centerRight,
       width: MediaQuery.of(context).size.width * .3,
       child: Stack(
         overflow: Overflow.visible,
         children: <Widget>[
           Image.asset(
-            "assets/baseball_field_image.png",
+            imgName,
             width: 200,
             height: 200,
           ),
@@ -388,9 +470,9 @@ class _GameScreenState extends State<GameScreen>
               ],
             ),
           ),
-          getFieldPlayerWidgetLeft(),
-          getFieldPlayerRightWidget(),
-          getFieldPlayerTopWidget(),
+//          getFieldPlayerWidgetLeft(),
+//          getFieldPlayerRightWidget(),
+//          getFieldPlayerTopWidget(),
         ],
       ),
     );
@@ -563,43 +645,43 @@ class _GameScreenState extends State<GameScreen>
     }
   }
 
-  Row getCurrentPlayerInfoWidget() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        FadeAnimation(
-            1.3,
-            Text(
-              "4.",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600),
-            )),
-        SizedBox(
-          width: 10,
-        ),
-        FadeAnimation(
-            1.3,
-            CircleAvatar(
-              maxRadius: 15,
-              backgroundImage: AssetImage("assets/girl.png"),
-            )),
-        SizedBox(
-          width: 10,
-        ),
-        FadeAnimation(
-            1.3,
-            Text(
-              "Ayush Mehre",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400),
-            )),
-      ],
-    );
-  }
+//  Row getCurrentPlayerInfoWidget() {
+//    return Row(
+//      mainAxisAlignment: MainAxisAlignment.center,
+//      children: <Widget>[
+//        FadeAnimation(
+//            1.3,
+//            Text(
+//              "4.",
+//              style: TextStyle(
+//                  color: Colors.white,
+//                  fontSize: 20,
+//                  fontWeight: FontWeight.w600),
+//            )),
+//        SizedBox(
+//          width: 10,
+//        ),
+//        FadeAnimation(
+//            1.3,
+//            CircleAvatar(
+//              maxRadius: 15,
+//              backgroundImage: AssetImage("assets/girl.png"),
+//            )),
+//        SizedBox(
+//          width: 10,
+//        ),
+//        FadeAnimation(
+//            1.3,
+//            Text(
+//              "Ayush Mehre",
+//              style: TextStyle(
+//                  color: Colors.white,
+//                  fontSize: 18,
+//                  fontWeight: FontWeight.w400),
+//            )),
+//      ],
+//    );
+//  }
 
 //  Container getCurrentPlayersInfo() {
 //    return Container(
@@ -737,17 +819,42 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getPlayersRow() {
+    var players = firebaseGameObject.players;
+    var playersWithCurrentPlayerAtFirst = List<Player>();
+    var playersBeforeCurrentPlayer = List<Player>();
+    var playersAfterCurrentPlayer = List<Player>();
+
+    //getting all the players before currentActivePlayer
+    for (int i = 0; i < firebaseGameObject.currentActivePlayer; i++) {
+      playersBeforeCurrentPlayer.add(players[i]);
+    }
+
+    //getting all the players after currentActivePlayer
+    for (int i = firebaseGameObject.currentActivePlayer;
+        i < players.length;
+        i++) {
+      playersAfterCurrentPlayer.add(players[i]);
+    }
+
+    playersWithCurrentPlayerAtFirst.addAll(playersAfterCurrentPlayer);
+    playersWithCurrentPlayerAtFirst.addAll(playersBeforeCurrentPlayer);
+
     List<Widget> playersW = List();
     //playersW.add(getCupWidget());
     var count = 0;
-    for (Player player in firebaseGameObject.players) {
-      playersW.add(getPlayerWidget(player,
-          active: count == firebaseGameObject.currentActivePlayer));
+    for (Player player in playersWithCurrentPlayerAtFirst) {
+      playersW.add(getPlayerWidget(player, index: count));
       count++;
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: playersW,
+    return Container(
+      width: 300,
+      child: SingleChildScrollView(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: playersW,
+        ),
+        scrollDirection: Axis.horizontal,
+      ),
     );
   }
 
@@ -793,8 +900,7 @@ class _GameScreenState extends State<GameScreen>
             backgroundColor: Colors.redAccent,
             child: CircleAvatar(
               radius: 15,
-              backgroundImage: NetworkImage(
-                  "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff"),
+              backgroundImage: networkImage(player),
             ),
           ),
           Text(
@@ -807,29 +913,74 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
-  Widget getPlayerWidget(Player player, {bool active = false}) {
+  Widget getDueUpHitterWidget(int index) {
+    var label = "";
+    var src = "";
+    var playerName = "";
+    switch (index) {
+      case 1:
+        label = "On Deck";
+        src = dueUpHitterID1Link;
+        playerName = dueUpHitterID1Name ?? "";
+        break;
+      case 2:
+        label = "In the Hole";
+        src = dueUpHitterID2Link;
+        playerName = dueUpHitterID2Name ?? "";
+        break;
+      case 3:
+        label = "  3rd Up  ";
+        src = dueUpHitterID3Link;
+        playerName = dueUpHitterID3Name ?? "";
+        break;
+    }
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      margin: EdgeInsets.only(bottom: 5),
+      color: index <= 3 ? Colors.black.withOpacity(0.5) : Colors.transparent,
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: Colors.white, fontSize: 10),
+          ),
+          Image.network(
+            src,
+            width: 25,
+            height: 25,
+          ),
+          Text(
+            playerName,
+            style: TextStyle(color: Colors.white, fontSize: 10),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget getPlayerWidget(Player player, {int index}) {
+    var playerName = player.name;
+    if (playerName.contains(" ")) {
+      playerName = player.name.substring(0, player.name.indexOf(" "));
+    }
     return Padding(
-      padding: const EdgeInsets.only(right: 24.0),
+      padding: const EdgeInsets.only(right: 8.0),
       child: Column(
         children: <Widget>[
-          active
+          index == 0
               ? Image.asset("assets/logo.png",
-                  width: 25, height: 25, fit: BoxFit.contain)
-              : SizedBox(
-                  width: 25,
-                  height: 25,
-                ),
+                  width: 50, height: 50, fit: BoxFit.contain)
+              : getDueUpHitterWidget(index),
           CircleAvatar(
-            radius: active ? 17 : 15,
+            radius: index == 0 ? 17 : 15,
             backgroundColor: Colors.yellow,
             child: CircleAvatar(
               radius: 15,
-              backgroundImage: NetworkImage(
-                  "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff"),
+              backgroundImage: networkImage(player),
             ),
           ),
           Text(
-            player.name,
+            playerName,
             style: TextStyle(
                 color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
           ),
@@ -841,6 +992,11 @@ class _GameScreenState extends State<GameScreen>
         ],
       ),
     );
+  }
+
+  NetworkImage networkImage(Player player) {
+    return NetworkImage(
+        "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff");
   }
 
   Widget getPointsColumn() {
@@ -855,6 +1011,7 @@ class _GameScreenState extends State<GameScreen>
             children: <Widget>[
               Column(
                 children: <Widget>[
+                  getImageWidget(awayTeamLogoURL),
                   Text(
                     firebaseGameObject.selectedGame.awayTeam,
                     style: TextStyle(
@@ -906,6 +1063,7 @@ class _GameScreenState extends State<GameScreen>
               ),
               Column(
                 children: <Widget>[
+                  getImageWidget(homeTeamLogoURL),
                   Text(
                     firebaseGameObject.selectedGame.homeTeam,
                     style: TextStyle(
@@ -1074,7 +1232,8 @@ class _GameScreenState extends State<GameScreen>
     try {
 //      var play = firebaseGameObject.currentInningNumber[currentPlay];
       int number = firebaseGameObject.selectedGame.inning;
-      var inningHalf = firebaseGameObject.currentInningHalf == "T" ? "▲" : "▼";
+      var inningHalf =
+          firebaseGameObject.selectedGame.inningHalf == "T" ? "▲" : "▼";
       if (number == 1) {
         return number.toString() + "st $inningHalf";
       } else if (number == 2) {
@@ -1367,6 +1526,22 @@ class _GameScreenState extends State<GameScreen>
     });
   }
 
+  void fetchTeams() {
+    API().fetchTeamImage().then((value) {
+      for (TeamObject team in value) {
+        if (firebaseGameObject.selectedGame.awayTeamID == team.teamID) {
+          setState(() {
+            awayTeamLogoURL = team.wikipediaWordMarkUrl;
+          });
+        }
+        if (firebaseGameObject.selectedGame.homeTeamID == team.teamID) {
+          homeTeamLogoURL = team.wikipediaWordMarkUrl;
+        }
+      }
+      return null;
+    });
+  }
+
   void fetchPitcherProfilePicture() {
     API()
         .fetchPlayerImage(firebaseGameObject.selectedGame.currentPitcherID)
@@ -1376,6 +1551,60 @@ class _GameScreenState extends State<GameScreen>
       });
       return null;
     });
+  }
+
+  void fetchDueUpHitter1Picture() {
+    API()
+        .fetchPlayerProfile(firebaseGameObject.selectedGame.dueUpHitterID1)
+        .then((value) {
+      setState(() {
+        dueUpHitterID1Link = value.photoUrl;
+        dueUpHitterID1Name = value.lastName;
+      });
+      return null;
+    });
+  }
+
+  void fetchDueUpHitter2Picture() {
+    API()
+        .fetchPlayerProfile(firebaseGameObject.selectedGame.dueUpHitterID2)
+        .then((value) {
+      setState(() {
+        dueUpHitterID2Link = value.photoUrl;
+        dueUpHitterID2Name = value.lastName;
+      });
+      return null;
+    });
+  }
+
+  void fetchDueUpHitter3Picture() {
+    API()
+        .fetchPlayerProfile(firebaseGameObject.selectedGame.dueUpHitterID3)
+        .then((value) {
+      setState(() {
+        dueUpHitterID3Link = value.photoUrl;
+        dueUpHitterID3Name = value.lastName;
+      });
+      return null;
+    });
+  }
+
+  Widget getImageWidget(String url) {
+    if (url.endsWith("png")) {
+      return Image.network(
+        url,
+        width: 25,
+        height: 25,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return SvgPicture.network(
+        url,
+        width: 25,
+        height: 25,
+        fit: BoxFit.cover,
+      );
+    }
   }
 
   showQDialog() {
@@ -1448,6 +1677,9 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void showGameNotStartedDialog() async {
+    if (dialogVisible) {
+      Navigator.pop(context);
+    }
     dialogVisible = true;
     await showGeneralDialog(
       barrierLabel: "Barrier",
@@ -1532,6 +1764,13 @@ class _GameScreenState extends State<GameScreen>
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context);
+                if (widget.doubleClose) {
+                  Navigator.pop(context);
+                }
+                if (widget.tripleClose) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }
               },
               child: Text(
                 "OK",
@@ -1592,7 +1831,11 @@ mixin PortraitStatefulModeMixin<T extends StatefulWidget> on State<T> {
 
   @override
   void dispose() {
-    _enableRotation();
+    if (!Utils.doNotRotate) {
+      _enableRotation();
+    }else{
+      Utils.doNotRotate = false;
+    }
     super.dispose();
   }
 }

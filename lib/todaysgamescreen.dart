@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +9,8 @@ import 'package:passthecup/model/gameObject.dart';
 import 'package:passthecup/utils.dart';
 
 import 'api.dart';
+import 'gamelobby.dart';
+import 'model/Player.dart';
 import 'model/teamobject.dart';
 
 class TodaysGameScreen extends StatefulWidget {
@@ -21,6 +27,10 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    this.getUser();
+
+
     futureResult = API().fetchGames().then((value) {
       setState(() {
         gamesList = value;
@@ -54,14 +64,15 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
         child: ListView.builder(
             itemCount: gamesList.length,
             itemBuilder: (context, index) {
-             // bool before = gamesList[index].status == "Final";
+              // bool before = gamesList[index].status == "Final";
               return Visibility(
                 child: GestureDetector(
                   onTap: () {
-                    if (gamesList[index].status!="Canceled") {
-                      Navigator.pop(context, gamesList[index]);
+                    if (gamesList[index].status != "Canceled") {
+                      createGameAndEnter(context, gamesList[index]);
                     } else {
-                      Utils().showToast("Canceled games cannot be selected", context);
+                      Utils().showToast(
+                          "Canceled games cannot be selected", context);
                     }
                   },
                   child: Card(
@@ -76,6 +87,20 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
               );
             }),
       );
+    }
+  }
+
+  FirebaseUser user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  getUser() async {
+    FirebaseUser firebaseUser = await _auth.currentUser();
+    await firebaseUser?.reload();
+    firebaseUser = await _auth.currentUser();
+    if (firebaseUser != null) {
+      setState(() {
+        this.user = firebaseUser;
+      });
     }
   }
 
@@ -99,6 +124,75 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
           getinDayUserFormat(gamesList[index].day),
       style: TextStyle(color: before ? Colors.red : null),
     );
+  }
+
+  void createGameAndEnter(BuildContext context, GameObject _currengame) {
+    Utils().showLoaderDialog(context);
+    List<Map<String, dynamic>> players = List();
+    List<Map<String, dynamic>> playersLobby = List();
+    var player = Player(
+        name: user.displayName, email: user.email, gamescore: -5, host: true);
+    playersLobby.add(player.toJson());
+//    player.host = false;
+//    playersLobby.add(player.toJson());
+    String gameID = generateGameID();
+    var map = {
+      "gameID": _currengame.gameID,
+      "selectedGame": _currengame.toJson(),
+      "selectedTeam": null, //_currenteam.toJson(),
+      "name": user.displayName,
+      "hostID": user.email,
+      "joinPlayers": 0,
+      "creatorId": user.uid,
+      "status": 0,
+      "gameCode": gameID,
+      "createdOn": DateTime.now().toString(),
+      "players": playersLobby,
+      "simulation": false,
+      "lastResult": "",
+      "lastResultPointsAwarded": 0,
+      "currentHitter": "",
+      "currentPitcher": "",
+      "currentHitterID": 0,
+      "currentPitcherID": 0,
+      "currentInningNumber": 0,
+      "currentInningHalf": "T",
+      "currentActivePlayer": 0,
+      "cupScore": 0,
+      "lastUpdatedAt": ""
+    };
+    var lobbymap = {
+      "players": playersLobby,
+    };
+    Firestore.instance
+        .collection("games")
+        .document(gameID)
+        .setData(map)
+        .then((_) {
+      print("Game Created Successfully!");
+      Firestore.instance
+          .collection("players")
+          .document(gameID)
+          .setData(lobbymap)
+          .then((value) {
+        Navigator.pop(context);
+        openLoabbyScreen(context, gameID);
+      });
+    });
+  }
+
+  void openLoabbyScreen(BuildContext context, String gameID) {
+    Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
+      builder: (BuildContext context) {
+        return new Lobby(gameID, false);
+      },
+    ));
+  }
+
+  String generateGameID() {
+    var rng = new Random();
+    var code = rng.nextInt(900000) + 100000;
+    return code.toString();
   }
 }
 

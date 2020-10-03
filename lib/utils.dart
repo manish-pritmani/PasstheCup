@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class Utils {
+  static bool doNotRotate = false;
+
   Color getBGColor() {
     return Hexcolor("#ffffff");
   }

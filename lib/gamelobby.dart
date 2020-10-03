@@ -14,6 +14,7 @@ import 'package:passthecup/model/teamobject.dart';
 import 'package:passthecup/utils.dart';
 
 import 'game2.dart';
+import 'gamescreen.dart';
 import 'model/Player.dart';
 import 'model/firebasegameObject.dart';
 
@@ -42,6 +43,8 @@ class LobbyState extends State<Lobby> {
   DocumentReference lobbyDocumentRef;
   StreamSubscription<DocumentSnapshot> gameDocumentSubscription;
 
+  bool hideListView = false;
+
   // StreamSubscription<DocumentSnapshot> lobbyDocumentSubscription;
 
   LobbyState(this.gameID, this.add, this.user);
@@ -54,7 +57,9 @@ class LobbyState extends State<Lobby> {
     gameDocumentRef = Firestore.instance.collection('games').document(gameID);
 //    lobbyDocumentRef =
 //        Firestore.instance.collection('players').document(gameID);
-
+    setState(() {
+      hideListView = false;
+    });
     startFetching();
   }
 
@@ -71,10 +76,24 @@ class LobbyState extends State<Lobby> {
         listenToGameObjectChanges();
       } else {
         if (firebaseGameObject.status == 1) {
-          Utils().showToast("Game has already started", context, oktext: "OK",
-              ok: () {
-            Navigator.pop(context, false);
-          });
+          if (firebaseGameObject.selectedGame.status == "InProgress") {
+            Utils().showToast("Game has already started", context, oktext: "OK",
+                ok: () {
+              Navigator.pop(context, false);
+            });
+          } else {
+            if (add) {
+              addMeAsAPlayer();
+              addToMyGames();
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GameScreen(
+                            firebaseGameObject,
+                            doubleClose: true,
+                          )));
+            }
+          }
         } else {
           Utils().showToast("Game has already ended", context, oktext: "OK",
               ok: () {
@@ -215,80 +234,80 @@ class LobbyState extends State<Lobby> {
     return Container(
       alignment: Alignment.center,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              getGameLobbyTitle(),
-              getTeamvsTeam(),
-              SizedBox(
-                height: 20,
-              ),
-              getGameCodeWidget(),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Players in Lobby (${firebaseGameObject.players.length})",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40),
-                child: Container(
-                    height: 220,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.redAccent),
-                    child: ListView(
-                      children: getAllPlayers(),
-                    )),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40),
-                child: MaterialButton(
-                  minWidth: double.infinity,
-                  height: 60,
-                  onPressed: () {
-                    if (!add) {
+          getGameLobbyTitle(),
+          getTeamvsTeam(),
+          SizedBox(
+            height: 20,
+          ),
+          getGameCodeWidget(),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "Players in Lobby (${firebaseGameObject.players.length})",
+            style: TextStyle(
+                color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Container(
+                height: 220,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.redAccent),
+                child: buildListView()),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: () {
+                if (!add) {
 //                      showAlertDialog(context, "", "Select Mode", "Simulation",
 //                          "Live Game");
-                      openGameScreen(context, false);
-                    } else {
-                      Utils().showToast(
-                          "Wait for host to start the game", context);
-                    }
-                  },
-                  color: Utils().getBlue(),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
-                  child: Text(
-                    add ? "WAITING FOR GAME TO START" : "START GAME",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                ),
+                  openGameScreen(context, false);
+                } else {
+                  Utils().showToast("Wait for host to start the game", context);
+                }
+              },
+              color: Utils().getBlue(),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                add ? "WAITING FOR GAME TO START" : "START GAME",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Widget buildListView() {
+    if (!hideListView) {
+      return ListView(
+        children: getAllPlayers(),
+      );
+    } else {
+      return Text("");
+    }
   }
 
   showAlertDialog(BuildContext context, String message, String heading,
@@ -340,6 +359,9 @@ class LobbyState extends State<Lobby> {
 //  }
 
   void openGameScreen(BuildContext context, bool simulation) {
+    setState(() {
+      hideListView = true;
+    });
     addToMyGames();
     Utils().showLoaderDialog(context);
     firebaseGameObject.status = 1;
@@ -360,6 +382,7 @@ class LobbyState extends State<Lobby> {
             MaterialPageRoute(
                 builder: (context) => GameScreen(
                       firebaseGameObject,
+                      tripleClose: true,
                     )));
       }).catchError((onError) => {Utils().showToast(onError.message, context)});
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
