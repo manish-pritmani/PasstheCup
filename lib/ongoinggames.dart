@@ -283,14 +283,14 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
 
   Text getOngoingText() {
     return Text(
-      "OnGoing",
+      "Active",
       style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
     );
   }
 
   Text getGameEndedText() {
     return Text(
-      "Game Ended",
+      "Complete",
       style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
     );
   }
