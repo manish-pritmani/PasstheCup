@@ -351,7 +351,7 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getCupWidget() {
     var scoreToShow = firebaseGameObject.cupScore.toString();
-    if (firebaseGameObject.cupScore > 10 && firebaseGameObject.cupScore < 10) {
+    if (firebaseGameObject.cupScore > -10 && firebaseGameObject.cupScore < 10) {
       scoreToShow = "0" + firebaseGameObject.cupScore.toString();
     }
     return Stack(
@@ -896,7 +896,8 @@ class _GameScreenState extends State<GameScreen>
 
     double width2 = deviceWidth <= 670 ? 200 : 300;
     return Container(
-      width: width2,
+      alignment: Alignment.center,
+      width: deviceWidth - 100,
       child: SingleChildScrollView(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -995,8 +996,8 @@ class _GameScreenState extends State<GameScreen>
           ),
           Image.network(
             src,
-            width: 25,
-            height: 25,
+            width: 35,
+            height: 35,
           ),
           Text(
             playerName,
@@ -1013,7 +1014,7 @@ class _GameScreenState extends State<GameScreen>
       playerName = player.name.substring(0, player.name.indexOf(" "));
     }
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 12.0),
       child: Column(
         children: <Widget>[
           index == 0 ? getCupWidget() : getDueUpHitterWidget(index),
@@ -1030,7 +1031,7 @@ class _GameScreenState extends State<GameScreen>
                   alignment: Alignment.center,
                 ),
                 Align(
-                  child: getPointsAwardedWidget(),
+                  child: index == 0 ? getPointsAwardedWidget() : null,
                   alignment: Alignment.center,
                 ),
               ],
