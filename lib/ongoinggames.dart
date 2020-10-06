@@ -249,11 +249,11 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       children: [
         Text(
           gameObject == null ? "0" : gameObject.cupScore.toString(),
-          style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
         ),
         Text(
           "Cupscore",
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
         )
       ],
     );
@@ -310,7 +310,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       );
     } else {
       return Text(
-        "Final Result: " + getWinner(),
+        "" + getWinner(),
         style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
       );
     }

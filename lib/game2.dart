@@ -75,6 +75,10 @@ class _GameScreenState extends State<GameScreen>
   String dueUpHitterID2Name;
   String dueUpHitterID3Name;
 
+  double deviceWidth;
+
+  bool small;
+
   _GameScreenState(this.firebaseGameObject);
 
   @override
@@ -87,6 +91,8 @@ class _GameScreenState extends State<GameScreen>
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+
+
 
     setState(() {
       gameOver = false;
@@ -179,6 +185,11 @@ class _GameScreenState extends State<GameScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    print(MediaQuery.of(context).size.width.toString()+" width of device");
+    setState(() {
+      deviceWidth = MediaQuery.of(context).size.width;
+      small = deviceWidth<=670;
+    });
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
@@ -218,7 +229,7 @@ class _GameScreenState extends State<GameScreen>
   Widget buildBuildSafeArea() {
     return Stack(
       children: [
-        SafeArea(child: buildSafeArea()),
+        Container(child: buildSafeArea()),
         Align(
           child: GestureDetector(
               onTap: () {
@@ -282,9 +293,9 @@ class _GameScreenState extends State<GameScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  getLastSnapshotTimeText(),
+                  //getLastSnapshotTimeText(),
                   getGameIDText(),
-                  getChannelNameText(),
+                  //getChannelNameText(),
                   //getPlayID(),
                 ],
               ),
@@ -294,8 +305,8 @@ class _GameScreenState extends State<GameScreen>
           Align(
             child: Image.asset(
               getAdImageName(),
-              width: 250,
-              height: 40,
+              width: small?200:250,
+              height: small?30:40,
               fit: BoxFit.fitWidth,
             ),
             alignment: Alignment.topLeft,
@@ -566,7 +577,7 @@ class _GameScreenState extends State<GameScreen>
   Text getChannelNameText() {
     return Text(
       "Channel: ${firebaseGameObject.selectedGame.channel}",
-      style: TextStyle(color: Hexcolor("#99FFFFFF")),
+      style: TextStyle(color: Hexcolor("#99FFFFFF"), fontSize: small?10:10),
     );
   }
 
@@ -577,7 +588,7 @@ class _GameScreenState extends State<GameScreen>
       //"\nLongest Time: ${getLargest()} sec"
       // "\nAverage Time: ${getAvg()} sec"
       //"\n${updateDurationArray.toString()}",
-      style: TextStyle(color: Hexcolor("#99FFFFFF")),
+      style: TextStyle(color: Hexcolor("#99FFFFFF"), fontSize: small?10:10),
     );
   }
 
@@ -597,7 +608,7 @@ class _GameScreenState extends State<GameScreen>
   Text getGameIDText() {
     return Text(
       "Game ID: ${firebaseGameObject.gameCode}",
-      style: TextStyle(color: Hexcolor("#99FFFFFF")),
+      style: TextStyle(color: Hexcolor("#99FFFFFF"), fontSize: small?10:10),
     );
   }
 
@@ -846,8 +857,10 @@ class _GameScreenState extends State<GameScreen>
       playersW.add(getPlayerWidget(player, index: count));
       count++;
     }
+
+    double width2 = deviceWidth<=670?200:300;
     return Container(
-      width: 300,
+      width: width2,
       child: SingleChildScrollView(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
