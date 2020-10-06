@@ -298,7 +298,7 @@ class _GameScreenState extends State<GameScreen>
                 ],
               ),
             ),
-            alignment: Alignment.topCenter,
+            alignment: Alignment.topLeft,
           ),
           Align(
             child: Image.asset(
@@ -354,23 +354,26 @@ class _GameScreenState extends State<GameScreen>
     if (firebaseGameObject.cupScore > -10 && firebaseGameObject.cupScore < 10) {
       scoreToShow = "0" + firebaseGameObject.cupScore.toString();
     }
-    return Stack(
-      children: <Widget>[
-        Image.asset(
-          "assets/Cup_Icon.png",
-          width: 70,
-          height: 50,
-        ),
-        Positioned(
-          top: 15,
-          left: 27,
-          child: Text(
-            scoreToShow + "",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return Container(
+      margin: EdgeInsets.only(bottom: 8),
+      child: Stack(
+        children: <Widget>[
+          Image.asset(
+            "assets/Cup_Icon.png",
+            width: 70,
+            height: 50,
           ),
-        ),
-      ],
+          Positioned(
+            top: 15,
+            left: 27,
+            child: Text(
+              scoreToShow + "",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -643,7 +646,7 @@ class _GameScreenState extends State<GameScreen>
   Text getGameIDText() {
     return Text(
       "Game ID: ${firebaseGameObject.gameCode}",
-      style: TextStyle(color: Hexcolor("#99FFFFFF"), fontSize: small ? 10 : 10),
+      style: TextStyle(color: Hexcolor("#99FFFFFF"), fontSize: small ? 12 : 12),
     );
   }
 
