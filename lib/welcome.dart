@@ -100,6 +100,8 @@ class _WelcomeState extends State<Welcome> {
     setState(() {
       borderColor = Colors.transparent;
     });
+
+    
   }
 
   @override

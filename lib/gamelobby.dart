@@ -90,10 +90,20 @@ class LobbyState extends State<Lobby> {
             }
           }
         } else {
-          Utils().showToast("Game has already ended", context, oktext: "OK",
-              ok: () {
-            Navigator.pop(context, false);
-          });
+          if (!exists(user.email)) {
+            Utils().showToast("Game has already ended", context, oktext: "OK",
+                ok: () {
+              Navigator.pop(context, false);
+            });
+          } else {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GameScreen(
+                          firebaseGameObject,
+                          doubleClose: true,
+                        )));
+          }
         }
       }
       //listenLobby();
@@ -128,6 +138,7 @@ class LobbyState extends State<Lobby> {
     switch (firebaseGameObject.status) {
       case 0: //not started
         if (add) {
+          addToMyGames();
           addMeAsAPlayer();
         }
         break;
@@ -192,6 +203,7 @@ class LobbyState extends State<Lobby> {
     if (!exists(email) && !isAdded) {
       firebaseGameObject.players.add(Player(
           name: user.displayName, email: email, gamescore: -5, host: false));
+      firebaseGameObject.cupScore = firebaseGameObject.cupScore + 5;
       isAdded = true;
     }
     //var document = Firestore.instance.collection('players').document(gameID);
