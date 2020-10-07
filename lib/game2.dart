@@ -282,11 +282,14 @@ class _GameScreenState extends State<GameScreen>
             child: getExitButton(),
             alignment: Alignment.topRight,
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[getMainRow(context), getBottomRow()],
+          Transform.scale(
+            scale: small ? 0.9 : 1.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[getMainRow(context), getBottomRow()],
+            ),
           ),
           Align(
             child: Padding(
@@ -372,16 +375,17 @@ class _GameScreenState extends State<GameScreen>
         children: <Widget>[
           Image.asset(
             "assets/Cup_Icon.png",
-            width: large?120:70,
-            height: large?100:50,
+            width: large ? 120 : 70,
+            height: large ? 100 : 50,
           ),
           Positioned(
-            top: large?35:15,
-            left: large?50:27,
+            top: large ? 35 : 15,
+            left: large ? 50 : 27,
             child: Text(
               scoreToShow + "",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: large?20:16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: large ? 20 : 16, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -401,8 +405,11 @@ class _GameScreenState extends State<GameScreen>
 //          width: MediaQuery.of(context).size.width * .2,
 //        ),
 //        getRightWidget(),
-        getFieldWidget(),
-        showNextThreeHitters?getCupWidget(large:true):SizedBox(),
+        Transform.scale(
+          scale: 1,
+          child: getFieldWidget(),
+        ),
+        showNextThreeHitters ? getCupWidget(large: true) : SizedBox(),
         getScoreData(),
       ],
     );
@@ -574,8 +581,8 @@ class _GameScreenState extends State<GameScreen>
         showNextThreeHitters = false;
       });
       var pointsToDisplay = lastResultPointsAwarded.toString();
-      if(lastResultPointsAwarded>0){
-        pointsToDisplay = "+"+lastResultPointsAwarded.toString();
+      if (lastResultPointsAwarded > 0) {
+        pointsToDisplay = "+" + lastResultPointsAwarded.toString();
       }
       return Container(
         width: MediaQuery.of(context).size.width - 100,
@@ -587,10 +594,7 @@ class _GameScreenState extends State<GameScreen>
               padding: EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
               color: Colors.blueAccent.withOpacity(0.5),
               child: AutoSizeText(
-                displayMsg.toString() +
-                    " (" +
-                    pointsToDisplay +
-                    ")",
+                displayMsg.toString() + " (" + pointsToDisplay + ")",
                 style: TextStyle(color: Colors.white),
                 maxLines: 1,
                 textAlign: TextAlign.center,
@@ -1000,7 +1004,7 @@ class _GameScreenState extends State<GameScreen>
         break;
     }
     return Opacity(
-      opacity: showNextThreeHitters?1:0,
+      opacity: showNextThreeHitters ? 1 : 0,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         margin: EdgeInsets.only(bottom: 5),
@@ -1031,20 +1035,26 @@ class _GameScreenState extends State<GameScreen>
     if (playerName.contains(" ")) {
       playerName = player.name.substring(0, player.name.indexOf(" "));
     }
+    double radius2 = small ? 20 : 25;
+    double highlighted = small ? 22 : 27;
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          index == 0 ? (showNextThreeHitters?getDueUpHitterWidget(index+1):getCupWidget()) : getDueUpHitterWidget(index+1),
+          index == 0
+              ? (showNextThreeHitters
+                  ? getDueUpHitterWidget(index + 1)
+                  : getCupWidget())
+              : getDueUpHitterWidget(index + 1),
           CircleAvatar(
-            radius: index == 0 ? 27 : 25,
+            radius: index == 0 ? highlighted : radius2,
             backgroundColor: Colors.yellow,
             child: Stack(
               children: [
                 Align(
                   child: CircleAvatar(
-                    radius: 25,
+                    radius: radius2,
                     backgroundImage: networkImage(player),
                   ),
                   alignment: Alignment.center,
@@ -1546,9 +1556,7 @@ class _GameScreenState extends State<GameScreen>
               style: TextStyle(
                 color: pointsAwarded == 0
                     ? Colors.transparent
-                    : pointsAwarded >= 0
-                        ? Colors.black
-                        : Colors.white,
+                    : pointsAwarded >= 0 ? Colors.black : Colors.white,
                 fontSize: 15.0,
                 fontWeight: FontWeight.bold,
               ),
