@@ -282,14 +282,11 @@ class _GameScreenState extends State<GameScreen>
             child: getExitButton(),
             alignment: Alignment.topRight,
           ),
-          Transform.scale(
-            scale: small ? 0.9 : 1.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[getMainRow(context), getBottomRow()],
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[getMainRow(context), getBottomRow()],
           ),
           Align(
             child: Padding(
@@ -338,29 +335,7 @@ class _GameScreenState extends State<GameScreen>
   Padding getBottomRow() {
     return Padding(
       padding: const EdgeInsets.only(left: 30.0, right: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          //getLastPlayDescriptionWidget(),
-          Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-//            getRightWidget(),
-                Row(
-                  children: [
-//                    getPointsAwardedWidget(),
-                    getPlayersRow(),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: getLastPlayDescriptionWidget(),
-                )
-              ]),
-        ],
-      ),
+      child: getLastPlayDescriptionWidget(),
     );
   }
 
@@ -375,12 +350,12 @@ class _GameScreenState extends State<GameScreen>
         children: <Widget>[
           Image.asset(
             "assets/Cup_Icon.png",
-            width: large ? 120 : 70,
-            height: large ? 100 : 50,
+            width: large ? 100 : 70,
+            height: large ? 80 : 50,
           ),
           Positioned(
-            top: large ? 35 : 15,
-            left: large ? 50 : 27,
+            top: large ? 25 : 15,
+            left: large ? 40 : 27,
             child: Text(
               scoreToShow + "",
               textAlign: TextAlign.center,
@@ -405,12 +380,15 @@ class _GameScreenState extends State<GameScreen>
 //          width: MediaQuery.of(context).size.width * .2,
 //        ),
 //        getRightWidget(),
-        Transform.scale(
-          scale: 1,
-          child: getFieldWidget(),
-        ),
+        getFieldWidget(),
         showNextThreeHitters ? getCupWidget(large: true) : SizedBox(),
-        getScoreData(),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            getScoreData(),
+            getPlayersRow()
+          ],
+        ),
       ],
     );
   }
@@ -574,9 +552,17 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getLastPlayDescriptionWidget() {
+    List<String> blackListedPlays = [
+      "stolen base",
+      "caught stealing",
+      "wild pitch",
+      "passed ball"
+    ];
     bool b = displayMsg != "null";
     var lastResultPointsAwarded = firebaseGameObject.lastResultPointsAwarded;
-    if (lastResultPointsAwarded != 0) {
+    if (lastResultPointsAwarded != 0 ||
+        blackListedPlays
+            .contains(firebaseGameObject.lastResult.toLowerCase())) {
       setState(() {
         showNextThreeHitters = false;
       });
@@ -705,9 +691,8 @@ class _GameScreenState extends State<GameScreen>
   Container getScoreData() {
     try {
       return Container(
-        width: MediaQuery.of(context).size.width * .4,
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(right: 60),
         child: Column(
           children: <Widget>[
             getPointsColumn(),
@@ -933,8 +918,8 @@ class _GameScreenState extends State<GameScreen>
 
     double width2 = deviceWidth <= 670 ? 200 : 300;
     return Container(
+      width: deviceWidth*0.4,
       alignment: Alignment.center,
-      width: deviceWidth - 100,
       child: SingleChildScrollView(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1038,7 +1023,7 @@ class _GameScreenState extends State<GameScreen>
     double radius2 = small ? 20 : 25;
     double highlighted = small ? 22 : 27;
     return Padding(
-      padding: const EdgeInsets.only(right: 12.0),
+      padding: const EdgeInsets.only(right: 6.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
@@ -1680,15 +1665,15 @@ class _GameScreenState extends State<GameScreen>
     if (url.endsWith("png")) {
       return Image.network(
         url,
-        width: 25,
-        height: 25,
+        width: 30,
+        height: 30,
         fit: BoxFit.cover,
       );
     } else {
       return SvgPicture.network(
         url,
-        width: 25,
-        height: 25,
+        width: 30,
+        height: 30,
         fit: BoxFit.cover,
       );
     }
