@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -16,6 +18,7 @@ import 'package:passthecup/ongoinggames.dart';
 import 'package:passthecup/resultscreen.dart';
 import 'package:passthecup/traingle.dart';
 import 'package:passthecup/utils.dart';
+import 'package:passthecup/welcome.dart';
 import 'package:screen/screen.dart';
 
 import 'api.dart';
@@ -81,7 +84,14 @@ class _GameScreenState extends State<GameScreen>
 
   bool showNextThreeHitters = false;
 
+  MobileAdEvent interstitialAdEvent;
+
+  bool adShown = false;
+
   _GameScreenState(this.firebaseGameObject);
+
+  BannerAd _bannerAd;
+  InterstitialAd _interstitialAd;
 
   @override
   void initState() {
@@ -112,6 +122,34 @@ class _GameScreenState extends State<GameScreen>
             DateTime.fromMillisecondsSinceEpoch(lastSnapshotReceivedTime));
       });
     });
+
+    _bannerAd = createBannerAd()..load();
+    _interstitialAd = createInterstitialAd()..load();
+    SchedulerBinding.instance.addPostFrameCallback((_) => afterBuild());
+  }
+
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: Welcome.targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
+
+  InterstitialAd createInterstitialAd() {
+    return InterstitialAd(
+      adUnitId: InterstitialAd.testAdUnitId,
+      targetingInfo: Welcome.targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("InterstitialAd event $event");
+        setState(() {
+          interstitialAdEvent = event;
+        });
+      },
+    );
   }
 
   void listenGameObject() {
@@ -178,6 +216,8 @@ class _GameScreenState extends State<GameScreen>
   void dispose() {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     timer?.cancel();
+    _bannerAd?.dispose();
+    _interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -186,6 +226,7 @@ class _GameScreenState extends State<GameScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     print(MediaQuery.of(context).size.width.toString() + " width of device");
     setState(() {
       deviceWidth = MediaQuery.of(context).size.width;
@@ -202,6 +243,16 @@ class _GameScreenState extends State<GameScreen>
             )
           : buildBuildSafeArea(),
     );
+  }
+
+  void afterBuild() {
+    // executes after build is done
+    _bannerAd ??= createBannerAd();
+    var width = MediaQuery.of(context).size.width;
+    var horizontalCenterOffset2 = width/2+200;
+    _bannerAd
+      ..load()
+      ..show(anchorType: AnchorType.top, horizontalCenterOffset: -horizontalCenterOffset2);
   }
 
   Widget buildDrawer(BuildContext context) {
@@ -303,15 +354,15 @@ class _GameScreenState extends State<GameScreen>
             ),
             alignment: Alignment.topLeft,
           ),
-          Align(
-            child: Image.asset(
-              getAdImageName(),
-              width: small ? 200 : 250,
-              height: small ? 30 : 40,
-              fit: BoxFit.fitWidth,
-            ),
-            alignment: Alignment.topCenter,
-          ),
+//          Align(
+//            child: Image.asset(
+//              getAdImageName(),
+//              width: small ? 200 : 250,
+//              height: small ? 30 : 40,
+//              fit: BoxFit.fitWidth,
+//            ),
+//            alignment: Alignment.topCenter,
+//          ),
         ],
       ),
     );
@@ -372,22 +423,13 @@ class _GameScreenState extends State<GameScreen>
     return Row(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-//        Container(
-//          alignment: Alignment.centerRight,
-//          child: getCupWidget(),
-//          width: MediaQuery.of(context).size.width * .2,
-//        ),
-//        getRightWidget(),
         getFieldWidget(),
-        showNextThreeHitters ? getCupWidget(large: true) : SizedBox(),
+//        showNextThreeHitters ? getCupWidget(large: true) : SizedBox(),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            getScoreData(),
-            getPlayersRow()
-          ],
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[getScoreData(), getPlayersRow()],
         ),
       ],
     );
@@ -420,6 +462,7 @@ class _GameScreenState extends State<GameScreen>
           color: Colors.white,
         ),
         onPressed: () {
+//          _interstitialAd?.show();
           Utils().showToast("Are you sure you want to exit the game?", context,
               ok: () {
             Navigator.pop(context);
@@ -446,43 +489,57 @@ class _GameScreenState extends State<GameScreen>
             height: 200,
           ),
           Positioned(
-            bottom: 75,
-            left: 55,
+            bottom: 80,
+            left: 75,
             child: Column(
               children: <Widget>[
                 getPitcherImage(),
                 SizedBox(
                   height: 5,
                 ),
-                Text(
-                  firebaseGameObject.selectedGame.currentPitcher == null
-                      ? ""
-                      : firebaseGameObject.selectedGame.currentPitcher
-                          .toString(),
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                Visibility(
+                  visible: !showNextThreeHitters,
+                  child: Text(
+                    firebaseGameObject.selectedGame.currentPitcher == null
+                        ? ""
+                        : firebaseGameObject.selectedGame.currentPitcher
+                            .toString(),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
                 )
               ],
             ),
           ),
           Positioned(
             bottom: -10,
-            left: 50,
+            left: 65,
             child: Column(
               children: <Widget>[
                 getHitterImage(),
                 SizedBox(
                   height: 5,
                 ),
-                Text(
-                  firebaseGameObject.selectedGame.currentHitter == null
-                      ? ""
-                      : firebaseGameObject.selectedGame.currentHitter
-                          .toString(),
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                Visibility(
+                  visible: !showNextThreeHitters,
+                  child: Text(
+                    firebaseGameObject.selectedGame.currentHitter == null
+                        ? ""
+                        : firebaseGameObject.selectedGame.currentHitter
+                            .toString(),
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
                 ),
               ],
             ),
           ),
+          Visibility(
+            visible: showNextThreeHitters,
+            child: Positioned(
+              top: 50,
+              left: 50,
+              child: getCupWidget(large: true),
+            ),
+          )
 //          getFieldPlayerWidgetLeft(),
 //          getFieldPlayerRightWidget(),
 //          getFieldPlayerTopWidget(),
@@ -563,6 +620,7 @@ class _GameScreenState extends State<GameScreen>
     if (lastResultPointsAwarded != 0 ||
         blackListedPlays
             .contains(firebaseGameObject.lastResult.toLowerCase())) {
+      adShown = false;
       setState(() {
         showNextThreeHitters = false;
       });
@@ -571,14 +629,13 @@ class _GameScreenState extends State<GameScreen>
         pointsToDisplay = "+" + lastResultPointsAwarded.toString();
       }
       return Container(
-        width: MediaQuery.of(context).size.width - 100,
         child: Visibility(
           visible: b,
           child: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Container(
               padding: EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
-              color: Colors.blueAccent.withOpacity(0.5),
+              color: getLastPlayWidgetColor(lastResultPointsAwarded),
               child: AutoSizeText(
                 displayMsg.toString() + " (" + pointsToDisplay + ")",
                 style: TextStyle(color: Colors.white),
@@ -598,6 +655,12 @@ class _GameScreenState extends State<GameScreen>
         setState(() {
           showNextThreeHitters = true;
         });
+        if (!adShown) {
+          _interstitialAd?.show();
+          _interstitialAd?.dispose();
+          _interstitialAd = createInterstitialAd()..load();
+          adShown = true;
+        }
         return Container(
           width: 300,
           child: Visibility(
@@ -621,6 +684,7 @@ class _GameScreenState extends State<GameScreen>
           ),
         );
       } else {
+        adShown = false;
         setState(() {
           showNextThreeHitters = false;
         });
@@ -629,6 +693,16 @@ class _GameScreenState extends State<GameScreen>
           height: 50,
         );
       }
+    }
+  }
+
+  Color getLastPlayWidgetColor(int lastResultPointsAwarded) {
+    if (lastResultPointsAwarded > 0) {
+      return Colors.green.withOpacity(0.5);
+    } else if (lastResultPointsAwarded < 0) {
+      return Colors.redAccent.withOpacity(0.5);
+    } else {
+      return Colors.blueAccent.withOpacity(0.5);
     }
   }
 
@@ -865,7 +939,7 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getPitcherImage() {
     return Image.network(
-      pitcherImageLink,
+      showNextThreeHitters ? "" : pitcherImageLink,
       width: 50,
       height: 50,
     );
@@ -873,7 +947,7 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getHitterImage() {
     return Image.network(
-      hitterImageLink,
+      showNextThreeHitters ? "" : hitterImageLink,
       width: 50,
       height: 50,
     );
@@ -918,8 +992,7 @@ class _GameScreenState extends State<GameScreen>
 
     double width2 = deviceWidth <= 670 ? 200 : 300;
     return Container(
-      width: deviceWidth*0.4,
-      alignment: Alignment.center,
+      alignment: Alignment.centerLeft,
       child: SingleChildScrollView(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1056,14 +1129,29 @@ class _GameScreenState extends State<GameScreen>
             style: TextStyle(
                 color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
           ),
-          Text(
-            "${player.gamescore} Points",
-            style: TextStyle(
-                color: Colors.white, fontSize: 10, fontWeight: FontWeight.w400),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 6),
+            color: Colors.black.withOpacity(0.6),
+            child: Text(
+              "${player.gamescore}",
+              style: TextStyle(
+                  color: getColorAccordingToScore(player.gamescore),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Color getColorAccordingToScore(int gamescore) {
+    if (gamescore < 0) {
+      return Colors.redAccent;
+    } else if (gamescore > 0) {
+      return Colors.green;
+    }
+    return Colors.blueAccent;
   }
 
   NetworkImage networkImage(Player player) {
@@ -1541,7 +1629,9 @@ class _GameScreenState extends State<GameScreen>
               style: TextStyle(
                 color: pointsAwarded == 0
                     ? Colors.transparent
-                    : pointsAwarded >= 0 ? Colors.black : Colors.white,
+                    : pointsAwarded >= 0
+                        ? Colors.black
+                        : Colors.white,
                 fontSize: 15.0,
                 fontWeight: FontWeight.bold,
               ),

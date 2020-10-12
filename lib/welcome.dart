@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -17,6 +18,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share/share.dart';
 
 class Welcome extends StatefulWidget {
+  static const String testDevice = 'YOUR_DEVICE_ID';
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    testDevices: testDevice != null ? <String>[testDevice] : null,
+    keywords: <String>['mlb', 'baseball', 'sports'],
+    contentUrl: 'http://foo.com/bar.html',
+    childDirected: true,
+    nonPersonalizedAds: true,
+  );
+
   @override
   _WelcomeState createState() => _WelcomeState();
 }
@@ -30,6 +40,7 @@ class _WelcomeState extends State<Welcome> {
   DocumentSnapshot firebaseUserObject;
   Color borderColor;
   StreamSubscription<DocumentSnapshot> listen;
+  InterstitialAd _interstitialAd;
 
   //Todo : check if authenticated
   checkAuthentication() async {
@@ -101,7 +112,21 @@ class _WelcomeState extends State<Welcome> {
       borderColor = Colors.transparent;
     });
 
-    
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+
+    RewardedVideoAd.instance.listener =
+        (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
+      print("RewardedVideoAd event $event");
+      if (event == RewardedVideoAdEvent.rewarded) {
+        var email = firebaseUserObject.data["email"];
+        Firestore.instance
+            .collection("user")
+            .document(email)
+            .setData({"score": 50}, merge: true);
+      }
+    };
+
+    createRewardedVideoAds();
   }
 
   @override
@@ -160,15 +185,18 @@ class _WelcomeState extends State<Welcome> {
     String hex = "808080"; // color.value.toRadixString(16).substring(2);
     return Stack(
       children: <Widget>[
-        Align(child: FadeAnimation(
-            1.2,
-            Container(
-              height: MediaQuery.of(context).size.height / 2.9,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/people.png'),
-                      fit: BoxFit.cover)),
-            )), alignment: Alignment.bottomCenter,),
+        Align(
+          child: FadeAnimation(
+              1.2,
+              Container(
+                height: MediaQuery.of(context).size.height / 2.9,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/people.png'),
+                        fit: BoxFit.cover)),
+              )),
+          alignment: Alignment.bottomCenter,
+        ),
         Container(
           height: MediaQuery.of(context).size.height,
           width: double.infinity,
@@ -230,7 +258,6 @@ class _WelcomeState extends State<Welcome> {
             ],
           ),
         ),
-
         Align(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -379,8 +406,15 @@ class _WelcomeState extends State<Welcome> {
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => TodaysGameScreen()));
+                if (firebaseUserObject.data["score"] > 0) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TodaysGameScreen()));
+                } else {
+                  RewardedVideoAd.instance.show();
+                  createRewardedVideoAds();
+                }
               },
               color: Colors.redAccent,
               elevation: 0,
@@ -417,8 +451,13 @@ class _WelcomeState extends State<Welcome> {
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => GameId()));
+                if (firebaseUserObject.data["score"] > 0) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => GameId()));
+                } else {
+                  RewardedVideoAd.instance.show();
+                  createRewardedVideoAds();
+                }
               },
               color: Colors.redAccent,
               elevation: 0,
@@ -434,6 +473,12 @@ class _WelcomeState extends State<Welcome> {
             ),
           ),
         ));
+  }
+
+  void createRewardedVideoAds() {
+    RewardedVideoAd.instance.load(
+        adUnitId: RewardedVideoAd.testAdUnitId,
+        targetingInfo: Welcome.targetingInfo);
   }
 
   FadeAnimation getAvatarWidget(String hex) {
