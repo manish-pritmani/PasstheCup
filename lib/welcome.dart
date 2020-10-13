@@ -18,7 +18,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share/share.dart';
 
 class Welcome extends StatefulWidget {
-  static const String testDevice = 'YOUR_DEVICE_ID';
+  static const String testDevice = '708D3F24894BE8D6D31865513C6844A4';
   static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     testDevices: testDevice != null ? <String>[testDevice] : null,
     keywords: <String>['mlb', 'baseball', 'sports'],
@@ -112,7 +112,7 @@ class _WelcomeState extends State<Welcome> {
       borderColor = Colors.transparent;
     });
 
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    FirebaseAdMob.instance.initialize(appId: "ca-app-pub-8040945760645219~6638709781");
 
     RewardedVideoAd.instance.listener =
         (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {

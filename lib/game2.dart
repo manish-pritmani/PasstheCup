@@ -130,7 +130,7 @@ class _GameScreenState extends State<GameScreen>
 
   BannerAd createBannerAd() {
     return BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: /*"ca-app-pub-8040945760645219/7357443820"*/BannerAd.testAdUnitId,
       size: AdSize.banner,
       targetingInfo: Welcome.targetingInfo,
       listener: (MobileAdEvent event) {
@@ -619,7 +619,7 @@ class _GameScreenState extends State<GameScreen>
     var lastResultPointsAwarded = firebaseGameObject.lastResultPointsAwarded;
     if (lastResultPointsAwarded != 0 ||
         blackListedPlays
-            .contains(firebaseGameObject.lastResult.toLowerCase())) {
+            .contains(firebaseGameObject.lastResult.toString().toLowerCase())) {
       adShown = false;
       setState(() {
         showNextThreeHitters = false;
