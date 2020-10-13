@@ -252,7 +252,7 @@ class _GameScreenState extends State<GameScreen>
     var horizontalCenterOffset2 = width/2+200;
     _bannerAd
       ..load()
-      ..show(anchorType: AnchorType.top, horizontalCenterOffset: -horizontalCenterOffset2);
+      ..show(anchorType: AnchorType.top, horizontalCenterOffset: -150);
   }
 
   Widget buildDrawer(BuildContext context) {
@@ -345,8 +345,8 @@ class _GameScreenState extends State<GameScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  getLastSnapshotTimeText(),
-                  getGameIDText(),
+//                  getLastSnapshotTimeText(),
+//                  getGameIDText(),
                   //getChannelNameText(),
                   //getPlayID(),
                 ],
@@ -490,7 +490,7 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             bottom: 80,
-            left: 75,
+            left: small?50:70,
             child: Column(
               children: <Widget>[
                 getPitcherImage(),
@@ -512,7 +512,7 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             bottom: -10,
-            left: 65,
+            left: small?70:65,
             child: Column(
               children: <Widget>[
                 getHitterImage(),
@@ -765,8 +765,7 @@ class _GameScreenState extends State<GameScreen>
   Container getScoreData() {
     try {
       return Container(
-        alignment: Alignment.centerLeft,
-        padding: EdgeInsets.only(right: 60),
+        alignment: Alignment.center,
         child: Column(
           children: <Widget>[
             getPointsColumn(),
@@ -992,6 +991,7 @@ class _GameScreenState extends State<GameScreen>
 
     double width2 = deviceWidth <= 670 ? 200 : 300;
     return Container(
+      constraints: BoxConstraints(minWidth: 100, maxWidth: 400),
       alignment: Alignment.centerLeft,
       child: SingleChildScrollView(
         child: Row(
