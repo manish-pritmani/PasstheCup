@@ -8,6 +8,7 @@ import 'package:passthecup/model/firebasegameObject.dart';
 import 'package:passthecup/resultscreen.dart';
 
 import 'game2.dart';
+import 'logscreen.dart';
 
 class OnGoingGames extends StatefulWidget {
   final String status;
@@ -59,6 +60,7 @@ class _OnGoingGamesState extends State<OnGoingGames>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (loaded != null) {
       if (documents.length > 0) {
         return ListView.builder(
@@ -153,6 +155,10 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
       visible:
           gameObject != null && gameObject.selectedGame.status == widget.status,
       child: GestureDetector(
+        onLongPress: () {
+          var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen(gameObject));
+          Navigator.push(context, materialPageRoute);
+        },
         onTap: () {
           if (gameObject.selectedGame.status != "Final") {
             if (widget.onClick == null) {
@@ -165,13 +171,12 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
             } else {
               widget.onClick.call(gameObject);
             }
-          }else{
+          } else {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ResultScreen(
-                      gameObject, celibrate:false
-                    )));
+                    builder: (context) =>
+                        ResultScreen(gameObject, celibrate: false)));
           }
         },
         child: Card(
@@ -330,15 +335,15 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
     int myscore = 0;
     int winnerIndex = 0;
     for (int i = 0; i < gameObject.players.length; i++) {
-      if (gameObject.players[i].gamescore >myscore) {
+      if (gameObject.players[i].gamescore > myscore) {
         myscore = gameObject.players[i].gamescore;
         winnerIndex = i;
       }
     }
-    if (gameObject.players[winnerIndex].email==widget.user.email) {
+    if (gameObject.players[winnerIndex].email == widget.user.email) {
       return "You Won";
     } else {
-     return  gameObject.players[winnerIndex].name +" won. You lost";
+      return gameObject.players[winnerIndex].name + " won. You lost";
     }
   }
 }
