@@ -35,7 +35,6 @@ class _LogScreenState extends State<LogScreen> {
         docs = event.documents;
       });
     });
-
   }
 
   @override
