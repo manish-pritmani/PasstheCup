@@ -127,6 +127,14 @@ class _WelcomeState extends State<Welcome> {
     };
 
     createRewardedVideoAds();
+
+    Firestore.instance.collection("games").where("selectedGame.Status", isEqualTo: "InProgress").getDocuments().then((value) {
+      List<DocumentSnapshot> documents = value.documents;
+      for(DocumentSnapshot snapshot in documents){
+        snapshot.reference.setData({"selectedGame": {"Status": "Final"}}, merge: true);
+      }
+      return null;
+    });
   }
 
   @override
@@ -262,7 +270,7 @@ class _WelcomeState extends State<Welcome> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "V.1.1",
+              "V.1.3",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

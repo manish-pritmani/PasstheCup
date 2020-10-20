@@ -130,7 +130,8 @@ class _GameScreenState extends State<GameScreen>
 
   BannerAd createBannerAd() {
     return BannerAd(
-      adUnitId: /*"ca-app-pub-8040945760645219/7357443820"*/BannerAd.testAdUnitId,
+      adUnitId: /*"ca-app-pub-8040945760645219/7357443820"*/ BannerAd
+          .testAdUnitId,
       size: AdSize.banner,
       targetingInfo: Welcome.targetingInfo,
       listener: (MobileAdEvent event) {
@@ -249,7 +250,7 @@ class _GameScreenState extends State<GameScreen>
     // executes after build is done
     _bannerAd ??= createBannerAd();
     var width = MediaQuery.of(context).size.width;
-    var horizontalCenterOffset2 = width/2+200;
+    var horizontalCenterOffset2 = width / 2 + 200;
     _bannerAd
       ..load()
       ..show(anchorType: AnchorType.top, horizontalCenterOffset: -150);
@@ -471,12 +472,14 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getFieldWidget() {
-    var imgName = "assets/d____.png";
-    var r1 = firebaseGameObject.selectedGame.runnerOnFirst ?? false ? "1" : "_";
-    var r2 =
-        firebaseGameObject.selectedGame.runnerOnSecond ?? false ? "2" : "_";
-    var r3 = firebaseGameObject.selectedGame.runnerOnThird ?? false ? "3" : "_";
-    imgName = "assets/d$r1$r2$r3.png";
+    var imgName = "assets/d___.png";
+    if (!showNextThreeHitters) {
+      var r1 = firebaseGameObject.selectedGame.runnerOnFirst ?? false ? "1" : "_";
+      var r2 =
+          firebaseGameObject.selectedGame.runnerOnSecond ?? false ? "2" : "_";
+      var r3 = firebaseGameObject.selectedGame.runnerOnThird ?? false ? "3" : "_";
+      imgName = "assets/d$r1$r2$r3.png";
+    }
     return Container(
       alignment: Alignment.centerRight,
       width: MediaQuery.of(context).size.width * .3,
@@ -490,7 +493,7 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             bottom: 80,
-            left: small?50:70,
+            left: small ? 50 : 70,
             child: Column(
               children: <Widget>[
                 getPitcherImage(),
@@ -512,7 +515,7 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             bottom: -10,
-            left: small?70:65,
+            left: small ? 70 : 65,
             child: Column(
               children: <Widget>[
                 getHitterImage(),
@@ -617,9 +620,9 @@ class _GameScreenState extends State<GameScreen>
     ];
     bool b = displayMsg != "null";
     var lastResultPointsAwarded = firebaseGameObject.lastResultPointsAwarded;
-    if (lastResultPointsAwarded != 0 ||
-        blackListedPlays
-            .contains(firebaseGameObject.lastResult.toString().toLowerCase())) {
+    var contains = blackListedPlays
+        .contains(firebaseGameObject.lastResult.toString().toLowerCase());
+    if (contains || lastResultPointsAwarded != 0) {
       adShown = false;
       setState(() {
         showNextThreeHitters = false;
@@ -670,7 +673,7 @@ class _GameScreenState extends State<GameScreen>
               child: Container(
                 padding:
                     EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
-                color: Colors.blueAccent.withOpacity(0.5),
+                color: Colors.blueAccent.withOpacity(0.75),
                 child: AutoSizeText(
                   "End of the inning",
                   style: TextStyle(color: Colors.white),
@@ -698,11 +701,11 @@ class _GameScreenState extends State<GameScreen>
 
   Color getLastPlayWidgetColor(int lastResultPointsAwarded) {
     if (lastResultPointsAwarded > 0) {
-      return Colors.green.withOpacity(0.5);
+      return Colors.green.withOpacity(0.75);
     } else if (lastResultPointsAwarded < 0) {
-      return Colors.redAccent.withOpacity(0.5);
+      return Colors.redAccent.withOpacity(0.75);
     } else {
-      return Colors.blueAccent.withOpacity(0.5);
+      return Colors.blueAccent.withOpacity(0.75);
     }
   }
 
@@ -1889,7 +1892,7 @@ class _GameScreenState extends State<GameScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text("End of the inning",
+            Text("Please Wait For the Game to Begin",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,

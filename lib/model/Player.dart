@@ -9,7 +9,12 @@ class Player {
   Player.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     email = json['email'];
-    gamescore = json['gamescore'];
+    if (json["gamescore"] is double) {
+      var d = json['gamescore'] as double;
+      gamescore = d.toInt();
+    } else {
+      gamescore = json['gamescore'];
+    }
     host = json['host'];
   }
 
