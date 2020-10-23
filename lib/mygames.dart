@@ -31,13 +31,13 @@ class _MyGamesScreenState extends State<MyGamesScreen>
           bottom: TabBar(
             tabs: [
               new Tab(
-                text: "Ongoing Games",
+                text: "Active",
               ),
               new Tab(
-                text: "Scheduled Games",
+                text: "Scheduled",
               ),
               new Tab(
-                text: "Past Games",
+                text: "Complete",
               ),
             ],
             controller: _tabController,

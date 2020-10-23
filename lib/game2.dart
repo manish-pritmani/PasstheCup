@@ -474,10 +474,12 @@ class _GameScreenState extends State<GameScreen>
   Widget getFieldWidget() {
     var imgName = "assets/d___.png";
     if (!showNextThreeHitters) {
-      var r1 = firebaseGameObject.selectedGame.runnerOnFirst ?? false ? "1" : "_";
+      var r1 =
+          firebaseGameObject.selectedGame.runnerOnFirst ?? false ? "1" : "_";
       var r2 =
           firebaseGameObject.selectedGame.runnerOnSecond ?? false ? "2" : "_";
-      var r3 = firebaseGameObject.selectedGame.runnerOnThird ?? false ? "3" : "_";
+      var r3 =
+          firebaseGameObject.selectedGame.runnerOnThird ?? false ? "3" : "_";
       imgName = "assets/d$r1$r2$r3.png";
     }
     return Container(
@@ -1575,15 +1577,21 @@ class _GameScreenState extends State<GameScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          getDotView("BALL", firebaseGameObject.selectedGame.balls),
+          getDotView("BALL",
+              showNextThreeHitters ? 0 : firebaseGameObject.selectedGame.balls),
           SizedBox(
             width: 30,
           ),
-          getDotView("STRIKE", firebaseGameObject.selectedGame.strikes),
+          getDotView(
+              "STRIKE",
+              showNextThreeHitters
+                  ? 0
+                  : firebaseGameObject.selectedGame.strikes),
           SizedBox(
             width: 30,
           ),
-          getDotView("OUT", firebaseGameObject.selectedGame.outs),
+          getDotView("OUT",
+              showNextThreeHitters ? 0 : firebaseGameObject.selectedGame.outs),
         ],
       );
     } catch (e) {

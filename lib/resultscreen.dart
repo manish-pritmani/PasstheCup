@@ -23,6 +23,7 @@ class _ResultScreenState extends State<ResultScreen> {
   FirebaseGameObject firebaseGameObject;
 
   _ResultScreenState(this.firebaseGameObject);
+
   String bgImage;
   ConfettiController _controllerBottomCenter;
 
@@ -34,8 +35,7 @@ class _ResultScreenState extends State<ResultScreen> {
     _controllerBottomCenter =
         ConfettiController(duration: const Duration(seconds: 10));
 
-
-    Future.delayed(const Duration(milliseconds: 1500) , (){
+    Future.delayed(const Duration(milliseconds: 1500), () {
       _controllerBottomCenter.play();
     });
   }
@@ -62,7 +62,8 @@ class _ResultScreenState extends State<ResultScreen> {
     }
     return Stack(
       children: <Widget>[
-        Container( height: double.maxFinite,
+        Container(
+          height: double.maxFinite,
           decoration: BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
@@ -87,18 +88,16 @@ class _ResultScreenState extends State<ResultScreen> {
         Align(
           alignment: Alignment.center,
           child: ConfettiWidget(
-            confettiController: _controllerBottomCenter,
+              confettiController: _controllerBottomCenter,
               numberOfParticles: 20,
-              blastDirectionality: BlastDirectionality
-                  .explosive, // don't specify a direction, blast randomly
-              shouldLoop:
-              false,
+              blastDirectionality: BlastDirectionality.explosive,
+              // don't specify a direction, blast randomly
+              shouldLoop: false,
               colors: const [
                 Colors.redAccent,
                 Colors.blueAccent,
                 Colors.white
-              ]
-          ),
+              ]),
         ),
       ],
     );
@@ -313,15 +312,23 @@ class _ResultScreenState extends State<ResultScreen> {
 
   Widget getBSOLive() {
     try {
+      var ballsCount = firebaseGameObject.selectedGame.balls;
+      if (ballsCount > 3) {
+        ballsCount = 3;
+      }
+      var strikesCount = firebaseGameObject.selectedGame.strikes;
+      if (strikesCount > 2) {
+        strikesCount = 2;
+      }
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          getDotView("BALL", firebaseGameObject.selectedGame.balls),
+          getDotView("BALL", ballsCount),
           SizedBox(
             width: 30,
           ),
-          getDotView("STRIKE", firebaseGameObject.selectedGame.strikes),
+          getDotView("STRIKE", strikesCount),
           SizedBox(
             width: 30,
           ),
