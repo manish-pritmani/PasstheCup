@@ -3,18 +3,14 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:passthecup/animation/animation_controller.dart';
-import 'package:passthecup/create-game.dart';
 import 'package:passthecup/gameid.dart';
 import 'package:passthecup/mygames.dart';
-import 'package:passthecup/restartwidget.dart';
-import 'package:passthecup/resultscreen.dart';
 import 'package:passthecup/todaysgamescreen.dart';
 import 'package:passthecup/utils.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share/share.dart';
 
 class Welcome extends StatefulWidget {
@@ -128,13 +124,13 @@ class _WelcomeState extends State<Welcome> {
 
     createRewardedVideoAds();
 
-    Firestore.instance.collection("games").where("selectedGame.Status", isEqualTo: "InProgress").getDocuments().then((value) {
+   /* Firestore.instance.collection("games").where("selectedGame.Status", isEqualTo: "InProgress").getDocuments().then((value) {
       List<DocumentSnapshot> documents = value.documents;
       for(DocumentSnapshot snapshot in documents){
         snapshot.reference.setData({"selectedGame": {"Status": "Final"}}, merge: true);
       }
       return null;
-    });
+    });*/
   }
 
   @override
