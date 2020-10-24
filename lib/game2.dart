@@ -88,6 +88,8 @@ class _GameScreenState extends State<GameScreen>
 
   bool adShown = false;
 
+  bool playShown = false;
+
   _GameScreenState(this.firebaseGameObject);
 
   BannerAd _bannerAd;
@@ -110,6 +112,7 @@ class _GameScreenState extends State<GameScreen>
       hitterImageLink = "";
       pitcherImageLink = "";
       showNextThreeHitters = false;
+      playShown= false;
     });
 
     fetchBackgroundImage();
@@ -412,7 +415,7 @@ class _GameScreenState extends State<GameScreen>
               scoreToShow + "",
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontSize: large ? 20 : 16, fontWeight: FontWeight.bold),
+                  fontSize: large ?18 : 13, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -628,6 +631,7 @@ class _GameScreenState extends State<GameScreen>
       adShown = false;
       setState(() {
         showNextThreeHitters = false;
+        playShown = true;
       });
       var pointsToDisplay = lastResultPointsAwarded.toString();
       if (lastResultPointsAwarded > 0) {
@@ -665,6 +669,9 @@ class _GameScreenState extends State<GameScreen>
           _interstitialAd?.dispose();
           _interstitialAd = createInterstitialAd()..load();
           adShown = true;
+          setState(() {
+            playShown = true;
+          });
         }
         return Container(
           width: 300,
@@ -692,6 +699,7 @@ class _GameScreenState extends State<GameScreen>
         adShown = false;
         setState(() {
           showNextThreeHitters = false;
+          playShown = false;
         });
         return Container(
           width: 300,
@@ -1573,25 +1581,35 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
+
+      var ballsCount = firebaseGameObject.selectedGame.balls;
+      if (ballsCount!=null && ballsCount > 3) {
+        ballsCount = 3;
+      }
+      var strikesCount = firebaseGameObject.selectedGame.strikes;
+      if (strikesCount!=null && strikesCount > 2) {
+        strikesCount = 2;
+      }
+
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           getDotView("BALL",
-              showNextThreeHitters ? 0 : firebaseGameObject.selectedGame.balls),
+              playShown ? 0 : ballsCount),
           SizedBox(
             width: 30,
           ),
           getDotView(
               "STRIKE",
-              showNextThreeHitters
+              playShown
                   ? 0
-                  : firebaseGameObject.selectedGame.strikes),
+                  : strikesCount),
           SizedBox(
             width: 30,
           ),
           getDotView("OUT",
-              showNextThreeHitters ? 0 : firebaseGameObject.selectedGame.outs),
+              playShown ? 0 : firebaseGameObject.selectedGame.outs),
         ],
       );
     } catch (e) {
@@ -1900,10 +1918,10 @@ class _GameScreenState extends State<GameScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text("Please Wait For the Game to Begin",
+            Text("Please Wait For the Game to Begin", textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 24,
+                  fontSize: 20,
                   decoration: TextDecoration.none,
                 )),
             getVersusWidget(),
