@@ -127,7 +127,7 @@ class _GameScreenState extends State<GameScreen>
     });
 
     _bannerAd = createBannerAd()..load();
-    _interstitialAd = createInterstitialAd()..load();
+    //_interstitialAd = createInterstitialAd()..load();
     SchedulerBinding.instance.addPostFrameCallback((_) => afterBuild());
   }
 

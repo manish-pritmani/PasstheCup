@@ -6,9 +6,11 @@ import 'package:firebase_admob/firebase_admob.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:passthecup/ProfileStats.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/gameid.dart';
 import 'package:passthecup/mygames.dart';
+import 'package:passthecup/scoreBoard.dart';
 import 'package:passthecup/todaysgamescreen.dart';
 import 'package:passthecup/utils.dart';
 import 'package:share/share.dart';
@@ -255,6 +257,8 @@ class _WelcomeState extends State<Welcome> {
                   getJoinGameButton(context),
                   getCreateGameButton(context),
                   getMyGamesButton(),
+                  getScoreBoardButton(),
+                  getProfileStatsButton(),
                   getInviteFriendsButton(),
                   getSignoutButton(),
                 ],
@@ -274,6 +278,84 @@ class _WelcomeState extends State<Welcome> {
         )
       ],
     );
+  }
+
+  FadeAnimation getProfileStatsButton() {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (c){
+                  return ProfileStatsPage();
+                }));
+              },
+              color: Utils().getBlue(),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "Profile & Stats",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
+  }
+
+  FadeAnimation getScoreBoardButton() {
+    return FadeAnimation(
+        1.4,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: EdgeInsets.only(top: 3, left: 3),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border(
+                  bottom: BorderSide(color: borderColor),
+                  top: BorderSide(color: borderColor),
+                  left: BorderSide(color: borderColor),
+                  right: BorderSide(color: borderColor),
+                )),
+            child: MaterialButton(
+              minWidth: double.infinity,
+              height: 60,
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (c){
+                  return ScoreBoard();
+                }));
+              },
+              color: Utils().getBlue(),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                "Scoreboard",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+            ),
+          ),
+        ));
   }
 
   FadeAnimation getSignoutButton() {
