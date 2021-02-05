@@ -110,7 +110,8 @@ class _WelcomeState extends State<Welcome> {
       borderColor = Colors.transparent;
     });
 
-    FirebaseAdMob.instance.initialize(appId: "ca-app-pub-8040945760645219~6638709781");
+    FirebaseAdMob.instance
+        .initialize(appId: "ca-app-pub-8040945760645219~6638709781");
 
     RewardedVideoAd.instance.listener =
         (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
@@ -126,7 +127,7 @@ class _WelcomeState extends State<Welcome> {
 
     createRewardedVideoAds();
 
-   /* Firestore.instance.collection("games").where("selectedGame.Status", isEqualTo: "InProgress").getDocuments().then((value) {
+    /* Firestore.instance.collection("games").where("selectedGame.Status", isEqualTo: "InProgress").getDocuments().then((value) {
       List<DocumentSnapshot> documents = value.documents;
       for(DocumentSnapshot snapshot in documents){
         snapshot.reference.setData({"selectedGame": {"Status": "Final"}}, merge: true);
@@ -168,6 +169,36 @@ class _WelcomeState extends State<Welcome> {
               size: 20,
               color: Colors.transparent,
             ),
+          ),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                child: Column(
+                  children: [CircleAvatar(radius: 25,), SizedBox(height: 8,),Text('Ayush'), Text('ayushmehre@gmail.com')],
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                decoration: BoxDecoration(color: Colors.grey[300]),
+              ),
+              ListTile(
+                title: Text('Profile & Stats '),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (c) {
+                    return ProfileStatsPage();
+                  }));
+                },
+              ),
+              ListTile(
+                title: Text('Scorecard'),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (c) {
+                    return ScoreBoard();
+                  }));
+                },
+              ),
+            ],
           ),
         ),
         body: user == null
@@ -257,8 +288,8 @@ class _WelcomeState extends State<Welcome> {
                   getJoinGameButton(context),
                   getCreateGameButton(context),
                   getMyGamesButton(),
-                  getScoreBoardButton(),
-                  getProfileStatsButton(),
+                  // getScoreBoardButton(),
+                  //getProfileStatsButton(),
                   getInviteFriendsButton(),
                   getSignoutButton(),
                 ],
@@ -298,8 +329,8 @@ class _WelcomeState extends State<Welcome> {
             child: MaterialButton(
               minWidth: double.infinity,
               height: 60,
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (c){
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (c) {
                   return ProfileStatsPage();
                 }));
               },
@@ -337,8 +368,8 @@ class _WelcomeState extends State<Welcome> {
             child: MaterialButton(
               minWidth: double.infinity,
               height: 60,
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (c){
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (c) {
                   return ScoreBoard();
                 }));
               },

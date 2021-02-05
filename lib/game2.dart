@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,7 +41,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen>
-    with PortraitStatefulModeMixin<GameScreen> {
+    with PortraitStatefulModeMixin<GameScreen>, SingleTickerProviderStateMixin {
   FirebaseGameObject firebaseGameObject;
   bool gameOver;
   String displayMsg;
@@ -90,6 +92,8 @@ class _GameScreenState extends State<GameScreen>
 
   bool playShown = false;
 
+  AnimationController animateController;
+
   _GameScreenState(this.firebaseGameObject);
 
   BannerAd _bannerAd;
@@ -106,13 +110,16 @@ class _GameScreenState extends State<GameScreen>
       DeviceOrientation.landscapeLeft,
     ]);
 
+    animateController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+
     setState(() {
       gameOver = false;
       displayMsg = "";
       hitterImageLink = "";
       pitcherImageLink = "";
       showNextThreeHitters = false;
-      playShown= false;
+      playShown = false;
     });
 
     fetchBackgroundImage();
@@ -298,6 +305,35 @@ class _GameScreenState extends State<GameScreen>
               )),
           alignment: Alignment.centerLeft,
         ),
+        Center(
+          child: ZoomIn(
+              duration: Duration(milliseconds: 500),
+              animate: false,
+              manualTrigger: true,
+              controller: (controller) => animateController = controller,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/hr.png', width: 100, height: 100,),
+                      SizedBox(width: 25,),
+                      Text(
+                        "HOMERUN",
+                        style: TextStyle(
+                            fontSize: 75,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              )),
+        ),
       ],
     );
   }
@@ -399,28 +435,39 @@ class _GameScreenState extends State<GameScreen>
     if (firebaseGameObject.cupScore > -10 && firebaseGameObject.cupScore < 10) {
       scoreToShow = "0" + firebaseGameObject.cupScore.toString();
     }
-    return Container(
-      margin: EdgeInsets.only(bottom: 8),
-      child: Stack(
-        children: <Widget>[
-          Image.asset(
-            "assets/Cup_Icon.png",
-            width: large ? 100 : 70,
-            height: large ? 80 : 50,
-          ),
-          Positioned(
-            top: large ? 25 : 15,
-            left: large ? 40 : 27,
-            child: Text(
-              scoreToShow + "",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: large ?18 : 13, fontWeight: FontWeight.bold),
+    return InkWell(
+      onTap: () {
+        showHomeRunAnimation();
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 8),
+        child: Stack(
+          children: <Widget>[
+            Image.asset(
+              "assets/Cup_Icon.png",
+              width: large ? 100 : 70,
+              height: large ? 80 : 50,
             ),
-          ),
-        ],
+            Positioned(
+              top: large ? 25 : 15,
+              left: large ? 40 : 27,
+              child: Text(
+                scoreToShow + "",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: large ? 18 : 13, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void showHomeRunAnimation() async {
+    animateController.forward();
+    await Future.delayed(Duration(seconds: 3));
+    animateController.animateTo(0);
   }
 
   Row getMainRow(BuildContext context) {
@@ -433,7 +480,11 @@ class _GameScreenState extends State<GameScreen>
 //        showNextThreeHitters ? getCupWidget(large: true) : SizedBox(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[getScoreData(), getPlayersRow()],
+          children: <Widget>[
+            getScoreData(),
+            /* getPlayersRow()*/
+            getNewPlayerCarousel()
+          ],
         ),
       ],
     );
@@ -1581,13 +1632,12 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
-
       var ballsCount = firebaseGameObject.selectedGame.balls;
-      if (ballsCount!=null && ballsCount > 3) {
+      if (ballsCount != null && ballsCount > 3) {
         ballsCount = 3;
       }
       var strikesCount = firebaseGameObject.selectedGame.strikes;
-      if (strikesCount!=null && strikesCount > 2) {
+      if (strikesCount != null && strikesCount > 2) {
         strikesCount = 2;
       }
 
@@ -1595,21 +1645,16 @@ class _GameScreenState extends State<GameScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          getDotView("BALL",
-              playShown ? 0 : ballsCount),
+          getDotView("BALL", playShown ? 0 : ballsCount),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("STRIKE", playShown ? 0 : strikesCount),
           SizedBox(
             width: 30,
           ),
           getDotView(
-              "STRIKE",
-              playShown
-                  ? 0
-                  : strikesCount),
-          SizedBox(
-            width: 30,
-          ),
-          getDotView("OUT",
-              playShown ? 0 : firebaseGameObject.selectedGame.outs),
+              "OUT", playShown ? 0 : firebaseGameObject.selectedGame.outs),
         ],
       );
     } catch (e) {
@@ -1918,7 +1963,8 @@ class _GameScreenState extends State<GameScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text("Please Wait For the Game to Begin", textAlign: TextAlign.center,
+            Text("Please Wait For the Game to Begin",
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -2003,6 +2049,73 @@ class _GameScreenState extends State<GameScreen>
             color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
+  }
+
+  Widget getNewPlayerCarousel() {
+    var players = firebaseGameObject.players;
+    var playersWithCurrentPlayerAtFirst = List<Player>();
+    var playersBeforeCurrentPlayer = List<Player>();
+    var playersAfterCurrentPlayer = List<Player>();
+
+    //getting all the players before currentActivePlayer
+    for (int i = 0; i < firebaseGameObject.currentActivePlayer; i++) {
+      playersBeforeCurrentPlayer.add(players[i]);
+    }
+
+    //getting all the players after currentActivePlayer
+    for (int i = firebaseGameObject.currentActivePlayer;
+        i < players.length;
+        i++) {
+      playersAfterCurrentPlayer.add(players[i]);
+    }
+
+    playersWithCurrentPlayerAtFirst.addAll(playersAfterCurrentPlayer);
+    playersWithCurrentPlayerAtFirst.addAll(playersBeforeCurrentPlayer);
+
+    List<Widget> playersW = List();
+    //playersW.add(getCupWidget());
+    var count = 0;
+    for (Player player in playersWithCurrentPlayerAtFirst) {
+      playersW.add(getPlayerWidget(player, index: count));
+      count++;
+    }
+
+    double width2 = deviceWidth <= 670 ? 200 : 300;
+
+    return SizedBox(
+        width: 300,
+        height: 160,
+        child: CarouselSlider.builder(
+          options: CarouselOptions(
+            aspectRatio: 2.0,
+            enlargeCenterPage: false,
+            viewportFraction: 1,
+          ),
+          itemCount: (playersW.length / 2).round(),
+          itemBuilder: (context, index, realIdx) {
+            final int first = index * 2;
+            final int second = first + 1;
+            final int third = second + 1;
+            return Row(
+              children: [first, second, third].map((idx) {
+                if (idx < playersW.length) {
+                  return SizedBox(width: 100, child: playersW[idx]);
+                } else {
+                  return SizedBox();
+                }
+                return Expanded(
+                  flex: 1,
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    child: Image.network(
+                        'https://www.attendit.net/images/easyblog_shared/July_2018/7-4-18/b2ap3_large_totw_network_profile_400.jpg',
+                        fit: BoxFit.cover),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ));
   }
 }
 
