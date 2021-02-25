@@ -18,7 +18,7 @@ class API {
     List<GameObject> list;
     DateTime EastCoast = DateTime.now().toUtc().add(Duration(hours: -4));
 //    curDateTimeByZone(zone: "EST");
-    var date = DateFormat("yyyy-MMM-dd").format(EastCoast); //"2020-SEP-27";
+    var date = /*DateFormat("yyyy-MMM-dd").format(EastCoast);*/ "2020-SEP-27";
     var url =
         "https://api.sportsdata.io/v3/mlb/scores/json/GamesByDate/$date?key=5863b9d2fa7746cd8495fb3cc4b53743"; //BaseUrl + "Games/2020REG" + keyString;
     final response =
@@ -122,6 +122,11 @@ class API {
     var url = "$startURL/$gameID/$gameCode";
     final response = await http.get(url);
 
+    // var simURL = 'http://61.0.171.102/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=1';
+    var simURL = 'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=1';
+    final response1 = await http.get(simURL);
+    print(response1.body);
+
     if (response.statusCode == 200) {
       try {
         return true;
@@ -137,8 +142,7 @@ class API {
   }
 
   Future<List<TeamObject>> fetchTeamImage() async {
-    var url =
-        "https://api.sportsdata.io/v3/mlb/scores/json/teams$keyString";
+    var url = "https://api.sportsdata.io/v3/mlb/scores/json/teams$keyString";
     final response = await http.get(url);
     List<TeamObject> teams = List();
     if (response.statusCode == 200) {

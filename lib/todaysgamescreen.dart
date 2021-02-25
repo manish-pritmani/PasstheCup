@@ -111,7 +111,7 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
           gamesList[index].homeTeam +
           "   (" +
           gamesList[index].status +
-          ")",
+          ")"+' [${gamesList[index].gameID}]',
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
     );
   }
@@ -132,7 +132,13 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
     List<Map<String, dynamic>> playersLobby = List();
     var player = Player(
         name: user.displayName, email: user.email, gamescore: -5, host: true);
+    var player2 = Player(
+        name: 'Demo2 User', email: user.email+"2", gamescore: -5, host: false);
+    var player3 = Player(
+        name: 'Demo3 User', email: user.email+"3", gamescore: -5, host: false);
     playersLobby.add(player.toJson());
+    playersLobby.add(player2.toJson());
+    playersLobby.add(player3.toJson());
 //    player.host = false;
 //    playersLobby.add(player.toJson());
     String gameID = generateGameID();

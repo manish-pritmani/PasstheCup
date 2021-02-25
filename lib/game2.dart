@@ -319,8 +319,14 @@ class _GameScreenState extends State<GameScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/hr.png', width: 100, height: 100,),
-                      SizedBox(width: 25,),
+                      Image.asset(
+                        'assets/hr.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                      SizedBox(
+                        width: 25,
+                      ),
                       Text(
                         "HOMERUN",
                         style: TextStyle(
@@ -334,6 +340,7 @@ class _GameScreenState extends State<GameScreen>
                 ),
               )),
         ),
+        Align(child: getLastSnapshotTimeText(), alignment: Alignment.center,),
       ],
     );
   }
@@ -1130,7 +1137,7 @@ class _GameScreenState extends State<GameScreen>
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         margin: EdgeInsets.only(bottom: 5),
-        color: index <= 3 ? Colors.black.withOpacity(0.5) : Colors.transparent,
+        color: index <= 3 ?  Colors.black.withOpacity(0.5) : Colors.transparent,
         child: Column(
           children: [
             Text(
@@ -1143,7 +1150,7 @@ class _GameScreenState extends State<GameScreen>
               height: 35,
             ),
             Text(
-              playerName,
+              playerName.isNotEmpty?playerName:"Player",
               style: TextStyle(color: Colors.white, fontSize: 10),
             ),
           ],
@@ -1632,15 +1639,17 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
-      var ballsCount = firebaseGameObject.selectedGame.balls;
+      var ballsCount = firebaseGameObject.latestPlay['Balls'];//firebaseGameObject.selectedGame.balls; change back to original code when original game starts
       if (ballsCount != null && ballsCount > 3) {
         ballsCount = 3;
       }
-      var strikesCount = firebaseGameObject.selectedGame.strikes;
+      var strikesCount = firebaseGameObject.latestPlay['Strikes'];//firebaseGameObject.selectedGame.strikes; change back to original code when original game starts
       if (strikesCount != null && strikesCount > 2) {
         strikesCount = 2;
       }
 
+      var outs = firebaseGameObject.latestPlay['Outs'];//firebaseGameObject.selectedGame.outs; change back to original code when original game starts
+      playShown = false;// remove this line when original game starts
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
@@ -1654,7 +1663,7 @@ class _GameScreenState extends State<GameScreen>
             width: 30,
           ),
           getDotView(
-              "OUT", playShown ? 0 : firebaseGameObject.selectedGame.outs),
+              "OUT", playShown ? 0 : outs),
         ],
       );
     } catch (e) {

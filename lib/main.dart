@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -13,6 +16,14 @@ void main() {
   runApp(Phoenix(
     child: MyApp(),
   ),);
+  //fetchData();
+}
+
+void fetchData() async{
+  var response = await Firestore.instance.collection('games').document('100513').get();
+  var data = response.data;
+  var jsonEncode2 = jsonEncode(data);
+  print(jsonEncode2);
 }
 
 class MyApp extends StatelessWidget {

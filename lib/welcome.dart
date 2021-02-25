@@ -183,10 +183,18 @@ class _WelcomeState extends State<Welcome> {
                 decoration: BoxDecoration(color: Colors.grey[300]),
               ),
               ListTile(
-                title: Text('Profile & Stats '),
+                title: Text('Profile'),
                 onTap: (){
                   Navigator.push(context, MaterialPageRoute(builder: (c) {
-                    return ProfileStatsPage();
+                    return ProfileStatsPage(page:0);
+                  }));
+                },
+              ),
+              ListTile(
+                title: Text('Stats'),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (c) {
+                    return ProfileStatsPage(page:1);
                   }));
                 },
               ),

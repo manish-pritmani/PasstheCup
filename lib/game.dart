@@ -114,10 +114,10 @@
 //
 //     borderColor = Colors.transparent;
 //
-// //    timer = Timer.periodic(Duration(seconds: 3), (Timer t) {
-// //      simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
-// //    });
-//     //fetchGameDetails();
+//    timer = Timer.periodic(Duration(seconds: 3), (Timer t) {
+//      simulation ? onGameFetched(gameObjectPlayByPlay) : fetchGameDetails();
+//    });
+//     fetchGameDetails();
 //
 //     Firestore.instance
 //         .collection("images")
@@ -159,141 +159,141 @@
 //     super.dispose();
 //   }
 //
-// //  void fetchGameDetails() {
-// //    setState(() {
-// //      fetching = true;
-// //      // displaymsg = "refreshing...";
-// //    });
-// //    API()
-// //        .fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
-// //        .then((value) {
-// //      onGameFetched(value);
-// //      return null;
-// //    }).catchError((onError) {
-// //      setState(() {
-// //        fetching = false;
-// //      });
-// //    });
-// //  }
+//  void fetchGameDetails() {
+//    setState(() {
+//      fetching = true;
+//      // displaymsg = "refreshing...";
+//    });
+//    API()
+//        .fetchGamePlayByPlay(firebaseGameObject.selectedGame.gameID.toString())
+//        .then((value) {
+//      onGameFetched(value);
+//      return null;
+//    }).catchError((onError) {
+//      setState(() {
+//        fetching = false;
+//      });
+//    });
+//  }
 //
-// //  void onGameFetched(GameObjectPlayByPlay value) {
-// //    //FLOW 1  ---- IF GAME IS OVER RUN THIS
-// //    if (gameOver) {
-// //      if (dialogShown) {
-// //        //Utils().showToast("Game Over", context, oktext: "Show Results");
-// //        Navigator.pushReplacement(context, MaterialPageRoute(
-// //          builder: (BuildContext context) {
-// //            return ResultScreen();
-// //          },
-// //        ));
-// //        setState(() {
-// //          dialogShown = true;
-// //          fetching = false;
-// //          displaymsg = "Game is completed";
-// //        });
-// //      }
-// //      return;
-// //    }
-// //
-// //    //FLOW 2  ---- IF GAME IS NULL RUN THIS
-// //    if (value == null) {
-// //      print("Null Game Object received");
-// //      setState(() {
-// //        fetching = false;
-// //        displaymsg = "Game has not started yet";
-// //      });
-// //      return;
-// //    }
-// //
-// //    //FLOW 3  ---- IF GAME IS PLAYING RUN THIS
-// //    setState(() {
-// //      gameObjectPlayByPlay = value;
-// //      fetching = false;
-// //      plays = gameObjectPlayByPlay.plays;
-// //      //displaymsg = "Received";
-// //    });
-// //
-// //    //check if there are plays available or not
-// //    if (plays.length > 0) {
-// //      //Updating last play and pitch ID
-// //      if (latestPlay != null) {
-// //        setState(() {
-// //          lastPlayID = latestPlay.playID;
-// //        });
-// //      }
-// //      if (latestPitches != null) {
-// //        setState(() {
-// //          lastPitchID = latestPitches.pitchID;
-// //        });
-// //      }
-// //
-// //      //Updating latest pitch and play
-// //      setState(() {
-// //        latestPlay = plays[plays.length - 1];
-// //        latestPitches = latestPlay.pitches[latestPlay.pitches.length - 1];
-// //      });
-// //
-// //      //initializing last playID and last pitchID if they are -1
-// //      if (lastPlayID == -1) {
-// //        setState(() {
-// //          lastPlayID = latestPlay.playID;
-// //        });
-// //      }
-// //      if (lastPitchID == -1) {
-// //        setState(() {
-// //          lastPitchID = latestPitches.playID;
-// //        });
-// //      }
-// //
-// //      if (!simulation) {
-// //        if (latestPitches.pitchID != lastPitchID) {
-// //          //awardScoresToPlayers(plays[currentPlay]);
-// //        }
-// //        if (latestPlay.playID != lastPlayID) {
-// ////          awardScoresToPlayers(plays[currentPlay]);
-// //          awardScoresToPlayers(latestPlay);
-// //          changeActivePlayer();
-// //        }
-// //        updateAwayTeamRuns();
-// //        updateHomeTeamRuns();
-// //        fetchHitterProfilePicture();
-// //        fetchPitcherProfilePicture();
-// //        setState(() {
-// //          currentPlay = plays.length - 1;
-// //          currentInnings = latestPlay.inningNumber - 1;
-// //          currentPitch = latestPlay.pitches.length - 1;
-// //        });
-// //      } else {
-// //        var sizeOfPitchesInCurrentPlay = plays[currentPlay].pitches.length;
-// //        if (sizeOfPitchesInCurrentPlay - 1 < currentPitch) {
-// //          print(
-// //              "\n\nPlay $currentPlay}:\nRuns Batted In: ${plays[currentPlay].runsBattedIn}\nInnings: ${plays[currentPlay].inningNumber}${plays[currentPlay].inningHalf}\nDescription: ${plays[currentPlay].description}\nResult:${plays[currentPlay].result}");
+//  void onGameFetched(GameObjectPlayByPlay value) {
+//    //FLOW 1  ---- IF GAME IS OVER RUN THIS
+//    if (gameOver) {
+//      if (dialogShown) {
+//        //Utils().showToast("Game Over", context, oktext: "Show Results");
+//        Navigator.pushReplacement(context, MaterialPageRoute(
+//          builder: (BuildContext context) {
+//            return ResultScreen();
+//          },
+//        ));
+//        setState(() {
+//          dialogShown = true;
+//          fetching = false;
+//          displaymsg = "Game is completed";
+//        });
+//      }
+//      return;
+//    }
+//
+//    //FLOW 2  ---- IF GAME IS NULL RUN THIS
+//    if (value == null) {
+//      print("Null Game Object received");
+//      setState(() {
+//        fetching = false;
+//        displaymsg = "Game has not started yet";
+//      });
+//      return;
+//    }
+//
+//    //FLOW 3  ---- IF GAME IS PLAYING RUN THIS
+//    setState(() {
+//      gameObjectPlayByPlay = value;
+//      fetching = false;
+//      plays = gameObjectPlayByPlay.plays;
+//      //displaymsg = "Received";
+//    });
+//
+//    //check if there are plays available or not
+//    if (plays.length > 0) {
+//      //Updating last play and pitch ID
+//      if (latestPlay != null) {
+//        setState(() {
+//          lastPlayID = latestPlay.playID;
+//        });
+//      }
+//      if (latestPitches != null) {
+//        setState(() {
+//          lastPitchID = latestPitches.pitchID;
+//        });
+//      }
+//
+//      //Updating latest pitch and play
+//      setState(() {
+//        latestPlay = plays[plays.length - 1];
+//        latestPitches = latestPlay.pitches[latestPlay.pitches.length - 1];
+//      });
+//
+//      //initializing last playID and last pitchID if they are -1
+//      if (lastPlayID == -1) {
+//        setState(() {
+//          lastPlayID = latestPlay.playID;
+//        });
+//      }
+//      if (lastPitchID == -1) {
+//        setState(() {
+//          lastPitchID = latestPitches.playID;
+//        });
+//      }
+//
+//      if (!simulation) {
+//        if (latestPitches.pitchID != lastPitchID) {
+//          //awardScoresToPlayers(plays[currentPlay]);
+//        }
+//        if (latestPlay.playID != lastPlayID) {
 // //          awardScoresToPlayers(plays[currentPlay]);
-// //          if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
-// //            setState(() {
-// //              currentPlay = currentPlay + 1;
-// //            });
-// //            changeActivePlayer();
-// //            updateAwayTeamRuns();
-// //            updateHomeTeamRuns();
-// //            fetchHitterProfilePicture();
-// //            fetchPitcherProfilePicture();
-// //            setState(() {
-// //              currentPitch = 1;
-// //              currentInnings = plays[currentPlay].inningNumber - 1;
-// //            });
-// //          } else {
-// //            setState(() {
-// //              gameOver = true;
-// //            });
-// //          }
-// //        } else {
-// //          setState(() {
-// //            currentPitch = currentPitch + 1;
-// //          });
-// //        }
-// //      }
-// //    }
+//          awardScoresToPlayers(latestPlay);
+//          changeActivePlayer();
+//        }
+//        updateAwayTeamRuns();
+//        updateHomeTeamRuns();
+//        fetchHitterProfilePicture();
+//        fetchPitcherProfilePicture();
+//        setState(() {
+//          currentPlay = plays.length - 1;
+//          currentInnings = latestPlay.inningNumber - 1;
+//          currentPitch = latestPlay.pitches.length - 1;
+//        });
+//      } else {
+//        var sizeOfPitchesInCurrentPlay = plays[currentPlay].pitches.length;
+//        if (sizeOfPitchesInCurrentPlay - 1 < currentPitch) {
+//          print(
+//              "\n\nPlay $currentPlay}:\nRuns Batted In: ${plays[currentPlay].runsBattedIn}\nInnings: ${plays[currentPlay].inningNumber}${plays[currentPlay].inningHalf}\nDescription: ${plays[currentPlay].description}\nResult:${plays[currentPlay].result}");
+//          awardScoresToPlayers(plays[currentPlay]);
+//          if (currentPlay + 1 < gameObjectPlayByPlay.plays.length) {
+//            setState(() {
+//              currentPlay = currentPlay + 1;
+//            });
+//            changeActivePlayer();
+//            updateAwayTeamRuns();
+//            updateHomeTeamRuns();
+//            fetchHitterProfilePicture();
+//            fetchPitcherProfilePicture();
+//            setState(() {
+//              currentPitch = 1;
+//              currentInnings = plays[currentPlay].inningNumber - 1;
+//            });
+//          } else {
+//            setState(() {
+//              gameOver = true;
+//            });
+//          }
+//        } else {
+//          setState(() {
+//            currentPitch = currentPitch + 1;
+//          });
+//        }
+//      }
+//    }
 // //
 // ////    if (/*false*/ !printed) {
 // ////      bool isFirstActive = true;

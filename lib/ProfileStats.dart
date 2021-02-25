@@ -5,6 +5,10 @@ import 'package:passthecup/StatsPage.dart';
 import 'ongoinggames.dart';
 
 class ProfileStatsPage extends StatefulWidget {
+  final int page;
+
+  ProfileStatsPage({this.page = 0});
+
   @override
   _ProfileStatsPageState createState() => _ProfileStatsPageState();
 }
@@ -17,7 +21,8 @@ class _ProfileStatsPageState extends State<ProfileStatsPage>
   void initState() {
     // TODO: implement initState
     super.initState();
-    _tabController = new TabController(length: 2, vsync: this);
+    _tabController =
+        new TabController(length: 2, vsync: this, initialIndex: widget.page);
   }
 
   @override

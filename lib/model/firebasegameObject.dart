@@ -12,6 +12,7 @@ class FirebaseGameObject {
   String gameCode;
   int gameID;
   GameObject selectedGame;
+  Map latestPlay;
   String createdOn;
   int status;
   int cupScore;
@@ -72,6 +73,14 @@ class FirebaseGameObject {
     } else {
       selectedGame = null;
     }
+
+    if (json['latestPlay'] != null) {
+      var jsonSelectedGame = json['latestPlay'];
+      latestPlay = jsonSelectedGame;
+    } else {
+      latestPlay = null;
+    }
+
     if (json['selectedTeam'] != null) {
       Map<String, dynamic> jsonTeam = json['selectedTeam'];
       selectedTeam = new TeamObject.fromJson(jsonTeam);

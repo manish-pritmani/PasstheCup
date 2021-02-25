@@ -17,7 +17,7 @@ class _ScoreBoardState extends State<ScoreBoard> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: Utils().getBlue(),
+        // backgroundColor: Utils().getBlue(),
         title: Text("Score Board"),
       ),
       body: Container(
