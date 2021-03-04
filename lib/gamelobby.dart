@@ -14,12 +14,13 @@ import 'model/Player.dart';
 import 'model/firebasegameObject.dart';
 
 class Lobby extends StatefulWidget {
-  String gameID;
-  bool add;
+  final String gameID;
+  final bool add;
 
-  FirebaseUser user;
+  final FirebaseUser user;
+  final bool simulation;
 
-  Lobby(this.gameID, this.add, {this.user});
+  Lobby(this.gameID, this.add, {this.user, this.simulation = false});
 
   @override
   LobbyState createState() => LobbyState(gameID, add, user);
@@ -243,6 +244,8 @@ class LobbyState extends State<Lobby> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          FadeAnimation(
+              1, Text(widget.simulation ? 'Simulation Mode' : 'Real Game')),
           getGameLobbyTitle(),
           getTeamvsTeam(),
           SizedBox(
@@ -283,7 +286,7 @@ class LobbyState extends State<Lobby> {
                 if (!add || isHost()) {
 //                      showAlertDialog(context, "", "Select Mode", "Simulation",
 //                          "Live Game");
-                  openGameScreen(context, false);
+                  openGameScreen(context, widget.simulation);
                 } else {
                   Utils().showToast("Wait for host to start the game", context);
                 }
@@ -317,39 +320,39 @@ class LobbyState extends State<Lobby> {
     }
   }
 
-  showAlertDialog(BuildContext context, String message, String heading,
-      String buttonAcceptTitle, String buttonCancelTitle) {
-    // set up the buttons
-    Widget cancelButton = FlatButton(
-      child: Text(buttonCancelTitle),
-      onPressed: () {
-        openGameScreen(context, false);
-      },
-    );
-    Widget continueButton = FlatButton(
-      child: Text(buttonAcceptTitle),
-      onPressed: () {
-        openGameScreen(context, true);
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text(heading),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
+  // showAlertDialog(BuildContext context, String message, String heading,
+  //     String buttonAcceptTitle, String buttonCancelTitle) {
+  //   // set up the buttons
+  //   Widget cancelButton = FlatButton(
+  //     child: Text(buttonCancelTitle),
+  //     onPressed: () {
+  //       openGameScreen(context, false);
+  //     },
+  //   );
+  //   Widget continueButton = FlatButton(
+  //     child: Text(buttonAcceptTitle),
+  //     onPressed: () {
+  //       openGameScreen(context, true);
+  //     },
+  //   );
+  //
+  //   // set up the AlertDialog
+  //   AlertDialog alert = AlertDialog(
+  //     title: Text(heading),
+  //     actions: [
+  //       cancelButton,
+  //       continueButton,
+  //     ],
+  //   );
+  //
+  //   // show the dialog
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return alert;
+  //     },
+  //   );
+  // }
 
 //  void joinGameInBetween(BuildContext context, bool simulation) {
 //    addToMyGames();
@@ -379,20 +382,43 @@ class LobbyState extends State<Lobby> {
         .document(firebaseGameObject.gameCode)
         .setData(firebaseGameObject.toJson(), merge: true)
         .then((value) {
-      API()
-          .startGame(firebaseGameObject.selectedGame.gameID,
-              firebaseGameObject.gameCode)
-          .then((value) {
-        Navigator.pop(context);
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => GameScreen(
-                      firebaseGameObject,
-                      tripleClose: true,
-                    )));
-      }).catchError((onError) => {Utils().showToast(onError.message, context)});
+      if (!simulation) {
+        startActualGame(context);
+      } else {
+        startSimulatedGame(context);
+      }
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
+  }
+
+  void startActualGame(BuildContext context) {
+    API()
+        .startGame(
+            firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
+        .then((value) {
+      openNextScreen(context);
+    }).catchError((onError) => {Utils().showToast(onError.message, context)});
+  }
+
+  void startSimulatedGame(BuildContext context) {
+    Utils().showLoaderDialog(context);
+    API()
+        .startSimulation(
+            firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
+        .then((value) {
+          Navigator.pop(context);
+      openNextScreen(context);
+    }).catchError((onError) => {Utils().showToast(onError.message, context)});
+  }
+
+  void openNextScreen(BuildContext context) {
+    Navigator.pop(context);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => GameScreen(
+                  firebaseGameObject,
+                  tripleClose: true,
+                )));
   }
 
   List<Widget> getAllPlayers() {

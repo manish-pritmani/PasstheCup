@@ -30,7 +30,6 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
 
     this.getUser();
 
-
     futureResult = API().fetchGames().then((value) {
       setState(() {
         gamesList = value;
@@ -111,7 +110,8 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
           gamesList[index].homeTeam +
           "   (" +
           gamesList[index].status +
-          ")"+' [${gamesList[index].gameID}]',
+          ")" +
+          ' [${gamesList[index].gameID}]',
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
     );
   }
@@ -127,18 +127,41 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
   }
 
   void createGameAndEnter(BuildContext context, GameObject _currengame) {
+    var simulation = false;
+    if (_currengame.gameID == 60260 || _currengame.gameID == 60631) {
+      simulation = true;
+    }
+
+    if (_currengame.gameEndDateTime!=null) {
+      DateFormat dateFormat = new DateFormat("yyyy-MM-dd'T'hh:mm:ss");
+      DateTime parse = dateFormat.parse(_currengame.gameEndDateTime);
+      DateTime eastCoastTimeNow = DateTime.now().toUtc().add(Duration(hours: -4));
+      simulation = parse.isBefore(eastCoastTimeNow);
+    }
+
+
     Utils().showLoaderDialog(context);
     List<Map<String, dynamic>> players = List();
     List<Map<String, dynamic>> playersLobby = List();
     var player = Player(
         name: user.displayName, email: user.email, gamescore: -5, host: true);
     var player2 = Player(
-        name: 'Demo2 User', email: user.email+"2", gamescore: -5, host: false);
+        name: 'Demo2 User',
+        email: user.email + "2",
+        gamescore: -5,
+        host: false);
     var player3 = Player(
-        name: 'Demo3 User', email: user.email+"3", gamescore: -5, host: false);
+        name: 'Demo3 User',
+        email: user.email + "3",
+        gamescore: -5,
+        host: false);
     playersLobby.add(player.toJson());
-    playersLobby.add(player2.toJson());
-    playersLobby.add(player3.toJson());
+    if (simulation) {
+      playersLobby.add(player2.toJson());
+      playersLobby.add(player3.toJson());
+      _currengame.status = 'InProgress';
+      _currengame.isClosed = false;
+    }
 //    player.host = false;
 //    playersLobby.add(player.toJson());
     String gameID = generateGameID();
@@ -154,7 +177,7 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
       "gameCode": gameID,
       "createdOn": DateTime.now().toString(),
       "players": playersLobby,
-      "simulation": false,
+      "simulation": simulation,
       "lastResult": "",
       "lastResultPointsAwarded": 0,
       "currentHitter": "",
@@ -182,15 +205,19 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
           .setData(lobbymap)
           .then((value) {
         Navigator.pop(context);
-        openLoabbyScreen(context, gameID);
+        openLobbyScreen(context, gameID, simulation);
       });
     });
   }
 
-  void openLoabbyScreen(BuildContext context, String gameID) {
+  void openLobbyScreen(BuildContext context, String gameID, bool simulation) {
     Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
       builder: (BuildContext context) {
-        return new Lobby(gameID, false);
+        return new Lobby(
+          gameID,
+          false,
+          simulation: simulation,
+        );
       },
     ));
   }

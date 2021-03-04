@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -80,6 +81,10 @@ class _GameScreenState extends State<GameScreen>
   String dueUpHitterID2Name;
   String dueUpHitterID3Name;
 
+  bool runnerOnFirst2Dummy;
+  bool runnerOnSecond2Dummy;
+  bool runnerOnThird2Dummy;
+
   double deviceWidth;
 
   bool small;
@@ -98,6 +103,9 @@ class _GameScreenState extends State<GameScreen>
 
   BannerAd _bannerAd;
   InterstitialAd _interstitialAd;
+
+  var playerFallbackURL =
+      'https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10000001.png';
 
   @override
   void initState() {
@@ -175,9 +183,12 @@ class _GameScreenState extends State<GameScreen>
         print("Snapshot Received: " + encode);
         setState(() {
           firebaseGameObject = FirebaseGameObject.fromJson(map);
-          displayMsg = firebaseGameObject.selectedGame.lastPlay.toString();
+          displayMsg = firebaseGameObject.lastResult.toString();
           lastSnapshotReceivedTime = DateTime.now().millisecondsSinceEpoch;
           updateDurationArray.add(timeSinceLastUpdate.inSeconds);
+          runnerOnFirst2Dummy = Random().nextBool();
+          runnerOnSecond2Dummy = Random().nextBool();
+          runnerOnThird2Dummy = Random().nextBool();
         });
         fetchHitterProfilePicture();
         fetchPitcherProfilePicture();
@@ -340,7 +351,10 @@ class _GameScreenState extends State<GameScreen>
                 ),
               )),
         ),
-        Align(child: getLastSnapshotTimeText(), alignment: Alignment.center,),
+        // Align(
+        //   child: getLastSnapshotTimeText(),
+        //   alignment: Alignment.center,
+        // ),
       ],
     );
   }
@@ -364,7 +378,7 @@ class _GameScreenState extends State<GameScreen>
   }
 
   ImageProvider<dynamic> getBackgroundImage() {
-    if (bgImage == null) {
+    if (bgImage == null || bgImage == "") {
       return AssetImage("assets/stadium.jpg");
     } else {
       return NetworkImage(bgImage);
@@ -534,13 +548,20 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getFieldWidget() {
     var imgName = "assets/d___.png";
+    var runnerOnFirst2 = firebaseGameObject.selectedGame.runnerOnFirst;
+    var runnerOnSecond2 = firebaseGameObject.selectedGame.runnerOnSecond;
+    var runnerOnThird2 = firebaseGameObject.selectedGame.runnerOnThird;
+
+    if(firebaseGameObject.simulation){
+      runnerOnFirst2 = true;
+      runnerOnSecond2 = true;
+      runnerOnThird2 = false;
+    }
+
     if (!showNextThreeHitters) {
-      var r1 =
-          firebaseGameObject.selectedGame.runnerOnFirst ?? false ? "1" : "_";
-      var r2 =
-          firebaseGameObject.selectedGame.runnerOnSecond ?? false ? "2" : "_";
-      var r3 =
-          firebaseGameObject.selectedGame.runnerOnThird ?? false ? "3" : "_";
+      var r1 = runnerOnFirst2 ?? false ? "1" : "_";
+      var r2 = runnerOnSecond2 ?? false ? "2" : "_";
+      var r3 = runnerOnThird2 ?? false ? "3" : "_";
       imgName = "assets/d$r1$r2$r3.png";
     }
     return Container(
@@ -675,6 +696,8 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getLastPlayDescriptionWidget() {
+    print('last result: ' +
+        firebaseGameObject.lastResult.toString().toLowerCase());
     List<String> blackListedPlays = [
       "stolen base",
       "caught stealing",
@@ -786,11 +809,12 @@ class _GameScreenState extends State<GameScreen>
 
   Text getLastSnapshotTimeText() {
     return Text(
-      "Last Updated: ${timeSinceLastUpdate.inSeconds.toString()} sec ago",
+      "Last Updated: ${timeSinceLastUpdate.inSeconds.toString()} sec ago\nsimulation:${firebaseGameObject.simulation}",
       //"\nShortest Time: ${getSmallest()} sec"
       //"\nLongest Time: ${getLargest()} sec"
       // "\nAverage Time: ${getAvg()} sec"
       //"\n${updateDurationArray.toString()}",
+      textAlign: TextAlign.center,
       style: TextStyle(color: Hexcolor("#99FFFFFF"), fontSize: small ? 10 : 10),
     );
   }
@@ -1009,7 +1033,7 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getPitcherImage() {
     return Image.network(
-      showNextThreeHitters ? "" : pitcherImageLink,
+      showNextThreeHitters ? playerFallbackURL : pitcherImageLink,
       width: 50,
       height: 50,
     );
@@ -1017,7 +1041,7 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getHitterImage() {
     return Image.network(
-      showNextThreeHitters ? "" : hitterImageLink,
+      showNextThreeHitters ? playerFallbackURL : hitterImageLink,
       width: 50,
       height: 50,
     );
@@ -1137,7 +1161,7 @@ class _GameScreenState extends State<GameScreen>
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         margin: EdgeInsets.only(bottom: 5),
-        color: index <= 3 ?  Colors.black.withOpacity(0.5) : Colors.transparent,
+        color: index <= 3 ? Colors.black.withOpacity(0.5) : Colors.transparent,
         child: Column(
           children: [
             Text(
@@ -1145,12 +1169,12 @@ class _GameScreenState extends State<GameScreen>
               style: TextStyle(color: Colors.white, fontSize: 10),
             ),
             Image.network(
-              src,
+              src ?? playerFallbackURL,
               width: 35,
               height: 35,
             ),
             Text(
-              playerName.isNotEmpty?playerName:"Player",
+              playerName.isNotEmpty ? playerName : "Player",
               style: TextStyle(color: Colors.white, fontSize: 10),
             ),
           ],
@@ -1639,17 +1663,20 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
-      var ballsCount = firebaseGameObject.latestPlay['Balls'];//firebaseGameObject.selectedGame.balls; change back to original code when original game starts
+      var ballsCount = firebaseGameObject.latestPlay[
+          'Balls']; //firebaseGameObject.selectedGame.balls; change back to original code when original game starts
       if (ballsCount != null && ballsCount > 3) {
         ballsCount = 3;
       }
-      var strikesCount = firebaseGameObject.latestPlay['Strikes'];//firebaseGameObject.selectedGame.strikes; change back to original code when original game starts
+      var strikesCount = firebaseGameObject.latestPlay[
+          'Strikes']; //firebaseGameObject.selectedGame.strikes; change back to original code when original game starts
       if (strikesCount != null && strikesCount > 2) {
         strikesCount = 2;
       }
 
-      var outs = firebaseGameObject.latestPlay['Outs'];//firebaseGameObject.selectedGame.outs; change back to original code when original game starts
-      playShown = false;// remove this line when original game starts
+      var outs = firebaseGameObject.latestPlay[
+          'Outs']; //firebaseGameObject.selectedGame.outs; change back to original code when original game starts
+      playShown = false; // remove this line when original game starts
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
@@ -1662,8 +1689,7 @@ class _GameScreenState extends State<GameScreen>
           SizedBox(
             width: 30,
           ),
-          getDotView(
-              "OUT", playShown ? 0 : outs),
+          getDotView("OUT", playShown ? 0 : outs),
         ],
       );
     } catch (e) {
@@ -1761,9 +1787,11 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void fetchHitterProfilePicture() {
-    API()
-        .fetchPlayerImage(firebaseGameObject.selectedGame.currentHitterID)
-        .then((value) {
+    var currentHitterID2 = firebaseGameObject.selectedGame.currentHitterID;
+    if (firebaseGameObject.simulation) {
+      currentHitterID2 = 10000005;
+    }
+    API().fetchPlayerImage(currentHitterID2).then((value) {
       setState(() {
         hitterImageLink = value;
       });
@@ -1788,9 +1816,11 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void fetchPitcherProfilePicture() {
-    API()
-        .fetchPlayerImage(firebaseGameObject.selectedGame.currentPitcherID)
-        .then((value) {
+    var currentPitcherID2 = firebaseGameObject.selectedGame.currentPitcherID;
+    if (firebaseGameObject.simulation) {
+      currentPitcherID2 = 10000016;
+    }
+    API().fetchPlayerImage(currentPitcherID2).then((value) {
       setState(() {
         pitcherImageLink = value;
       });
@@ -1799,9 +1829,11 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void fetchDueUpHitter1Picture() {
-    API()
-        .fetchPlayerProfile(firebaseGameObject.selectedGame.dueUpHitterID1)
-        .then((value) {
+    var dueUpHitterID12 = firebaseGameObject.selectedGame.dueUpHitterID1;
+    if (firebaseGameObject.simulation) {
+      dueUpHitterID12 = 10000058;
+    }
+    API().fetchPlayerProfile(dueUpHitterID12).then((value) {
       setState(() {
         dueUpHitterID1Link = value.photoUrl;
         dueUpHitterID1Name = value.lastName;
@@ -1811,9 +1843,11 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void fetchDueUpHitter2Picture() {
-    API()
-        .fetchPlayerProfile(firebaseGameObject.selectedGame.dueUpHitterID2)
-        .then((value) {
+    var dueUpHitterID22 = firebaseGameObject.selectedGame.dueUpHitterID2;
+    if (firebaseGameObject.simulation) {
+      dueUpHitterID22 = 10000070;
+    }
+    API().fetchPlayerProfile(dueUpHitterID22).then((value) {
       setState(() {
         dueUpHitterID2Link = value.photoUrl;
         dueUpHitterID2Name = value.lastName;
@@ -1823,9 +1857,11 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void fetchDueUpHitter3Picture() {
-    API()
-        .fetchPlayerProfile(firebaseGameObject.selectedGame.dueUpHitterID3)
-        .then((value) {
+    var dueUpHitterID32 = firebaseGameObject.selectedGame.dueUpHitterID3;
+    if (firebaseGameObject.simulation) {
+      dueUpHitterID32 = 10000193;
+    }
+    API().fetchPlayerProfile(dueUpHitterID32).then((value) {
       setState(() {
         dueUpHitterID3Link = value.photoUrl;
         dueUpHitterID3Name = value.lastName;
@@ -2112,15 +2148,15 @@ class _GameScreenState extends State<GameScreen>
                 } else {
                   return SizedBox();
                 }
-                return Expanded(
-                  flex: 1,
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    child: Image.network(
-                        'https://www.attendit.net/images/easyblog_shared/July_2018/7-4-18/b2ap3_large_totw_network_profile_400.jpg',
-                        fit: BoxFit.cover),
-                  ),
-                );
+                // return Expanded(
+                //   flex: 1,
+                //   child: Container(
+                //     margin: EdgeInsets.symmetric(horizontal: 10),
+                //     child: Image.network(
+                //         'https://www.attendit.net/images/easyblog_shared/July_2018/7-4-18/b2ap3_large_totw_network_profile_400.jpg',
+                //         fit: BoxFit.cover),
+                //   ),
+                // );
               }).toList(),
             );
           },
