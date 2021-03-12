@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+//import 'package:flutter_svg/svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 import 'api.dart';
@@ -85,6 +86,7 @@ class _TeamSelectScreenState extends State<TeamSelectScreen> {
         fit: BoxFit.cover,
       );
     } else {
+//      return Container();
       return SvgPicture.network(
         url,
         width: 50,

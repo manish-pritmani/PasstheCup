@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+
+//import 'package:flutter_svg/svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:passthecup/animation/animation_controller.dart';
@@ -34,8 +36,12 @@ class GameScreen extends StatefulWidget {
 
   final bool tripleClose;
 
+  final bool attending;
+
   GameScreen(this.firebaseGameObject,
-      {this.doubleClose = false, this.tripleClose = false});
+      {this.doubleClose = false,
+      this.tripleClose = false,
+      this.attending = false});
 
   @override
   State<StatefulWidget> createState() => _GameScreenState(firebaseGameObject);
@@ -552,7 +558,7 @@ class _GameScreenState extends State<GameScreen>
     var runnerOnSecond2 = firebaseGameObject.selectedGame.runnerOnSecond;
     var runnerOnThird2 = firebaseGameObject.selectedGame.runnerOnThird;
 
-    if(firebaseGameObject.simulation){
+    if (firebaseGameObject.simulation) {
       runnerOnFirst2 = true;
       runnerOnSecond2 = true;
       runnerOnThird2 = false;
@@ -1694,7 +1700,21 @@ class _GameScreenState extends State<GameScreen>
       );
     } catch (e) {
       print(e);
-      return SizedBox();
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          getDotView("BALL", 0),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("STRIKE", 0),
+          SizedBox(
+            width: 30,
+          ),
+          getDotView("OUT", 0),
+        ],
+      );
     }
   }
 
@@ -1710,14 +1730,12 @@ class _GameScreenState extends State<GameScreen>
       children: <Widget>[
         Text(
           title,
-          style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
         ),
         SizedBox(
           height: 0,
         ),
-        Text(dots,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        Text(dots, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -1879,6 +1897,7 @@ class _GameScreenState extends State<GameScreen>
         fit: BoxFit.cover,
       );
     } else {
+//      return Container();
       return SvgPicture.network(
         url,
         width: 30,

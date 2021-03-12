@@ -110,8 +110,7 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
           gamesList[index].homeTeam +
           "   (" +
           gamesList[index].status +
-          ")" +
-          ' [${gamesList[index].gameID}]',
+          ")",
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
     );
   }

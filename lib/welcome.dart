@@ -143,6 +143,7 @@ class _WelcomeState extends State<Welcome> {
         resizeToAvoidBottomInset: false,
         backgroundColor: Utils().getBGColor(),
         appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
           elevation: 0,
           brightness: Brightness.light,
           backgroundColor: Utils().getBGColor(),
@@ -160,16 +161,16 @@ class _WelcomeState extends State<Welcome> {
               ),
             )
           ],
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 20,
-              color: Colors.transparent,
-            ),
-          ),
+//          leading: IconButton(
+//            onPressed: () {
+//              Navigator.pop(context);
+//            },
+//            icon: Icon(
+//              Icons.arrow_back_ios,
+//              size: 20,
+//              color: Colors.transparent,
+//            ),
+//          ),
         ),
         drawer: Drawer(
           child: ListView(
@@ -199,7 +200,7 @@ class _WelcomeState extends State<Welcome> {
                 },
               ),
               ListTile(
-                title: Text('Scorecard'),
+                title: Text('Scoring Settings'),
                 onTap: (){
                   Navigator.push(context, MaterialPageRoute(builder: (c) {
                     return ScoreBoard();

@@ -393,7 +393,7 @@ class API {
   }
 
   Future<FullPlayerObject> fetchPlayerProfile(int hitterID) async {
-    if (hitterID == null) {
+    if(hitterID==null){
       hitterID = 10000001;
     }
     var url =
@@ -434,26 +434,26 @@ class API {
     }
   }
 
+
   Future<bool> startSimulation(int gameID, String gameCode) async {
     var checkURL = checkStatus + gameID.toString();
 
-    // var stopURL =
-    //     'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=-1';
-    // final response = await http.get(stopURL);
-    // print(response.body);
+    var stopURL =
+        'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=-1';
+    final response = await http.get(stopURL);
+    print(response.body);
 
     var response2 = await http.get(checkURL);
-    if (response2.body != "-1") {
-      print('simulation already running');
+    if (response2.body == "0") {
       return false;
-    } else {
-      var simURL =
-          'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=1';
-      final response1 = await http.get(simURL);
-      print(response1.body);
-
-      return true;
     }
+
+    var simURL =
+        'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=1';
+    final response1 = await http.get(simURL);
+    print(response1.body);
+
+   return true;
   }
 
   Future<List<TeamObject>> fetchTeamImage() async {

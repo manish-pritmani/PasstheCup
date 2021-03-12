@@ -239,73 +239,80 @@ class LobbyState extends State<Lobby> {
   }
 
   Widget buildSingleChildScrollView(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          FadeAnimation(
-              1, Text(widget.simulation ? 'Simulation Mode' : 'Real Game')),
-          getGameLobbyTitle(),
-          getTeamvsTeam(),
-          SizedBox(
-            height: 20,
-          ),
-          getGameCodeWidget(),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            "Players in Lobby (${firebaseGameObject.players.length})",
-            style: TextStyle(
-                color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Container(
-                height: 220,
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.redAccent),
-                child: buildListView()),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: MaterialButton(
-              minWidth: double.infinity,
-              height: 60,
-              onPressed: () {
-                if (!add || isHost()) {
+    return SingleChildScrollView(
+      child: Container(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FadeAnimation(
+                1, Text(widget.simulation ? 'Simulation Mode' : 'Real Game')),
+            getGameLobbyTitle(),
+            getTeamvsTeam(),
+            SizedBox(
+              height: 20,
+            ),
+            getGameCodeWidget(),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              "Players in Lobby (${firebaseGameObject.players.length})",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: Container(
+                  height: 220,
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.redAccent),
+                  child: buildListView()),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: MaterialButton(
+                minWidth: double.infinity,
+                height: 60,
+                onPressed: () {
+                  if (!add || isHost()) {
 //                      showAlertDialog(context, "", "Select Mode", "Simulation",
 //                          "Live Game");
-                  openGameScreen(context, widget.simulation);
-                } else {
-                  Utils().showToast("Wait for host to start the game", context);
-                }
-              },
-              color: Utils().getBlue(),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50)),
-              child: Text(
-                add && !isHost() ? "WAITING FOR GAME TO START" : "START GAME",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
+
+                    showAttendingDialog();
+//                    openGameScreen(context, widget.simulation);
+                  } else {
+                    Utils()
+                        .showToast("Wait for host to start the game", context);
+                  }
+                },
+                color: Utils().getBlue(),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50)),
+                child: Text(
+                  add && !isHost() ? "WAITING FOR GAME TO START" : "START GAME",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -368,7 +375,7 @@ class LobbyState extends State<Lobby> {
 //                )));
 //  }
 
-  void openGameScreen(BuildContext context, bool simulation) {
+  void openGameScreen(BuildContext context, bool simulation, {bool attending = false}) {
     setState(() {
       hideListView = true;
     });
@@ -383,40 +390,41 @@ class LobbyState extends State<Lobby> {
         .setData(firebaseGameObject.toJson(), merge: true)
         .then((value) {
       if (!simulation) {
-        startActualGame(context);
+        startActualGame(context, attending);
       } else {
-        startSimulatedGame(context);
+        startSimulatedGame(context, attending);
       }
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
   }
 
-  void startActualGame(BuildContext context) {
+  void startActualGame(BuildContext context, bool attending) {
     API()
         .startGame(
             firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
         .then((value) {
-      openNextScreen(context);
+      openNextScreen(context, attending);
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
   }
 
-  void startSimulatedGame(BuildContext context) {
+  void startSimulatedGame(BuildContext context, bool attending) {
     Utils().showLoaderDialog(context);
     API()
         .startSimulation(
             firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
         .then((value) {
-          Navigator.pop(context);
-      openNextScreen(context);
+      Navigator.pop(context);
+      openNextScreen(context, attending);
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
   }
 
-  void openNextScreen(BuildContext context) {
+  void openNextScreen(BuildContext context, bool attending) {
     Navigator.pop(context);
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => GameScreen(
                   firebaseGameObject,
+                  attending: attending,
                   tripleClose: true,
                 )));
   }
@@ -650,12 +658,36 @@ class LobbyState extends State<Lobby> {
   }
 
   bool isHost() {
-    Player hostPlayer = null;
+    Player hostPlayer;
     for (Player player in firebaseGameObject.players) {
       if (player.host) {
         hostPlayer = player;
       }
     }
     return user.email == hostPlayer.email;
+  }
+
+  showAttendingDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Will you be attending this game?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: () {
+                  openGameScreen(context, widget.simulation, attending: true);
+                },
+              ),
+              FlatButton(
+                child: Text('No'),
+                onPressed: () {
+                  openGameScreen(context, widget.simulation, attending:false);
+                },
+              )
+            ],
+          );
+        });
   }
 }
