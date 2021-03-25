@@ -4,6 +4,7 @@ import 'package:passthecup/model/teamobject.dart';
 import 'Player.dart';
 
 class FirebaseGameObject {
+  bool attending;
   int joinPlayers;
   TeamObject selectedTeam;
   String creatorId;
@@ -32,6 +33,7 @@ class FirebaseGameObject {
 
   FirebaseGameObject(
       {this.joinPlayers,
+      this.attending,
       this.selectedTeam,
       this.creatorId,
       this.name,
@@ -57,6 +59,10 @@ class FirebaseGameObject {
       this.lastUpdatedAt});
 
   FirebaseGameObject.fromJson(Map<String, dynamic> json) {
+    attending = json['attending'];
+    if (attending == null) {
+      attending = false;
+    }
     joinPlayers = json['joinPlayers'];
     creatorId = json['creatorId'];
     name = json['name'];
@@ -113,6 +119,7 @@ class FirebaseGameObject {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['joinPlayers'] = this.joinPlayers;
+    data['attending'] = this.attending;
     if (this.selectedTeam != null) {
       data['selectedTeam'] = this.selectedTeam.toJson();
     }

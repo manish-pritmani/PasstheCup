@@ -27,6 +27,7 @@ import 'package:passthecup/welcome.dart';
 import 'package:screen/screen.dart';
 
 import 'api.dart';
+import 'login.dart';
 import 'model/Player.dart';
 
 class GameScreen extends StatefulWidget {
@@ -36,12 +37,8 @@ class GameScreen extends StatefulWidget {
 
   final bool tripleClose;
 
-  final bool attending;
-
   GameScreen(this.firebaseGameObject,
-      {this.doubleClose = false,
-      this.tripleClose = false,
-      this.attending = false});
+      {this.doubleClose = false, this.tripleClose = false});
 
   @override
   State<StatefulWidget> createState() => _GameScreenState(firebaseGameObject);
@@ -70,6 +67,8 @@ class _GameScreenState extends State<GameScreen>
   ];
 
   Duration timeSinceLastUpdate = Duration(seconds: 0);
+
+  DateTime initTime = DateTime.now();
 
   bool dialogVisible = false;
 
@@ -105,6 +104,17 @@ class _GameScreenState extends State<GameScreen>
 
   AnimationController animateController;
 
+  List<Map<String, dynamic>> bannerAdDocs = [];
+  List<Map<String, dynamic>> interstitialAdDocs = [];
+
+  int lastBannerAdTimeStamp = 0;
+
+  var lastBannerIndex = 0;
+
+  bool showCustomInterstitialAd;
+
+  var interstitailAdIndex = 0;
+
   _GameScreenState(this.firebaseGameObject);
 
   BannerAd _bannerAd;
@@ -134,6 +144,8 @@ class _GameScreenState extends State<GameScreen>
       pitcherImageLink = "";
       showNextThreeHitters = false;
       playShown = false;
+      lastBannerAdTimeStamp = DateTime.now().millisecondsSinceEpoch;
+      showCustomInterstitialAd = false;
     });
 
     fetchBackgroundImage();
@@ -147,9 +159,50 @@ class _GameScreenState extends State<GameScreen>
       });
     });
 
-    _bannerAd = createBannerAd()..load();
-    //_interstitialAd = createInterstitialAd()..load();
-    SchedulerBinding.instance.addPostFrameCallback((_) => afterBuild());
+    initBannerAds();
+    fetchInterstitialAds();
+  }
+
+  void initBannerAds() async {
+    await fetchBannerAds();
+
+    if (!firebaseGameObject.attending) {
+      _bannerAd = createBannerAd()..load();
+      //_interstitialAd = createInterstitialAd()..load();
+      SchedulerBinding.instance.addPostFrameCallback((_) => afterBuild());
+    }
+  }
+
+  fetchBannerAds() async {
+    var query = await Firestore.instance
+        .collection('advertisement')
+        .where('advertisement_type', isEqualTo: 'Banner')
+//        .where('team', isEqualTo: 'Chennai Super Kings')
+//        .where('advertisement_date', arrayContains: '19/03/2021')
+        .limit(10)
+        .getDocuments();
+    var documents = query.documents;
+    setState(() {
+      for (var v in documents) {
+        bannerAdDocs.add(v.data);
+      }
+    });
+  }
+
+  fetchInterstitialAds() async {
+    var query = await Firestore.instance
+        .collection('advertisement')
+        .where('advertisement_type', isEqualTo: 'Interstitial')
+//        .where('team', isEqualTo: 'Chennai Super Kings')
+//        .where('advertisement_date', arrayContains: '19/03/2021')
+        .limit(10)
+        .getDocuments();
+    var documents = query.documents;
+    setState(() {
+      for (var v in documents) {
+        interstitialAdDocs.add(v.data);
+      }
+    });
   }
 
   BannerAd createBannerAd() {
@@ -177,6 +230,18 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
+  createInterstitialAdCustom() {
+    var millisecondsSinceEpoch2 = initTime.millisecondsSinceEpoch;
+    var millisecondsSinceEpoch3 = DateTime.now().millisecondsSinceEpoch;
+    var diff = millisecondsSinceEpoch3 - millisecondsSinceEpoch2;
+    bool isGreaterThan10Sec = diff > 10000;
+    if (isGreaterThan10Sec) {
+      setState(() {
+        showCustomInterstitialAd = true;
+      });
+    }
+  }
+
   void listenGameObject() {
     Firestore.instance
         .collection("games")
@@ -201,6 +266,12 @@ class _GameScreenState extends State<GameScreen>
         fetchDueUpHitter1Picture();
         fetchDueUpHitter2Picture();
         fetchDueUpHitter3Picture();
+
+        if (firebaseGameObject.selectedGame.lastPlay
+            .toLowerCase()
+            .contains('homerun')) {
+          showHomeRunAnimation();
+        }
 
         if (firebaseGameObject.status == -1) {
           openResultScreen();
@@ -357,12 +428,49 @@ class _GameScreenState extends State<GameScreen>
                 ),
               )),
         ),
+        buildCustomBannerAd(),
+        buildCustomInterstitialAd(),
         // Align(
         //   child: getLastSnapshotTimeText(),
         //   alignment: Alignment.center,
         // ),
       ],
     );
+  }
+
+  Widget buildCustomBannerAd() {
+    if (firebaseGameObject.attending) {
+      var src =
+          "https://stockbuddyneerajhome.files.wordpress.com/2019/04/kffsivj.png";
+      if (bannerAdDocs.length > 0) {
+        if (DateTime.now().millisecondsSinceEpoch - lastBannerAdTimeStamp >
+            10000) {
+          lastBannerIndex++;
+          if (lastBannerIndex >= bannerAdDocs.length) {
+            lastBannerIndex = 0;
+          }
+          lastBannerAdTimeStamp = DateTime.now().millisecondsSinceEpoch;
+//          createInterstitialAdCustom();
+        }
+        src = bannerAdDocs[lastBannerIndex]['image'];
+      }
+      return Positioned(
+        child: Container(
+          width: 300,
+          height: 50,
+          color: Colors.white,
+          child: Image.network(
+            src,
+            width: 300,
+            fit: BoxFit.cover,
+            height: 50,
+          ),
+        ),
+        left: 150,
+      );
+    } else {
+      return SizedBox();
+    }
   }
 
   Widget buildSafeArea() {
@@ -464,7 +572,7 @@ class _GameScreenState extends State<GameScreen>
     }
     return InkWell(
       onTap: () {
-        showHomeRunAnimation();
+        //showHomeRunAnimation();
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 8),
@@ -747,14 +855,20 @@ class _GameScreenState extends State<GameScreen>
     } else {
       if (firebaseGameObject.selectedGame.balls == null &&
           firebaseGameObject.selectedGame.outs == null &&
-          firebaseGameObject.selectedGame.strikes == null) {
+          firebaseGameObject.selectedGame.strikes == null &&
+          firebaseGameObject.selectedGame.inning != null &&
+          firebaseGameObject.selectedGame.inning != 9) {
         setState(() {
           showNextThreeHitters = true;
         });
         if (!adShown) {
-          _interstitialAd?.show();
-          _interstitialAd?.dispose();
-          _interstitialAd = createInterstitialAd()..load();
+          if (!firebaseGameObject.attending) {
+            _interstitialAd?.show();
+            _interstitialAd?.dispose();
+            _interstitialAd = createInterstitialAd()..load();
+          } else {
+            createInterstitialAdCustom();
+          }
           adShown = true;
           setState(() {
             playShown = true;
@@ -1038,19 +1152,33 @@ class _GameScreenState extends State<GameScreen>
 //  }
 
   Widget getPitcherImage() {
-    return Image.network(
-      showNextThreeHitters ? playerFallbackURL : pitcherImageLink,
-      width: 50,
-      height: 50,
-    );
+    if (pitcherImageLink != null && pitcherImageLink.isNotEmpty) {
+      return Image.network(
+        showNextThreeHitters ? playerFallbackURL : pitcherImageLink,
+        width: 50,
+        height: 50,
+      );
+    } else {
+      return SizedBox(
+        width: 50,
+        height: 50,
+      );
+    }
   }
 
   Widget getHitterImage() {
-    return Image.network(
-      showNextThreeHitters ? playerFallbackURL : hitterImageLink,
-      width: 50,
-      height: 50,
-    );
+    if (hitterImageLink != null && hitterImageLink.isNotEmpty) {
+      return Image.network(
+        showNextThreeHitters ? playerFallbackURL : hitterImageLink,
+        width: 50,
+        height: 50,
+      );
+    } else {
+      return SizedBox(
+        width: 50,
+        height: 50,
+      );
+    }
   }
 
   String getBatterNameText() {
@@ -1669,20 +1797,27 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
-      var ballsCount = firebaseGameObject.latestPlay[
-          'Balls']; //firebaseGameObject.selectedGame.balls; change back to original code when original game starts
+      var ballsCount = /*firebaseGameObject.latestPlay[
+          'Balls'];*/
+          firebaseGameObject.selectedGame
+              .balls; //change back to original code when original game starts
       if (ballsCount != null && ballsCount > 3) {
         ballsCount = 3;
       }
-      var strikesCount = firebaseGameObject.latestPlay[
-          'Strikes']; //firebaseGameObject.selectedGame.strikes; change back to original code when original game starts
+      var strikesCount =
+          /*firebaseGameObject.latestPlay[
+          'Strikes'];*/
+          firebaseGameObject.selectedGame
+              .strikes; //change back to original code when original game starts
       if (strikesCount != null && strikesCount > 2) {
         strikesCount = 2;
       }
 
-      var outs = firebaseGameObject.latestPlay[
-          'Outs']; //firebaseGameObject.selectedGame.outs; change back to original code when original game starts
-      playShown = false; // remove this line when original game starts
+      var outs = /*firebaseGameObject.latestPlay[
+          'Outs'];*/
+          firebaseGameObject.selectedGame
+              .outs; //change back to original code when original game starts
+      //playShown = false; // remove this line when original game starts
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
@@ -1730,12 +1865,14 @@ class _GameScreenState extends State<GameScreen>
       children: <Widget>[
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
         ),
         SizedBox(
           height: 0,
         ),
-        Text(dots, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        Text(dots,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -1810,9 +1947,13 @@ class _GameScreenState extends State<GameScreen>
       currentHitterID2 = 10000005;
     }
     API().fetchPlayerImage(currentHitterID2).then((value) {
-      setState(() {
-        hitterImageLink = value;
-      });
+      try {
+        setState(() {
+          hitterImageLink = value;
+        });
+      } on Exception catch (e) {
+        print(e.toString());
+      }
       return null;
     });
   }
@@ -1852,10 +1993,14 @@ class _GameScreenState extends State<GameScreen>
       dueUpHitterID12 = 10000058;
     }
     API().fetchPlayerProfile(dueUpHitterID12).then((value) {
-      setState(() {
-        dueUpHitterID1Link = value.photoUrl;
-        dueUpHitterID1Name = value.lastName;
-      });
+      try {
+        setState(() {
+          dueUpHitterID1Link = value.photoUrl;
+          dueUpHitterID1Name = value.lastName;
+        });
+      } on Exception catch (e) {
+        print(e.toString());
+      }
       return null;
     });
   }
@@ -2180,6 +2325,42 @@ class _GameScreenState extends State<GameScreen>
             );
           },
         ));
+  }
+
+  buildCustomInterstitialAd() {
+    if (showCustomInterstitialAd) {
+      return Stack(
+        children: [
+          Container(
+            color: Colors.white,
+            child: Image.network(
+              interstitialAdDocs[interstitailAdIndex]['image'],
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.contain,
+              height: MediaQuery.of(context).size.height,
+            ),
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: MaterialButton(
+              onPressed: () {
+                setState(() {
+                  showCustomInterstitialAd = false;
+                  //adShown = false;
+                  interstitailAdIndex++;
+                  if (interstitailAdIndex >= interstitialAdDocs.length) {
+                    interstitailAdIndex = 0;
+                  }
+                });
+              },
+              child: Text('Close Ad'),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return SizedBox();
+    }
   }
 }
 

@@ -210,7 +210,7 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
   }
 
   void openLobbyScreen(BuildContext context, String gameID, bool simulation) {
-    Navigator.of(context).push(new MaterialPageRoute<TeamObject>(
+    Navigator.of(context).pushReplacement(new MaterialPageRoute<TeamObject>(
       builder: (BuildContext context) {
         return new Lobby(
           gameID,

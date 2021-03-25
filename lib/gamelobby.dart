@@ -375,7 +375,15 @@ class LobbyState extends State<Lobby> {
 //                )));
 //  }
 
-  void openGameScreen(BuildContext context, bool simulation, {bool attending = false}) {
+  void openGameScreen(BuildContext context, bool simulation,
+      {bool attending = false}) async {
+    Utils().showLoaderDialog(context);
+    await Firestore.instance
+        .collection('games')
+        .document(widget.gameID)
+        .setData({'attending': attending}, merge: true);
+    Navigator.pop(context);
+
     setState(() {
       hideListView = true;
     });
@@ -419,12 +427,14 @@ class LobbyState extends State<Lobby> {
 
   void openNextScreen(BuildContext context, bool attending) {
     Navigator.pop(context);
-    Navigator.pushReplacement(
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => GameScreen(
                   firebaseGameObject,
-                  attending: attending,
+//                  attending: attending,
                   tripleClose: true,
                 )));
   }
@@ -683,7 +693,7 @@ class LobbyState extends State<Lobby> {
               FlatButton(
                 child: Text('No'),
                 onPressed: () {
-                  openGameScreen(context, widget.simulation, attending:false);
+                  openGameScreen(context, widget.simulation, attending: false);
                 },
               )
             ],
