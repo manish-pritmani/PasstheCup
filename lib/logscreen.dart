@@ -51,14 +51,14 @@ class _LogScreenState extends State<LogScreen> {
         // color: Colors.black87,
         child: docs == null
             ? Center(
-          child: CircularProgressIndicator(),
-        )
+                child: CircularProgressIndicator(),
+              )
             : ListView.builder(
-          itemBuilder: (ctx, index) {
-            return getListItem(index);
-          },
-          itemCount: docs?.length ?? 0,
-        ),
+                itemBuilder: (ctx, index) {
+                  return getListItem(index);
+                },
+                itemCount: docs?.length ?? 0,
+              ),
       ),
     );
   }
@@ -67,14 +67,13 @@ class _LogScreenState extends State<LogScreen> {
     var edoc = docs[index];
     var data2 = edoc.data["data"];
     var dateTime =
-    DateTime.fromMillisecondsSinceEpoch(edoc["time"], isUtc: true)
-        .add(Duration(hours: 5, minutes: 30));
+        DateTime.fromMillisecondsSinceEpoch(edoc["time"], isUtc: true)
+            .add(Duration(hours: 5, minutes: 30));
     var format = new DateFormat("hh:mm:ss a, dd MMM yyyy").format(dateTime);
     var string =
-    // "Last Result: ${data2["lastResult"]}"
-    //"\nPoints awarded: ${data2["lastResultPointsAwarded"]}"
-        "Cup Score: ${data2["cupScore"]}\n${getAllPlayersScore(
-        data2["players"], data2["currentActivePlayer"])}";
+        // "Last Result: ${data2["lastResult"]}"
+        //"\nPoints awarded: ${data2["lastResultPointsAwarded"]}"
+        "Cup Score: ${data2["cupScore"]}\n${getAllPlayersScore(data2["players"], data2["currentActivePlayer"])}${data2['selectedGame']['CurrentHitter']}\n";
     String inning = data2["selectedGame"]["Inning"].toString() +
         data2["selectedGame"]["InningHalf"].toString();
     int lastPointsAwarded = data2["lastResultPointsAwarded"];
@@ -82,7 +81,6 @@ class _LogScreenState extends State<LogScreen> {
       padding: EdgeInsets.only(left: 16),
       child: TimelineTile(
         alignment: TimelineAlign.start,
-
         indicatorStyle: IndicatorStyle(
           width: 40,
           height: 35,
@@ -103,8 +101,7 @@ class _LogScreenState extends State<LogScreen> {
                 style: TextStyle(
                     color: getColor3(lastPointsAwarded),
                     fontSize: 20,
-                    fontWeight: FontWeight.bold
-                ),
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -115,25 +112,45 @@ class _LogScreenState extends State<LogScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(string, style: TextStyle(fontSize: 16),),
-                    Text("$format",
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: 16.0, top: 8, bottom: 8,),
+                Container(
+                  width: 180,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("$lastPointsAwarded", style: TextStyle(fontSize: 24,
-                          fontWeight: FontWeight.bold, color: getColor(
-                              lastPointsAwarded)),),
-                      Text("${data2["lastResult"]}", style: TextStyle(color: getColor(lastPointsAwarded)),),
+                      Text(
+                        string,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Flexible(child: Text(data2['lastResult'], style: TextStyle(fontSize: 12),),),
+                      Text("$format",
+                          style: TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
+                  ),
+                ),
+                Container(
+                  width: 100,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      right: 16.0,
+                      top: 8,
+                      bottom: 8,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "$lastPointsAwarded",
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: getColor(lastPointsAwarded)),
+                        ),
+                        Text(
+                          "${data2["latestPlay"]['Result']}",
+                          style: TextStyle(color: getColor(lastPointsAwarded), fontSize: 14), textAlign: TextAlign.right,
+                        ),
+                      ],
+                    ),
                   ),
                 )
               ],
@@ -178,12 +195,17 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   String getAllPlayersScore(List players, int activePlayer) {
+    if(activePlayer==0){
+      activePlayer = players.length;
+    }
     String string = "";
-    int index = 0;
+    int index = 1;
     for (Map p in players) {
       string = string + p["name"] + ": " + p["gamescore"].toString();
-      if (index + 1 == activePlayer) {
-        string = string + " (Points Awarded)";
+      if (index == activePlayer) {
+        string = "" + string + " 👈"; // " (Points Awarded)";
+      }else{
+        print(activePlayer.toString());
       }
       string = string + "\n";
       index++;

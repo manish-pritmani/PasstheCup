@@ -5,9 +5,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/api.dart';
 import 'package:passthecup/utils.dart';
+import 'package:share/share.dart';
 
 import 'game2.dart';
 import 'model/Player.dart';
@@ -206,9 +208,11 @@ class LobbyState extends State<Lobby> {
           name: user.displayName, email: email, gamescore: -5, host: false));
       firebaseGameObject.cupScore = firebaseGameObject.cupScore + 5;
       isAdded = true;
+      gameDocumentRef.setData(firebaseGameObject.toJson(), merge: true);
     }
+
+//    gameDocumentRef.setData(firebaseGameObject.toJson()); changed on 6th April 11:59 PM
     //var document = Firestore.instance.collection('players').document(gameID);
-    gameDocumentRef.setData(firebaseGameObject.toJson());
   }
 
   @override
@@ -381,7 +385,7 @@ class LobbyState extends State<Lobby> {
     await Firestore.instance
         .collection('games')
         .document(widget.gameID)
-        .setData({'attending': attending}, merge: true);
+        .setData({'attending': attending, 'status': 1}, merge: true);
     Navigator.pop(context);
 
     setState(() {
@@ -473,12 +477,42 @@ class LobbyState extends State<Lobby> {
               ),
               FadeAnimation(
                   1,
-                  Text(
-                    firebaseGameObject.gameCode,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        firebaseGameObject.gameCode,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+//                      GestureDetector(
+//                        child: Icon(
+//                          Icons.copy_rounded,
+//                          color: Colors.white,
+//                        ),
+//                        onTap: () {
+//                          Clipboard.setData(new ClipboardData(text: firebaseGameObject.gameCode.toString()));
+//                          Utils().showToast("Gamecode Copied", context);
+//                        },
+//                      ),
+//                      SizedBox(
+//                        width: 20,
+//                      ),
+                      GestureDetector(
+                        child: Icon(
+                          Icons.share_rounded,
+                          color: Colors.white,
+                        ),
+                        onTap: () {
+                          Share.share(firebaseGameObject.gameCode.toString());
+                        },
+                      ),
+                    ],
                   )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -49,6 +49,7 @@ class _GameScreenState extends State<GameScreen>
   FirebaseGameObject firebaseGameObject;
   bool gameOver;
   String displayMsg;
+  List<String> msgArray = [];
   String hitterImageLink = "";
   String pitcherImageLink = "";
   String bgImage = "";
@@ -254,7 +255,9 @@ class _GameScreenState extends State<GameScreen>
         print("Snapshot Received: " + encode);
         setState(() {
           firebaseGameObject = FirebaseGameObject.fromJson(map);
-          displayMsg = firebaseGameObject.lastResult.toString();
+          if (!isAlreadyAppeared(firebaseGameObject.lastResult.toString())) {
+            displayMsg = firebaseGameObject.lastResult.toString();
+          }
           lastSnapshotReceivedTime = DateTime.now().millisecondsSinceEpoch;
           updateDurationArray.add(timeSinceLastUpdate.inSeconds);
           runnerOnFirst2Dummy = Random().nextBool();
@@ -268,9 +271,18 @@ class _GameScreenState extends State<GameScreen>
         fetchDueUpHitter3Picture();
 
         if (firebaseGameObject.selectedGame.lastPlay
-            .toLowerCase()
-            .contains('homerun')) {
+                .toLowerCase()
+                .contains('homerun') ||
+            firebaseGameObject.selectedGame.lastPlay
+                .toLowerCase()
+                .contains('home run') ||
+            firebaseGameObject.selectedGame.lastPlay
+                .toLowerCase()
+                .contains('home')) {
           showHomeRunAnimation();
+          setState(() {
+            displayMsg = firebaseGameObject.selectedGame.lastPlay;
+          });
         }
 
         if (firebaseGameObject.status == -1) {
@@ -908,6 +920,20 @@ class _GameScreenState extends State<GameScreen>
         );
       }
     }
+  }
+
+  bool isAlreadyAppeared(String msg) {
+    for (String s in msgArray) {
+      if (s == msg) {
+        return true;
+      }
+    }
+    setState(() {
+      if (msg!='null' && msg.isNotEmpty) {
+        msgArray.add(displayMsg);
+      }
+    });
+    return false;
   }
 
   Color getLastPlayWidgetColor(int lastResultPointsAwarded) {
@@ -2293,7 +2319,7 @@ class _GameScreenState extends State<GameScreen>
 
     return SizedBox(
         width: 300,
-        height: 160,
+        height: 165,
         child: CarouselSlider.builder(
           options: CarouselOptions(
             aspectRatio: 2.0,
@@ -2346,6 +2372,7 @@ class _GameScreenState extends State<GameScreen>
               onPressed: () {
                 setState(() {
                   showCustomInterstitialAd = false;
+                  initTime = DateTime.now();
                   //adShown = false;
                   interstitailAdIndex++;
                   if (interstitailAdIndex >= interstitialAdDocs.length) {

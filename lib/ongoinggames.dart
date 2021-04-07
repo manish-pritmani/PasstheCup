@@ -156,8 +156,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
           gameObject != null && gameObject.selectedGame.status == widget.status,
       child: GestureDetector(
         onLongPress: () {
-          var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen(gameObject));
-          Navigator.push(context, materialPageRoute);
+          openPlayByPlayData(context);
         },
         onTap: () {
           if (gameObject.selectedGame.status != "Final") {
@@ -221,6 +220,9 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
                         style: TextStyle(color: Colors.grey),
                       ),
                     ),
+                    widget.status=='Final'?OutlineButton(onPressed: (){
+                      openPlayByPlayData(context);
+                    }, child: Text('Show play by play data'),):SizedBox()
                   ],
                 ),
                 widget.status == "Final"
@@ -232,6 +234,11 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
         ),
       ),
     );
+  }
+
+  void openPlayByPlayData(BuildContext context) {
+    var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen(gameObject));
+    Navigator.push(context, materialPageRoute);
   }
 
   Column buildMyScoreColumn() {

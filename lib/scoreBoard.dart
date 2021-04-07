@@ -43,30 +43,15 @@ class _ScoreBoardState extends State<ScoreBoard> {
                         ]),
                         TableRow(children: [
                           GetRowWidget(
-                              text: "Sacrifice",
-                              Point: "0",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Stolen Base",
-                              Point: "0",
-                              bg: true,
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
                               text: "Hit by Pitch",
-                              Point: "1",
+                              Point: "+1",
                               score: 1,
                               RowColors: positiveColor),
                         ]),
                         TableRow(children: [
                           GetRowWidget(
                               text: "Intentional Walk",
-                              Point: "1",
+                              Point: "+1",
                               bg: true,
                               score: 1,
                               RowColors: positiveColor),
@@ -74,7 +59,7 @@ class _ScoreBoardState extends State<ScoreBoard> {
                         TableRow(children: [
                           GetRowWidget(
                               text: "Single",
-                              Point: "2",
+                              Point: "+2",
                               score: 1,
                               RowColors: positiveColor),
                         ]),
@@ -82,29 +67,29 @@ class _ScoreBoardState extends State<ScoreBoard> {
                           GetRowWidget(
                               bg: true,
                               text: "Double",
-                              Point: "2",
+                              Point: "+2",
                               score: 1,
                               RowColors: positiveColor),
                         ]),
                         TableRow(children: [
                           GetRowWidget(
                               text: "RBI*",
-                              Point: "2",
+                              Point: "+2",
                               score: 1,
                               RowColors: positiveColor),
                         ]),
                         TableRow(children: [
                           GetRowWidget(
-                              text: "Triple*",
+                              text: "Triple",
                               bg: true,
-                              Point: "5",
+                              Point: "+5",
                               score: 1,
                               RowColors: positiveColor),
                         ]),
                         TableRow(children: [
                           GetRowWidget(
                               text: "Home Run",
-                              Point: "Cup Cleared",
+                              Point: "Entire Cup",
                               score: 1,
                               RowColors: positiveColor),
                         ]),
@@ -192,6 +177,15 @@ class _ScoreBoardState extends State<ScoreBoard> {
                               RowColors: negitiveColor),
                         ]),
                         TableRow(children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Non-Scoring Plays',
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        ]),
+                        TableRow(children: [
                           GetRowWidget(
                               text: "Error",
                               Point: "0",
@@ -209,6 +203,56 @@ class _ScoreBoardState extends State<ScoreBoard> {
                               text: "Sacrifice Fly",
                               Point: "0",
                               RowColors: neutralColor),
+                        ]),
+                        TableRow(children: [
+                          GetRowWidget(
+                              text: "Sacrifice",
+                              Point: "0",
+                              score: 0,
+                              bg: true,
+                              RowColors: neutralColor),
+                        ]),
+                        TableRow(children: [
+                          GetRowWidget(
+                              text: "Stolen Base",
+                              Point: "0",
+                              score: 0,
+                              RowColors: neutralColor),
+                        ]),
+                        TableRow(children: [
+                          GetRowWidget(
+                              text: "Caught Stealing",
+                              Point: "0",
+                              score: 0,
+                              bg: true,
+                              RowColors: neutralColor),
+                        ]),
+                        TableRow(children: [
+                          GetRowWidget(
+                              text: "Passed Ball",
+                              Point: "0",
+                              score: 0,
+                              RowColors: neutralColor),
+                        ]),
+                        TableRow(children: [
+                          GetRowWidget(
+                              text: "Wild Pitch",
+                              Point: "0",
+                              bg: true,
+                              score: 0,
+                              RowColors: neutralColor),
+                        ]),
+                        TableRow(children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                                '*Stats are updated after the completion of the inning'),
+                          )
+                        ]),
+                        TableRow(children: [
+                          SizedBox(
+                            height: 30,
+                          )
                         ]),
                       ],
                     ),
@@ -233,7 +277,7 @@ class _ScoreBoardState extends State<ScoreBoard> {
       children: [
         Container(
           margin: EdgeInsets.only(bottom: 0.0),
-          padding: EdgeInsets.only(left: 16, top:10, bottom: 10, right: 16),
+          padding: EdgeInsets.only(left: 16, top: 10, bottom: 10, right: 16),
           decoration: BoxDecoration(
               color: bg ? Colors.grey[200] : Colors.white,
               //isHeading == true ? Colors.white : RowColors,
@@ -271,7 +315,7 @@ class _ScoreBoardState extends State<ScoreBoard> {
   }
 
   Color getColor(int score) {
-    if(score==1000){
+    if (score == 1000) {
       return Colors.white.withOpacity(0);
     }
     try {
