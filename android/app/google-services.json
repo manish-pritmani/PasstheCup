@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "93712255872-3jqdqhk755hbdd2m0u14h6cnofsgo78a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.passthecup.application",
+            "certificate_hash": "98e9f3bb5b14b7e5546e0d75f9aafee3bddcb50c"
+          }
+        },
+        {
           "client_id": "93712255872-lcrnh46an4ktqcj7t06h51bis9h3ke8c.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -30,6 +38,13 @@
             {
               "client_id": "93712255872-lcrnh46an4ktqcj7t06h51bis9h3ke8c.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "93712255872-ivit0v4iu3dln2hrjpkj4lhf478qgegs.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.flutter.passthecup"
+              }
             }
           ]
         }

@@ -6,7 +6,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+//import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -97,7 +97,7 @@ class _GameScreenState extends State<GameScreen>
 
   bool showNextThreeHitters = false;
 
-  MobileAdEvent interstitialAdEvent;
+//  MobileAdEvent interstitialAdEvent;
 
   bool adShown = false;
 
@@ -116,10 +116,12 @@ class _GameScreenState extends State<GameScreen>
 
   var interstitailAdIndex = 0;
 
+  int lastHomeRunID = 0;
+
   _GameScreenState(this.firebaseGameObject);
 
-  BannerAd _bannerAd;
-  InterstitialAd _interstitialAd;
+//  BannerAd _bannerAd;
+//  InterstitialAd _interstitialAd;
 
   var playerFallbackURL =
       'https://s3-us-west-2.amazonaws.com/static.fantasydata.com/headshots/mlb/low-res/10000001.png';
@@ -168,68 +170,68 @@ class _GameScreenState extends State<GameScreen>
     await fetchBannerAds();
 
     if (!firebaseGameObject.attending) {
-      _bannerAd = createBannerAd()..load();
+//      _bannerAd = createBannerAd()..load();
       //_interstitialAd = createInterstitialAd()..load();
       SchedulerBinding.instance.addPostFrameCallback((_) => afterBuild());
     }
   }
 
   fetchBannerAds() async {
-    var query = await Firestore.instance
+    var query = await FirebaseFirestore.instance
         .collection('advertisement')
         .where('advertisement_type', isEqualTo: 'Banner')
 //        .where('team', isEqualTo: 'Chennai Super Kings')
 //        .where('advertisement_date', arrayContains: '19/03/2021')
         .limit(10)
-        .getDocuments();
-    var documents = query.documents;
+        .get();
+    var documents = query.docs;
     setState(() {
       for (var v in documents) {
-        bannerAdDocs.add(v.data);
+        bannerAdDocs.add(v.data());
       }
     });
   }
 
   fetchInterstitialAds() async {
-    var query = await Firestore.instance
+    var query = await FirebaseFirestore.instance
         .collection('advertisement')
         .where('advertisement_type', isEqualTo: 'Interstitial')
 //        .where('team', isEqualTo: 'Chennai Super Kings')
 //        .where('advertisement_date', arrayContains: '19/03/2021')
         .limit(10)
-        .getDocuments();
-    var documents = query.documents;
+        .get();
+    var documents = query.docs;
     setState(() {
       for (var v in documents) {
-        interstitialAdDocs.add(v.data);
+        interstitialAdDocs.add(v.data());
       }
     });
   }
 
-  BannerAd createBannerAd() {
-    return BannerAd(
-      adUnitId: /*"ca-app-pub-8040945760645219/7357443820"*/ BannerAd
-          .testAdUnitId,
-      size: AdSize.banner,
-      targetingInfo: Welcome.targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("BannerAd event $event");
-      },
-    );
-  }
-
-  InterstitialAd createInterstitialAd() {
-    return InterstitialAd(
-      adUnitId: InterstitialAd.testAdUnitId,
-      targetingInfo: Welcome.targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-        setState(() {
-          interstitialAdEvent = event;
-        });
-      },
-    );
-  }
+//  BannerAd createBannerAd() {
+//    return BannerAd(
+//      adUnitId: /*"ca-app-pub-8040945760645219/7357443820"*/ BannerAd
+//          .testAdUnitId,
+//      size: AdSize.banner,
+//      targetingInfo: Welcome.targetingInfo,
+//      listener: (MobileAdEvent event) {
+//        print("BannerAd event $event");
+//      },
+//    );
+//  }
+//
+//  InterstitialAd createInterstitialAd() {
+//    return InterstitialAd(
+//      adUnitId: InterstitialAd.testAdUnitId,
+//      targetingInfo: Welcome.targetingInfo,
+//      listener: (MobileAdEvent event) {
+//        print("InterstitialAd event $event");
+//        setState(() {
+//          interstitialAdEvent = event;
+//        });
+//      },
+//    );
+//  }
 
   createInterstitialAdCustom() {
     var millisecondsSinceEpoch2 = initTime.millisecondsSinceEpoch;
@@ -244,13 +246,13 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void listenGameObject() {
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("games")
-        .document(firebaseGameObject.gameCode)
+        .doc(firebaseGameObject.gameCode)
         .snapshots()
         .listen((event) {
       try {
-        var map = event.data;
+        var map = event.data();
         var encode = jsonEncode(map);
         print("Snapshot Received: " + encode);
         setState(() {
@@ -270,16 +272,23 @@ class _GameScreenState extends State<GameScreen>
         fetchDueUpHitter2Picture();
         fetchDueUpHitter3Picture();
 
-        if (firebaseGameObject.selectedGame.lastPlay
+        if (firebaseGameObject.selectedGame.lastPlay.toString()
                 .toLowerCase()
                 .contains('homerun') ||
-            firebaseGameObject.selectedGame.lastPlay
+            firebaseGameObject.selectedGame.lastPlay.toString()
                 .toLowerCase()
                 .contains('home run') ||
-            firebaseGameObject.selectedGame.lastPlay
+            firebaseGameObject.selectedGame.lastPlay.toString()
                 .toLowerCase()
                 .contains('home')) {
-          showHomeRunAnimation();
+          if (firebaseGameObject.lastPlayID!=lastHomeRunID) {
+            showHomeRunAnimation();
+            setState(() {
+              lastHomeRunID = firebaseGameObject.lastPlayID;
+            });
+          }else{
+            print('skipped');
+          }
           setState(() {
             displayMsg = firebaseGameObject.selectedGame.lastPlay;
           });
@@ -288,6 +297,9 @@ class _GameScreenState extends State<GameScreen>
         if (firebaseGameObject.status == -1) {
           openResultScreen();
         }
+        print("GAME STATUS: "+firebaseGameObject.status.toString());
+        print("GAME ISCLOSED: "+firebaseGameObject.selectedGame.isClosed.toString());
+        print("GAME STATUS: "+firebaseGameObject.selectedGame.status.toString());
 
         if (firebaseGameObject.selectedGame.status == "Scheduled") {
           showGameNotStartedDialog();
@@ -311,12 +323,12 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void fetchBackgroundImage() {
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("images")
-        .document(firebaseGameObject.selectedGame.homeTeam)
+        .doc(firebaseGameObject.selectedGame.homeTeam)
         .get()
         .then((value) {
-      var src = value.data["link"];
+      var src = value.data()["link"];
       setState(() {
         bgImage = src;
       });
@@ -325,10 +337,10 @@ class _GameScreenState extends State<GameScreen>
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    timer?.cancel();
-    _bannerAd?.dispose();
-    _interstitialAd?.dispose();
+//    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+//    timer?.cancel();
+//    _bannerAd?.dispose();
+//    _interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -358,12 +370,12 @@ class _GameScreenState extends State<GameScreen>
 
   void afterBuild() {
     // executes after build is done
-    _bannerAd ??= createBannerAd();
-    var width = MediaQuery.of(context).size.width;
-    var horizontalCenterOffset2 = width / 2 + 200;
-    _bannerAd
-      ..load()
-      ..show(anchorType: AnchorType.top, horizontalCenterOffset: -150);
+//    _bannerAd ??= createBannerAd();
+//    var width = MediaQuery.of(context).size.width;
+//    var horizontalCenterOffset2 = width / 2 + 200;
+//    _bannerAd
+//      ..load()
+//      ..show(anchorType: AnchorType.top, horizontalCenterOffset: -150);
   }
 
   Widget buildDrawer(BuildContext context) {
@@ -578,10 +590,11 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget getCupWidget({bool large = false}) {
-    var scoreToShow = firebaseGameObject.cupScore.toString();
-    if (firebaseGameObject.cupScore > -10 && firebaseGameObject.cupScore < 10) {
-      scoreToShow = "0" + firebaseGameObject.cupScore.toString();
+    var scoreToShow = firebaseGameObject.cupScore2.toString();
+    if (firebaseGameObject.cupScore2 > -10 && firebaseGameObject.cupScore2 < 10) {
+      scoreToShow = "0" + firebaseGameObject.cupScore2.toString();
     }
+    //scoreToShow = firebaseGameObject.cupScore.toString()+','+firebaseGameObject.cupScore2.toString(); //temporirily added
     return InkWell(
       onTap: () {
         //showHomeRunAnimation();
@@ -875,9 +888,9 @@ class _GameScreenState extends State<GameScreen>
         });
         if (!adShown) {
           if (!firebaseGameObject.attending) {
-            _interstitialAd?.show();
-            _interstitialAd?.dispose();
-            _interstitialAd = createInterstitialAd()..load();
+//            _interstitialAd?.show();
+//            _interstitialAd?.dispose();
+//            _interstitialAd = createInterstitialAd()..load();
           } else {
             createInterstitialAdCustom();
           }
@@ -930,7 +943,7 @@ class _GameScreenState extends State<GameScreen>
     }
     setState(() {
       if (msg!='null' && msg.isNotEmpty) {
-        msgArray.add(displayMsg);
+        msgArray.add(msg);
       }
     });
     return false;
@@ -1388,9 +1401,9 @@ class _GameScreenState extends State<GameScreen>
             padding: EdgeInsets.symmetric(horizontal: 6),
             color: Colors.black.withOpacity(0.6),
             child: Text(
-              "${player.gamescore}",
+              "${player.gamescore2}",
               style: TextStyle(
-                  color: getColorAccordingToScore(player.gamescore),
+                  color: getColorAccordingToScore(player.gamescore2),
                   fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
@@ -1823,26 +1836,26 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
-      var ballsCount = /*firebaseGameObject.latestPlay[
-          'Balls'];*/
-          firebaseGameObject.selectedGame
-              .balls; //change back to original code when original game starts
+      var ballsCount = firebaseGameObject.latestPlay[
+          'Balls'];
+//          firebaseGameObject.selectedGame
+//              .balls; //change back to original code when original game starts
       if (ballsCount != null && ballsCount > 3) {
         ballsCount = 3;
       }
       var strikesCount =
-          /*firebaseGameObject.latestPlay[
-          'Strikes'];*/
-          firebaseGameObject.selectedGame
-              .strikes; //change back to original code when original game starts
+          firebaseGameObject.latestPlay[
+          'Strikes'];
+//          firebaseGameObject.selectedGame
+//              .strikes; //change back to original code when original game starts
       if (strikesCount != null && strikesCount > 2) {
         strikesCount = 2;
       }
 
-      var outs = /*firebaseGameObject.latestPlay[
-          'Outs'];*/
-          firebaseGameObject.selectedGame
-              .outs; //change back to original code when original game starts
+      var outs = firebaseGameObject.latestPlay[
+          'Outs'];
+//          firebaseGameObject.selectedGame
+//              .outs; //change back to original code when original game starts
       //playShown = false; // remove this line when original game starts
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -2236,13 +2249,13 @@ class _GameScreenState extends State<GameScreen>
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context);
-                if (widget.doubleClose) {
-                  Navigator.pop(context);
-                }
-                if (widget.tripleClose) {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                }
+//                if (widget.doubleClose) {
+////                  Navigator.pop(context);
+//                }
+//                if (widget.tripleClose) {
+//                  Navigator.pop(context);
+////                  Navigator.pop(context);
+//                }
               },
               child: Text(
                 "OK",

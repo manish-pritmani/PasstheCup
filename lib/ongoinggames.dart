@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:passthecup/logscreen2.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
 import 'package:passthecup/resultscreen.dart';
 
@@ -23,7 +24,7 @@ class OnGoingGames extends StatefulWidget {
 
 class _OnGoingGamesState extends State<OnGoingGames>
     with AutomaticKeepAliveClientMixin<OnGoingGames> {
-  FirebaseUser firebaseUser;
+  User firebaseUser;
 
   List<DocumentSnapshot> documents = List();
 
@@ -38,23 +39,23 @@ class _OnGoingGamesState extends State<OnGoingGames>
 
   Future getUser() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
     await firebaseUser?.reload();
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
     QuerySnapshot querySnapshot = await fetchGames();
     setState(() {
-      documents = querySnapshot.documents;
+      documents = querySnapshot.docs;
       loaded = true;
     });
   }
 
   Future<QuerySnapshot> fetchGames() async {
-    QuerySnapshot documents = await Firestore.instance
+    QuerySnapshot documents = await FirebaseFirestore.instance
         .collection("user")
-        .document(firebaseUser.email)
+        .doc(firebaseUser.email)
         .collection("mygames")
         .orderBy("createdOn", descending: true)
-        .getDocuments();
+        .get();
     return documents;
   }
 
@@ -101,7 +102,7 @@ class OnGoingGameWidget extends StatefulWidget {
   }) : super(key: key);
 
   final DocumentSnapshot document;
-  final FirebaseUser user;
+  final User user;
 
   @override
   _OnGoingGameWidgetState createState() => _OnGoingGameWidgetState();
@@ -124,13 +125,13 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
 //        .document(widget.document.data["gameCode"])
 //        .get();
 
-    listen = Firestore.instance
+    listen = FirebaseFirestore.instance
         .collection("games")
-        .document(widget.document.data["gameCode"])
+        .doc(widget.document.data()["gameCode"])
         .snapshots()
         .listen((event) {
       setState(() {
-        gameObject = FirebaseGameObject.fromJson(event.data);
+        gameObject = FirebaseGameObject.fromJson(event.data());
       });
     });
   }
@@ -144,19 +145,21 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var map = widget.document.data;
+    var map = widget.document.data();
     Map<String, dynamic> data2 = map["selectedGame"];
     var eventDate;
-    if (gameObject != null) {
+    if (gameObject != null && gameObject.createdOn!=null) {
       eventDate =
           gameObject.createdOn.substring(0, gameObject.createdOn.indexOf("."));
     }
     return Visibility(
       visible:
-          gameObject != null && gameObject.selectedGame.status == widget.status,
+          gameObject != null && (gameObject.selectedGame?.status??'') == widget.status,
       child: GestureDetector(
         onLongPress: () {
-          openPlayByPlayData(context);
+          var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen2(gameObject));
+          Navigator.push(context, materialPageRoute);
+          //openPlayByPlayData(context);
         },
         onTap: () {
           if (gameObject.selectedGame.status != "Final") {
@@ -221,7 +224,9 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
                       ),
                     ),
                     widget.status=='Final'?OutlineButton(onPressed: (){
-                      openPlayByPlayData(context);
+                      var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen2(gameObject));
+                      Navigator.push(context, materialPageRoute);
+//                      openPlayByPlayData(context);
                     }, child: Text('Show play by play data'),):SizedBox()
                   ],
                 ),
@@ -237,8 +242,30 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
   }
 
   void openPlayByPlayData(BuildContext context) {
-    var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen(gameObject));
-    Navigator.push(context, materialPageRoute);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('Select type of logs:'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Real time Play by Play'),
+                onPressed: () {
+                  var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen(gameObject));
+                  Navigator.push(context, materialPageRoute);
+                },
+              ),
+              FlatButton(
+                child: Text('Recalculated Play by Play'),
+                onPressed: () {
+                  var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen2(gameObject));
+                  Navigator.push(context, materialPageRoute);
+                },
+              )
+            ],
+          );
+        });
   }
 
   Column buildMyScoreColumn() {
@@ -260,7 +287,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
     return Column(
       children: [
         Text(
-          gameObject == null ? "0" : gameObject.cupScore.toString(),
+          gameObject == null ? "0" : gameObject.cupScore2.toString(),
           style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
         ),
         Text(
@@ -332,7 +359,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
     int myscore = 0;
     for (int i = 0; i < gameObject.players.length; i++) {
       if (gameObject.players[i].email == widget.user.email) {
-        myscore = gameObject.players[i].gamescore;
+        myscore = gameObject.players[i].gamescore2;
       }
     }
     return myscore.toString();

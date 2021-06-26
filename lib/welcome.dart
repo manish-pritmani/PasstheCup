@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+//import 'package:firebase_admob/firebase_admob.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:passthecup/ProfileStats.dart';
 import 'package:passthecup/animation/animation_controller.dart';
+import 'package:passthecup/authentication.dart';
 import 'package:passthecup/gameid.dart';
 import 'package:passthecup/mygames.dart';
 import 'package:passthecup/scoreBoard.dart';
@@ -15,15 +18,16 @@ import 'package:passthecup/todaysgamescreen.dart';
 import 'package:passthecup/utils.dart';
 import 'package:share/share.dart';
 
+
 class Welcome extends StatefulWidget {
   static const String testDevice = '708D3F24894BE8D6D31865513C6844A4';
-  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-    testDevices: testDevice != null ? <String>[testDevice] : null,
-    keywords: <String>['mlb', 'baseball', 'sports'],
-    contentUrl: 'http://foo.com/bar.html',
-    childDirected: true,
-    nonPersonalizedAds: true,
-  );
+//  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+//    testDevices: testDevice != null ? <String>[testDevice] : null,
+//    keywords: <String>['mlb', 'baseball', 'sports'],
+//    contentUrl: 'http://foo.com/bar.html',
+//    childDirected: true,
+//    nonPersonalizedAds: true,
+//  );
 
   @override
   _WelcomeState createState() => _WelcomeState();
@@ -32,17 +36,17 @@ class Welcome extends StatefulWidget {
 class _WelcomeState extends State<Welcome> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  FirebaseUser user;
+  User user;
   bool isSignedIn = false;
   String gamerImage;
   DocumentSnapshot firebaseUserObject;
   Color borderColor;
   StreamSubscription<DocumentSnapshot> listen;
-  InterstitialAd _interstitialAd;
+//  InterstitialAd _interstitialAd;
 
   //Todo : check if authenticated
   checkAuthentication() async {
-    _auth.onAuthStateChanged.listen((user) {
+    _auth.authStateChanges().listen((user) {
       if (user == null) {
         Navigator.pushReplacementNamed(context, '/signin');
       }
@@ -51,19 +55,19 @@ class _WelcomeState extends State<Welcome> {
 
   //Todo : get user details
   getUser() async {
-    FirebaseUser firebaseUser = await _auth.currentUser();
+    User firebaseUser = _auth.currentUser;
     await firebaseUser?.reload();
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
 
     if (firebaseUser != null) {
       setState(() {
         this.user = firebaseUser;
         this.isSignedIn = true;
-        this.gamerImage = user.photoUrl;
+        this.gamerImage = user.photoURL;
       });
-      Firestore.instance
+      FirebaseFirestore.instance
           .collection("user")
-          .document(user.email)
+          .doc(user.email)
           .get()
           .then((value) {
         setState(() {
@@ -75,11 +79,11 @@ class _WelcomeState extends State<Welcome> {
       Utils().showToast("UserObject null", context);
     }
     print(
-        "${user.displayName} is the gamer name with profile image url ${user.photoUrl}");
+        "${user.displayName} is the gamer name with profile image url ${user.photoURL}");
 
-    listen = Firestore.instance
+    listen = FirebaseFirestore.instance
         .collection("user")
-        .document(user.email)
+        .doc(user.email)
         .snapshots()
         .listen((event) {
       setState(() {
@@ -90,7 +94,9 @@ class _WelcomeState extends State<Welcome> {
 
   //TODO: Implement logout button somewhere in welcome screen
   signout() async {
-    _auth.signOut();
+    await FacebookAuth.instance.logOut();
+    await _auth.signOut();
+    await Authentication.signOut(context: context);
 //   Phoenix.rebirth(context);
   }
 
@@ -110,20 +116,20 @@ class _WelcomeState extends State<Welcome> {
       borderColor = Colors.transparent;
     });
 
-    FirebaseAdMob.instance
-        .initialize(appId: "ca-app-pub-8040945760645219~6638709781");
-
-    RewardedVideoAd.instance.listener =
-        (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
-      print("RewardedVideoAd event $event");
-      if (event == RewardedVideoAdEvent.rewarded) {
-        var email = firebaseUserObject.data["email"];
-        Firestore.instance
-            .collection("user")
-            .document(email)
-            .setData({"score": 50}, merge: true);
-      }
-    };
+//    FirebaseAdMob.instance
+//        .initialize(appId: "ca-app-pub-8040945760645219~6638709781");
+//
+//    RewardedVideoAd.instance.listener =
+//        (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
+//      print("RewardedVideoAd event $event");
+//      if (event == RewardedVideoAdEvent.rewarded) {
+//        var email = firebaseUserObject.data()["email"];
+//        FirebaseFirestore.instance
+//            .collection("user")
+//            .doc(email)
+//            .set({"score": 50}, SetOptions(merge: true));
+//      }
+//    };
 
     createRewardedVideoAds();
 
@@ -139,6 +145,18 @@ class _WelcomeState extends State<Welcome> {
   @override
   Widget build(BuildContext context) {
     if (firebaseUserObject != null) {
+      var data = firebaseUserObject.data();
+      var score = 0;
+      if (data!=null) {
+         score = data["score"];
+      }else{
+        score = 0;
+      }
+      var name = 'Ayush';
+      var email = 'ayushmehre@gmail.com';
+      name = user.displayName;
+      email = user.email;
+      String hex = "808080";
       return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Utils().getBGColor(),
@@ -152,7 +170,7 @@ class _WelcomeState extends State<Welcome> {
               padding: const EdgeInsets.only(right: 16.0),
               child: Center(
                 child: Text(
-                  "Your Points💰: ${firebaseUserObject.data["score"]}",
+                  "Your Points💰: ${score}",
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -177,7 +195,7 @@ class _WelcomeState extends State<Welcome> {
             children: [
               DrawerHeader(
                 child: Column(
-                  children: [CircleAvatar(radius: 25,), SizedBox(height: 8,),Text('Ayush'), Text('ayushmehre@gmail.com')],
+                  children: [CircleAvatar(radius: 20, child: getAvatarWidget(hex),), SizedBox(height: 8,),Text(name), Text(email)],
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
                 ),
@@ -207,6 +225,19 @@ class _WelcomeState extends State<Welcome> {
                   }));
                 },
               ),
+              Divider(),
+              ListTile(
+                title: Text('Privacy Policy'),
+                onTap: (){
+                  open("https://www.sportsaddictgames.com/sports-addict-games/privacy-policy");
+                },
+              ),
+              ListTile(
+                title: Text('EULA'),
+                onTap: () async{
+                  open("https://www.sportsaddictgames.com/sports-addict-games/eula");
+                },
+              ),
             ],
           ),
         ),
@@ -226,9 +257,33 @@ class _WelcomeState extends State<Welcome> {
     }
   }
 
+  open(url){
+    FlutterWebBrowser.openWebPage(
+      url: url,
+      customTabsOptions: CustomTabsOptions(
+        colorScheme: CustomTabsColorScheme.dark,
+        addDefaultShareMenuItem: true,
+        instantAppsEnabled: true,
+        showTitle: true,
+        urlBarHidingEnabled: true,
+      ),
+      safariVCOptions: SafariViewControllerOptions(
+        barCollapsingEnabled: true,
+        dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
+        modalPresentationCapturesStatusBarAppearance: true,
+      ),
+    );
+  }
+
+
+
   Widget buildContainer(BuildContext context) {
     Color color = Colors.primaries[Random().nextInt(Colors.primaries.length)];
     String hex = "808080"; // color.value.toRadixString(16).substring(2);
+    var name = 'null';
+    if (firebaseUserObject.data()!=null) {
+      name = firebaseUserObject.data()["name"];
+    }
     return Stack(
       children: <Widget>[
         Align(
@@ -276,7 +331,7 @@ class _WelcomeState extends State<Welcome> {
                           FadeAnimation(
                             1,
                             Text(
-                              "${firebaseUserObject.data["name"] == null ? user.email : firebaseUserObject.data["name"]}"
+                              "${name == null ? user.email : name}"
                                   .toUpperCase(),
                               style: TextStyle(
                                   color: Colors.black,
@@ -308,9 +363,9 @@ class _WelcomeState extends State<Welcome> {
         ),
         Align(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Text(
-              "V.1.4.1",
+              "V.1.4.2",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -532,13 +587,15 @@ class _WelcomeState extends State<Welcome> {
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                if (firebaseUserObject.data["score"] > 0) {
+                var data2 = firebaseUserObject.data();
+                var data = data2["score"];
+                if (data > 0) {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => TodaysGameScreen()));
                 } else {
-                  RewardedVideoAd.instance.show();
+                  //RewardedVideoAd.instance.show();
                   createRewardedVideoAds();
                 }
               },
@@ -577,11 +634,11 @@ class _WelcomeState extends State<Welcome> {
               minWidth: double.infinity,
               height: 60,
               onPressed: () {
-                if (firebaseUserObject.data["score"] > 0) {
+                if (firebaseUserObject.data()["score"] > 0) {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => GameId()));
                 } else {
-                  RewardedVideoAd.instance.show();
+                  //RewardedVideoAd.instance.show();
                   createRewardedVideoAds();
                 }
               },
@@ -602,18 +659,23 @@ class _WelcomeState extends State<Welcome> {
   }
 
   void createRewardedVideoAds() {
-    RewardedVideoAd.instance.load(
-        adUnitId: RewardedVideoAd.testAdUnitId,
-        targetingInfo: Welcome.targetingInfo);
+//    RewardedVideoAd.instance.load(
+//        adUnitId: RewardedVideoAd.testAdUnitId,
+//        targetingInfo: Welcome.targetingInfo);
   }
 
   FadeAnimation getAvatarWidget(String hex) {
+    var name = 'null';
+
+    if (firebaseUserObject.data()!=null) {
+      name = firebaseUserObject.data()["name"];
+    }
     return FadeAnimation(
         1,
         CircleAvatar(
           radius: 20,
           backgroundImage: NetworkImage(
-              "https://ui-avatars.com/api/?name=${firebaseUserObject.data["name"]}&bold=true&background=$hex&color=ffffff"),
+              "https://ui-avatars.com/api/?name=$name&bold=true&background=$hex&color=ffffff"),
         ));
   }
 
@@ -621,8 +683,8 @@ class _WelcomeState extends State<Welcome> {
     return FadeAnimation(
         1,
         CircleAvatar(
-          backgroundImage: user.photoUrl != null
-              ? NetworkImage("${user.photoUrl}")
+          backgroundImage: user.photoURL != null
+              ? NetworkImage("${user.photoURL}")
               : AssetImage('asset/index.png'),
         ));
   }

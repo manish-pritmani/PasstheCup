@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,20 +7,24 @@ import 'package:intl/intl.dart';
 import 'package:passthecup/model/firebasegameObject.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-import 'animation/MyText.dart';
 import 'utils.dart';
 
-class LogScreen extends StatefulWidget {
+class LogScreen2 extends StatefulWidget {
   final FirebaseGameObject gameObject;
 
-  LogScreen(this.gameObject);
+  LogScreen2(this.gameObject);
 
   @override
-  _LogScreenState createState() => _LogScreenState();
+  _LogScreen2State createState() => _LogScreen2State();
 }
 
-class _LogScreenState extends State<LogScreen> {
-  List<DocumentSnapshot> docs;
+class _LogScreen2State extends State<LogScreen2> {
+//  List<DocumentSnapshot> docs;
+
+  FirebaseGameObject gameObject;
+  StreamSubscription<DocumentSnapshot> listen;
+
+  Map<String, dynamic> data;
 
   @override
   void initState() {
@@ -29,34 +35,50 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   void fetchLogs() async {
-    Query query = FirebaseFirestore.instance
-        .collection("snapshots")
-        .where("gameId", isEqualTo: widget.gameObject.gameCode)
-        .orderBy("time", descending: true);
-
-    query.snapshots(includeMetadataChanges: false).listen((event) {
-      setState(() {
-        docs = event.docs.reversed.toList();
-      });
+    listen = FirebaseFirestore.instance
+        .collection('games')
+        .doc(widget.gameObject.gameCode.toString())
+        .snapshots(includeMetadataChanges: true)
+        .listen((event) {
+      if (event.data() != null) {
+        setState(() {
+          gameObject = FirebaseGameObject.fromJson(event.data());
+          data = event.data();
+        });
+      } else {
+        print(event.toString());
+      }
     });
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    listen?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    for(var data2 in docs){
-      var map = data2.data()["data"];
-//      print(map.toString()+"\n\n");
-      var inning = map["selectedGame"]["Inning"].toString()+map["latestPlay"]["InningHalf"].toString();
-      print(inning+":"+map["latestPlay"]["Result"]+":"+map["lastResultPointsAwarded"].toString());
+
+    for(var data2 in data["pointsAwarded"]){
+     try{
+       print(data2["Inning"].toString()+":"+data2["Result"] + ": " + data2["points"].toString());
+     }catch(e){
+      print(e.toString());
+     }
     }
+
+    var length2 = data['pointsAwarded']?.length ?? 0;
     return Scaffold(
       appBar: AppBar(
-        title: MyText("Play by Play Data: ${widget.gameObject.gameCode}"),
+        title:
+            Text("Play by Play (Recalculated): ${widget.gameObject.gameCode}"),
       ),
       body: Container(
         padding: EdgeInsets.all(4),
         // color: Colors.black87,
-        child: docs == null
+        child: gameObject == null
             ? Center(
                 child: CircularProgressIndicator(),
               )
@@ -64,26 +86,53 @@ class _LogScreenState extends State<LogScreen> {
                 itemBuilder: (ctx, index) {
                   return getListItem(index);
                 },
-                itemCount: docs?.length ?? 0,
+                itemCount: length2 ?? 0,
               ),
       ),
     );
   }
 
   Widget getListItem(int index) {
-    var edoc = docs[index];
-    var data2 = edoc.data()["data"];
-    var dateTime =
-        DateTime.fromMillisecondsSinceEpoch(edoc["time"], isUtc: true)
-            .add(Duration(hours: 5, minutes: 30));
-    var format = new DateFormat("hh:mm:ss a, dd MMM yyyy").format(dateTime);
-    var string =
-        // "Last Result: ${data2["lastResult"]}"
-        //"\nPoints awarded: ${data2["lastResultPointsAwarded"]}"
-        "Cup Score: ${data2["cupScore"]}\n${getAllPlayersScore(data2["players"], data2["currentActivePlayer"])}${data2['selectedGame']['CurrentHitter']}\n";
-    String inning = data2["selectedGame"]["Inning"].toString() +
-        data2["selectedGame"]["InningHalf"].toString();
-    int lastPointsAwarded = data2["lastResultPointsAwarded"];
+    var edoc = data['pointsAwarded'];
+    var data2 = edoc[index];
+
+
+//    var dateTime =
+//        DateTime.fromMillisecondsSinceEpoch(edoc["time"], isUtc: true)
+//            .add(Duration(hours: 5, minutes: 30));
+//    var format = new DateFormat("hh:mm:ss a, dd MMM yyyy").format(dateTime);
+//    var string =
+//        // "Last Result: ${data2["lastResult"]}"
+//        //"\nPoints awarded: ${data2["lastResultPointsAwarded"]}"
+//        "Cup Score: ${data2["cupScore"]}\n${getAllPlayersScore(data2["players"], data2["currentActivePlayer"])}${data2['selectedGame']['CurrentHitter']}\n";
+//    String inning = data2["selectedGame"]["Inning"].toString() +
+//        data2["selectedGame"]["InningHalf"].toString();
+    int lastPointsAwarded = data2["points"];
+
+    String playersscrore = '';
+
+//    for (var v = 0; v < data2['players']?.length??0; v++) {
+//      playersscrore =
+//          playersscrore + '\n' + data2['players'][v]['name'] + ': ' +
+//              data2['players'][v]['gamescore2'].toString();
+//      var index = v+1;
+//      if(index<0 || index>=data2['players'].length){
+//        index = 0;//data2['players'].length-1;
+//      }
+//      if (data2['email']==data2['players'][index]['email']) {
+//          playersscrore  = playersscrore + ' 👈';
+//      }
+//    }
+   try{
+     playersscrore = data2['name'] +
+//         ' (' +
+//         data2['email'] +
+         ' was awarded ' +
+         data2['points'].toString();
+   }catch(e){
+     playersscrore = '';
+   }
+
     return Padding(
       padding: EdgeInsets.only(left: 16),
       child: TimelineTile(
@@ -103,8 +152,8 @@ class _LogScreenState extends State<LogScreen> {
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: MyText(
-                inning+'',
+              child: Text(
+                data2['Inning'].toString() + '',
                 style: TextStyle(
                     color: getColor3(lastPointsAwarded),
                     fontSize: 20,
@@ -124,14 +173,29 @@ class _LogScreenState extends State<LogScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyText('LatestPlayID: '+data2['lastPlayID'].toString(), style: TextStyle(fontWeight: FontWeight.bold),),
-                      MyText('PlayID: '+data2['latestPlay']['PlayID'].toString(), style: TextStyle(fontWeight: FontWeight.bold),),
-                      MyText(
-                        string+'',
+//                      Text(
+//                        'LatestPlayID: ' + data2['lastPlayID'].toString(),
+//                        style: TextStyle(fontWeight: FontWeight.bold),
+//                      ),
+                      Text(
+                        'PlayID: ' + data2['PlayID'].toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Cupscore: ' + data2['cupscore'].toString(),
                         style: TextStyle(fontSize: 16),
                       ),
-                      Flexible(child: MyText(data2['lastResult'], style: TextStyle(fontSize: 12),),),
-                      MyText("$format"+'',
+                      Text(
+                        playersscrore.toString().trim(),
+                        style: TextStyle(fontSize: 16),
+                      ),
+//                      Flexible(
+//                        child: Text(
+//                          data2['lastResult'].toString(),
+//                          style: TextStyle(fontSize: 12),
+//                        ),
+//                      ),
+                      Text(data2['Description'].toString() + '',
                           style: TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ),
@@ -147,16 +211,18 @@ class _LogScreenState extends State<LogScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        MyText(
-                          "$lastPointsAwarded"+'',
+                        Text(
+                          ("$lastPointsAwarded").toString(),
                           style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: getColor(lastPointsAwarded)),
                         ),
-                        MyText(
-                          "${data2["latestPlay"]['Result']}"+'',
-                          style: TextStyle(color: getColor(lastPointsAwarded), fontSize: 14), textAlign: TextAlign.right,
+                        Text(
+                          ("${data2['Result']}").toString(),
+                          style: TextStyle(
+                              color: getColor(lastPointsAwarded), fontSize: 14),
+                          textAlign: TextAlign.right,
                         ),
                       ],
                     ),
@@ -166,11 +232,12 @@ class _LogScreenState extends State<LogScreen> {
             ),
           ),
         ),
-        // subtitle: MyText("$format"),
-        // title: MyText(string),
+        // subtitle: Text("$format"),
+        // title: Text(string),
         // isThreeLine: true,
       ),
     );
+    //return Text('khsfghjkshgk');
   }
 
   Color getColor(int lastPointsAwarded) {
@@ -204,7 +271,7 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   String getAllPlayersScore(List players, int activePlayer) {
-    if(activePlayer==0){
+    if (activePlayer == 0) {
       activePlayer = players.length;
     }
     String string = "";
@@ -213,7 +280,7 @@ class _LogScreenState extends State<LogScreen> {
       string = string + p["name"] + ": " + p["gamescore"].toString();
       if (index == activePlayer) {
         string = "" + string + " 👈"; // " (Points Awarded)";
-      }else{
+      } else {
         print(activePlayer.toString());
       }
       string = string + "\n";

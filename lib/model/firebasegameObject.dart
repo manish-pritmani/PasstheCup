@@ -17,6 +17,7 @@ class FirebaseGameObject {
   String createdOn;
   int status;
   int cupScore;
+  int cupScore2;
   bool simulation;
   List<Player> players;
   String lastResult;
@@ -43,6 +44,7 @@ class FirebaseGameObject {
       this.gameID,
       this.selectedGame,
       this.cupScore,
+      this.cupScore2,
       this.createdOn,
       this.simulation,
       this.status,
@@ -97,6 +99,11 @@ class FirebaseGameObject {
     simulation = json['simulation'];
     status = json['status'];
     cupScore = json['cupScore'];
+    if (json['cupScore2'] != null) {
+      cupScore2 = json['cupScore2'];
+    } else {
+      cupScore2 = 0;
+    }
     if (json['players'] != null) {
       players = new List<Player>();
       json['players'].forEach((v) {
@@ -125,6 +132,7 @@ class FirebaseGameObject {
     }
     data['creatorId'] = this.creatorId;
     data['cupScore'] = this.cupScore;
+    data['cupScore2'] = this.cupScore2;
     data['name'] = this.name;
     data['simulation'] = simulation;
     data['hostID'] = this.hostID;

@@ -14,6 +14,258 @@ class _ScoreBoardState extends State<ScoreBoard> {
 
   @override
   Widget build(BuildContext context) {
+    var list = [
+      TableRow(children: [
+        GetRowWidget(
+            text: "Results",
+            Point: "Points",
+            RowColors: Colors.white,
+            score: 1000,
+            isHeading: true),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Hit by Pitch",
+            Point: "+1",
+            score: 1,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Walk",
+            Point: "+1",
+            bg: true,
+            score: 1,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Intentional Walk",
+            Point: "+1",
+            bg: false,
+            score: 1,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Sacrifice",
+            Point: "+1",
+            bg: true,
+            score: 1,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Single", Point: "+1", score: 1, RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            bg: true,
+            text: "Double",
+            Point: "+2",
+            score: 1,
+            RowColors: positiveColor),
+      ]),
+//                        TableRow(children: [
+//                          GetRowWidget(
+//                              text: "RBI*",
+//                              Point: "+2",
+//                              score: 1,
+//                              RowColors: positiveColor),
+//                        ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Triple",
+            bg: false,
+            Point: "+5",
+            score: 1,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Home Run",
+            Point: "Entire Cup",
+            score: 1,
+            bg: true,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Fielder's Choice",
+            bg: false,
+            Point: "-1",
+            score: -1,
+            RowColors: positiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Fly Out", score: -1,
+            bg:true,
+            Point: "-1", RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Foul Out",
+            bg: !true,
+            score: -1,
+            Point: "-1",
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Ground Out",
+            Point: "-1",
+            score: -1,
+            bg: true,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Lineout",
+            bg: !true,
+            Point: "-1",
+            score: -1,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Pop Out", Point: "-1",
+            bg: true,
+            score: -1, RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Strikeout Looking",
+            bg: !true,
+            Point: "-2",
+            score: -1,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Strikeout Swinging",
+            Point: "-2",
+            bg: true,
+            score: -1,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Ground Into Double Play*",
+            bg: !true,
+            Point: "-2",
+            score: -1,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Line into Double Play",
+            Point: "-2",
+            bg: true,
+            score: -1,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Line into Triple Play",
+            bg: !true,
+            Point: "-5",
+            score: -1,
+            RowColors: negitiveColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(text: "Error", Point: "0",
+            bg: true,RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Catcher's Interference",
+            Point: "0",
+            bg: !true,
+            RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Non-Scoring Plays**',
+            textAlign: TextAlign.center,
+          ),
+        )
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Stolen Base", Point: "0",
+            bg: true,
+            score: 0, RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Caught Stealing",
+            Point: "0",
+            score: 0,
+            bg: !true,
+            RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Passed Ball", Point: "0",
+            bg: true,
+            score: 0, RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Wild Pitch",
+            Point: "0",
+            bg: !true,
+            score: 0,
+            RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Balk",
+            Point: "0",
+            bg: true,
+            score: 0,
+            RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Fielder's Indifference",
+            Point: "0",
+            bg: !true,
+            score: 0,
+            RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        GetRowWidget(
+            text: "Pick Off",
+            Point: "0",
+            bg: true,
+            score: 0,
+            RowColors: neutralColor),
+      ]),
+      TableRow(children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('*Scoring may be updated after the play'),
+              Text('**Cup does not move on non-scoring plays'),
+            ],
+          ),
+        )
+      ]),
+
+      TableRow(children: [
+        SizedBox(
+          height: 30,
+        )
+      ]),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -31,230 +283,7 @@ class _ScoreBoardState extends State<ScoreBoard> {
                   child: Container(
                     padding: EdgeInsets.all(0.0),
                     child: Table(
-                      children: [
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Results",
-                              Point: "Points",
-                              RowColors: Colors.white,
-                              bg: true,
-                              score: 1000,
-                              isHeading: true),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Hit by Pitch",
-                              Point: "+1",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Intentional Walk",
-                              Point: "+1",
-                              bg: true,
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Single",
-                              Point: "+2",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              bg: true,
-                              text: "Double",
-                              Point: "+2",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "RBI*",
-                              Point: "+2",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Triple",
-                              bg: true,
-                              Point: "+5",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Home Run",
-                              Point: "Entire Cup",
-                              score: 1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Fielder's Choice",
-                              bg: true,
-                              Point: "-1",
-                              score: -1,
-                              RowColors: positiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Fly Out",
-                              score: -1,
-                              Point: "-1",
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Foul Out",
-                              bg: true,
-                              score: -1,
-                              Point: "-1",
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Ground Out",
-                              Point: "-1",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Lineout",
-                              bg: true,
-                              Point: "-1",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Pop Out",
-                              Point: "-1",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Strikeout Looking",
-                              bg: true,
-                              Point: "-2",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Strikeout Swinging",
-                              Point: "-2",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Ground Into Double Play*",
-                              bg: true,
-                              Point: "-2",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Line into Double Play",
-                              Point: "-2",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Line into Triple Play",
-                              bg: true,
-                              Point: "-5",
-                              score: -1,
-                              RowColors: negitiveColor),
-                        ]),
-                        TableRow(children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Non-Scoring Plays',
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Error",
-                              Point: "0",
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Catcher's Interference",
-                              Point: "0",
-                              bg: true,
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Sacrifice Fly",
-                              Point: "0",
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Sacrifice",
-                              Point: "0",
-                              score: 0,
-                              bg: true,
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Stolen Base",
-                              Point: "0",
-                              score: 0,
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Caught Stealing",
-                              Point: "0",
-                              score: 0,
-                              bg: true,
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Passed Ball",
-                              Point: "0",
-                              score: 0,
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          GetRowWidget(
-                              text: "Wild Pitch",
-                              Point: "0",
-                              bg: true,
-                              score: 0,
-                              RowColors: neutralColor),
-                        ]),
-                        TableRow(children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                                '*Stats are updated after the completion of the inning'),
-                          )
-                        ]),
-                        TableRow(children: [
-                          SizedBox(
-                            height: 30,
-                          )
-                        ]),
-                      ],
+                      children: list,
                     ),
                   ),
                 ),

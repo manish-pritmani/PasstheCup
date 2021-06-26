@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -11,6 +12,9 @@ import 'package:passthecup/login.dart';
 import 'package:passthecup/signup.dart';
 import 'package:passthecup/utils.dart';
 import 'package:passthecup/welcome.dart';
+import 'package:passthecup/googlesigninbtn.dart';
+
+import 'authentication.dart';
 
 void main() {
   runApp(Phoenix(
@@ -20,7 +24,7 @@ void main() {
 }
 
 void fetchData() async{
-  var response = await Firestore.instance.collection('games').document('100513').get();
+  var response = await FirebaseFirestore.instance.collection('games').doc('100513').get();
   var data = response.data;
   var jsonEncode2 = jsonEncode(data);
   print(jsonEncode2);
@@ -64,20 +68,40 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     setState(() {
       doneloading = false;
+//      doneloading = true;
     });
-    FirebaseAuth.instance.currentUser().then((value) {
+
+    Firebase.initializeApp().then((value) {
       setState(() {
         doneloading = true;
       });
       if (value != null) {
-//        Utils().showToast("Login found", context);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Welcome()));
-      }else{
-       // Utils().showToast("Please Login", context);
+        if (FirebaseAuth.instance.currentUser != null) {
+          Utils().showToast("Login found", context);
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) {
+            return Welcome();
+          }));
+        }
+      } else {
+        // Utils().showToast("Please Login", context);
       }
       return null;
     });
+
+//    FirebaseAuth.instance.currentUser().then((value) {
+//      setState(() {
+//        doneloading = true;
+//      });
+//      if (value != null) {
+////        Utils().showToast("Login found", context);
+//        Navigator.pushReplacement(
+//            context, MaterialPageRoute(builder: (context) => Welcome()));
+//      }else{
+//       // Utils().showToast("Please Login", context);
+//      }
+//      return null;
+//    });
   }
 
   @override
@@ -87,8 +111,8 @@ class _HomePageState extends State<HomePage> {
       body: doneloading
           ? buildSafeArea(context, borderColor)
           : Center(
-              child: CircularProgressIndicator(),
-            ),
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 
@@ -97,7 +121,10 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         color: Utils().getBGColor(),
         width: double.infinity,
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height,
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 25),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,7 +156,10 @@ class _HomePageState extends State<HomePage> {
             FadeAnimation(
                 1.4,
                 Container(
-                  height: MediaQuery.of(context).size.height / 3,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height / 3,
                   decoration: BoxDecoration(
                       image: DecorationImage(
                           image: AssetImage('assets/logo.png'))),
@@ -220,4 +250,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+
+
 }
+

@@ -19,7 +19,7 @@ class Lobby extends StatefulWidget {
   final String gameID;
   final bool add;
 
-  final FirebaseUser user;
+  final User user;
   final bool simulation;
 
   Lobby(this.gameID, this.add, {this.user, this.simulation = false});
@@ -36,7 +36,7 @@ class LobbyState extends State<Lobby> {
   FirebaseGameObject firebaseGameObject;
 
 //  LobbyObject lobbyObject;
-  FirebaseUser user;
+  User user;
   DocumentReference gameDocumentRef;
   DocumentReference lobbyDocumentRef;
   StreamSubscription<DocumentSnapshot> gameDocumentSubscription;
@@ -52,7 +52,8 @@ class LobbyState extends State<Lobby> {
     // TODO: implement initState
     super.initState();
     isAdded = false;
-    gameDocumentRef = Firestore.instance.collection('games').document(gameID);
+    gameDocumentRef =
+        FirebaseFirestore.instance.collection('games').doc(gameID);
 //    lobbyDocumentRef =
 //        Firestore.instance.collection('players').document(gameID);
     setState(() {
@@ -77,8 +78,8 @@ class LobbyState extends State<Lobby> {
           if (firebaseGameObject.selectedGame.status == "InProgress") {
             Utils().showToast("Game has already started", context, oktext: "OK",
                 ok: () {
-              Navigator.pop(context, false);
-            });
+                  Navigator.pop(context, false);
+                });
           } else {
             if (add) {
               addMeAsAPlayer();
@@ -86,7 +87,8 @@ class LobbyState extends State<Lobby> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => GameScreen(
+                      builder: (context) =>
+                          GameScreen(
                             firebaseGameObject,
                             doubleClose: true,
                           )));
@@ -96,13 +98,14 @@ class LobbyState extends State<Lobby> {
           if (!exists(user.email)) {
             Utils().showToast("Game has already ended", context, oktext: "OK",
                 ok: () {
-              Navigator.pop(context, false);
-            });
+                  Navigator.pop(context, false);
+                });
           } else {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => GameScreen(
+                    builder: (context) =>
+                        GameScreen(
                           firebaseGameObject,
                           doubleClose: true,
                         )));
@@ -146,12 +149,13 @@ class LobbyState extends State<Lobby> {
         }
         break;
       case 1: //in Progress
-        //joinGameInBetween(context, firebaseGameObject.simulation);
+      //joinGameInBetween(context, firebaseGameObject.simulation);
         addToMyGames();
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => GameScreen(
+                builder: (context) =>
+                    GameScreen(
                       firebaseGameObject,
                     )));
         break;
@@ -177,7 +181,7 @@ class LobbyState extends State<Lobby> {
 //  }
 
   void onGetObject(DocumentSnapshot event) {
-    var map = event.data;
+    var map = event.data();
     var encode = jsonEncode(map);
     print(encode);
     setState(() {
@@ -208,7 +212,7 @@ class LobbyState extends State<Lobby> {
           name: user.displayName, email: email, gamescore: -5, host: false));
       firebaseGameObject.cupScore = firebaseGameObject.cupScore + 5;
       isAdded = true;
-      gameDocumentRef.setData(firebaseGameObject.toJson(), merge: true);
+      gameDocumentRef.set(firebaseGameObject.toJson(), SetOptions(merge: true));
     }
 
 //    gameDocumentRef.setData(firebaseGameObject.toJson()); changed on 6th April 11:59 PM
@@ -237,8 +241,8 @@ class LobbyState extends State<Lobby> {
         ),
         body: firebaseGameObject == null
             ? Center(
-                child: CircularProgressIndicator(),
-              )
+          child: CircularProgressIndicator(),
+        )
             : buildSingleChildScrollView(context));
   }
 
@@ -293,8 +297,11 @@ class LobbyState extends State<Lobby> {
                   if (!add || isHost()) {
 //                      showAlertDialog(context, "", "Select Mode", "Simulation",
 //                          "Live Game");
-
-                    showAttendingDialog();
+                    if (firebaseGameObject.players.length<2 && firebaseGameObject.selectedGame.status=="InProgress"){
+                      showNotEnoughPlayersDialog();
+                      return;
+                    }
+                      showAttendingDialog();
 //                    openGameScreen(context, widget.simulation);
                   } else {
                     Utils()
@@ -315,6 +322,13 @@ class LobbyState extends State<Lobby> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 20,
+            ),
+            Text('Powered By:'),
+            Image.asset('assets/og_image.png', height: 50,
+              width: 150,
+              fit: BoxFit.contain,)
           ],
         ),
       ),
@@ -382,10 +396,10 @@ class LobbyState extends State<Lobby> {
   void openGameScreen(BuildContext context, bool simulation,
       {bool attending = false}) async {
     Utils().showLoaderDialog(context);
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection('games')
-        .document(widget.gameID)
-        .setData({'attending': attending, 'status': 1}, merge: true);
+        .doc(widget.gameID)
+        .set({'attending': attending, 'status': 1}, SetOptions(merge: true));
     Navigator.pop(context);
 
     setState(() {
@@ -396,10 +410,10 @@ class LobbyState extends State<Lobby> {
     firebaseGameObject.status = 1;
     firebaseGameObject.simulation = simulation;
     firebaseGameObject.cupScore = firebaseGameObject.players.length * 5;
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("games")
-        .document(firebaseGameObject.gameCode)
-        .setData(firebaseGameObject.toJson(), merge: true)
+        .doc(firebaseGameObject.gameCode)
+        .set(firebaseGameObject.toJson(), SetOptions(merge: true))
         .then((value) {
       if (!simulation) {
         startActualGame(context, attending);
@@ -412,7 +426,7 @@ class LobbyState extends State<Lobby> {
   void startActualGame(BuildContext context, bool attending) {
     API()
         .startGame(
-            firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
+        firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
         .then((value) {
       openNextScreen(context, attending);
     }).catchError((onError) => {Utils().showToast(onError.message, context)});
@@ -422,7 +436,7 @@ class LobbyState extends State<Lobby> {
     Utils().showLoaderDialog(context);
     API()
         .startSimulation(
-            firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
+        firebaseGameObject.selectedGame.gameID, firebaseGameObject.gameCode)
         .then((value) {
       Navigator.pop(context);
       openNextScreen(context, attending);
@@ -436,7 +450,8 @@ class LobbyState extends State<Lobby> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => GameScreen(
+            builder: (context) =>
+                GameScreen(
                   firebaseGameObject,
 //                  attending: attending,
                   tripleClose: true,
@@ -612,7 +627,8 @@ class LobbyState extends State<Lobby> {
           CircleAvatar(
             maxRadius: 15,
             backgroundImage: NetworkImage(
-                "https://ui-avatars.com/api/?name=${player.name}&bold=true&background=808080&color=ffffff"),
+                "https://ui-avatars.com/api/?name=${player
+                    .name}&bold=true&background=808080&color=ffffff"),
           ),
           SizedBox(
             width: 10,
@@ -666,7 +682,7 @@ class LobbyState extends State<Lobby> {
   }
 
   void onGetUpdates(DocumentSnapshot event) {
-    var map = event.data;
+    var map = event.data();
     var encode = jsonEncode(map);
     //print(encode);
     setState(() {
@@ -687,16 +703,16 @@ class LobbyState extends State<Lobby> {
 
   void addToMyGames() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    FirebaseUser firebaseUser = await _auth.currentUser();
+    User firebaseUser = _auth.currentUser;
     await firebaseUser?.reload();
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
 
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("user")
-        .document(firebaseUser.email)
+        .doc(firebaseUser.email)
         .collection("mygames")
-        .document(gameID)
-        .setData(firebaseGameObject.toJson());
+        .doc(gameID)
+        .set(firebaseGameObject.toJson());
 
     print("Done");
   }
@@ -721,7 +737,7 @@ class LobbyState extends State<Lobby> {
               FlatButton(
                 child: Text('Yes'),
                 onPressed: () {
-                  openGameScreen(context, widget.simulation, attending: true);
+                  openGameScreen(context, widget.simulation, attending: false);
                 },
               ),
               FlatButton(
@@ -730,6 +746,25 @@ class LobbyState extends State<Lobby> {
                   openGameScreen(context, widget.simulation, attending: false);
                 },
               )
+            ],
+          );
+        });
+  }
+
+  void showNotEnoughPlayersDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('A game must have at least two players to be started.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                 // openGameScreen(context, widget.simulation, attending: false);
+                },
+              ),
             ],
           );
         });

@@ -67,11 +67,11 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
               return Visibility(
                 child: GestureDetector(
                   onTap: () {
-                    if (gamesList[index].status != "Canceled") {
+                    if (gamesList[index].status != "Canceled" || gamesList[index].status != "Postponed" || gamesList[index].status != "Final") {
                       createGameAndEnter(context, gamesList[index]);
                     } else {
                       Utils().showToast(
-                          "Canceled games cannot be selected", context);
+                          "This game cannot be selected", context);
                     }
                   },
                   child: Card(
@@ -89,13 +89,13 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
     }
   }
 
-  FirebaseUser user;
+  User user;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   getUser() async {
-    FirebaseUser firebaseUser = await _auth.currentUser();
+    User firebaseUser = _auth.currentUser;
     await firebaseUser?.reload();
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
     if (firebaseUser != null) {
       setState(() {
         this.user = firebaseUser;
@@ -192,16 +192,16 @@ class _TodaysGameScreenState extends State<TodaysGameScreen> {
     var lobbymap = {
       "players": playersLobby,
     };
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("games")
-        .document(gameID)
-        .setData(map)
+        .doc(gameID)
+        .set(map)
         .then((_) {
       print("Game Created Successfully!");
-      Firestore.instance
+      FirebaseFirestore.instance
           .collection("players")
-          .document(gameID)
-          .setData(lobbymap)
+          .doc(gameID)
+          .set(lobbymap)
           .then((value) {
         Navigator.pop(context);
         openLobbyScreen(context, gameID, simulation);

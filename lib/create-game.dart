@@ -23,16 +23,16 @@ class CreateGame extends StatefulWidget {
 class _CreateGameState extends State<CreateGame> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  FirebaseUser user;
+  User user;
 
   TeamObject _currenteam;
 
   GameObject _currengame;
 
   getUser() async {
-    FirebaseUser firebaseUser = await _auth.currentUser();
+    User firebaseUser = _auth.currentUser;
     await firebaseUser?.reload();
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
     if (firebaseUser != null) {
       setState(() {
         this.user = firebaseUser;
@@ -251,16 +251,16 @@ class _CreateGameState extends State<CreateGame> {
     var lobbymap = {
       "players": playersLobby,
     };
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("games")
-        .document(gameID)
-        .setData(map)
+        .doc(gameID)
+        .set(map)
         .then((_) {
       print("Game Created Successfully!");
-      Firestore.instance
+      FirebaseFirestore.instance
           .collection("players")
-          .document(gameID)
-          .setData(lobbymap)
+          .doc(gameID)
+          .set(lobbymap)
           .then((value) {
         Navigator.pop(context);
         openLoabbyScreen(context, gameID);

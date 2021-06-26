@@ -19,12 +19,12 @@ class _GameIdState extends State<GameId> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  FirebaseUser user;
+  User user;
 
   getUser() async {
-    FirebaseUser firebaseUser = await _auth.currentUser();
+    User firebaseUser = _auth.currentUser;
     await firebaseUser?.reload();
-    firebaseUser = await _auth.currentUser();
+    firebaseUser = _auth.currentUser;
     if (firebaseUser != null) {
       setState(() {
         this.user = firebaseUser;

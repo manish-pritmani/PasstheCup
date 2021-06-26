@@ -312,7 +312,7 @@ class API {
     var url =
         "https://api.sportsdata.io/v3/mlb/scores/json/GamesByDate/$date?key=5863b9d2fa7746cd8495fb3cc4b53743"; //BaseUrl + "Games/2020REG" + keyString;
     final response =
-        await http.get(url).timeout(Duration(seconds: 300), onTimeout: () {
+        await http.get(Uri.parse(url)).timeout(Duration(seconds: 300), onTimeout: () {
       throw Exception('TimedOut');
     }).catchError((onError) {
       print(onError);
@@ -326,8 +326,8 @@ class API {
       GameObject simulationGameObject = GameObject.fromJson(simGame1);
       GameObject simulationGameObject2 = GameObject.fromJson(simGame2);
 
-      list.insert(0, simulationGameObject);
-      list.insert(1, simulationGameObject2);
+      //list.insert(0, simulationGameObject);
+      //list.insert(1, simulationGameObject2);
       return list;
     } else {
       // If the server did not return a 200 OK response,
@@ -339,7 +339,7 @@ class API {
   Future<List<TeamObject>> fetchTeams() async {
     List<TeamObject> list;
     var url = BaseUrl + "teams" + keyString;
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -357,7 +357,7 @@ class API {
   Future<GameObjectPlayByPlay> fetchGamePlayByPlay(String gamid) async {
     var url =
         "https://api.sportsdata.io/v3/mlb/pbp/json/PlayByPlay/$gamid$keyString";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -374,7 +374,7 @@ class API {
   Future<String> fetchPlayerImage(int hitterID) async {
     var url =
         "https://api.sportsdata.io/v3/mlb/scores/json/Player/$hitterID$keyString";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -398,7 +398,7 @@ class API {
     }
     var url =
         "https://api.sportsdata.io/v3/mlb/scores/json/Player/$hitterID$keyString";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -418,7 +418,7 @@ class API {
 
   Future<bool> startGame(int gameID, String gameCode) async {
     var url = "$startURL/$gameID/$gameCode";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       try {
@@ -440,17 +440,17 @@ class API {
 
     var stopURL =
         'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=-1';
-    final response = await http.get(stopURL);
+    final response = await http.get(Uri.parse(stopURL));
     print(response.body);
 
-    var response2 = await http.get(checkURL);
+    var response2 = await http.get(Uri.parse(checkURL));
     if (response2.body == "0") {
       return false;
     }
 
     var simURL =
         'http://161.8.42.170:8181/PTCGame/UpadteGameStatusInDB?GameId=$gameID&Status=1';
-    final response1 = await http.get(simURL);
+    final response1 = await http.get(Uri.parse(simURL));
     print(response1.body);
 
    return true;
@@ -458,7 +458,7 @@ class API {
 
   Future<List<TeamObject>> fetchTeamImage() async {
     var url = "https://api.sportsdata.io/v3/mlb/scores/json/teams$keyString";
-    final response = await http.get(url);
+    final response = await http.get(Uri.parse(url));
     List<TeamObject> teams = List();
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,

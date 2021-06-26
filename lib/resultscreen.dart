@@ -112,12 +112,12 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   void fetchBackgroundImage() {
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("images")
-        .document(firebaseGameObject.selectedGame.homeTeam)
+        .doc(firebaseGameObject.selectedGame.homeTeam)
         .get()
         .then((value) {
-      var src = value.data["link"];
+      var src = value.data()["link"];
       setState(() {
         bgImage = src;
       });
@@ -406,7 +406,7 @@ class _ResultScreenState extends State<ResultScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             Text(
-              player.gamescore.toString(),
+              /*player.gamescore.toString()+', '+*/player.gamescore2.toString(),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             )
           ],
