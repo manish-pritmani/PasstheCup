@@ -369,8 +369,8 @@ class _ResultScreenState extends State<ResultScreen> {
     Player winner;
     int max = -10000;
     for (Player player in firebaseGameObject.players) {
-      if (player.gamescore > max) {
-        max = player.gamescore;
+      if (player.gamescore2 > max) {
+        max = player.gamescore2;
         winner = player;
       }
     }
@@ -386,7 +386,7 @@ class _ResultScreenState extends State<ResultScreen> {
     List<Player> players = firebaseGameObject.players;
 
     players.sort((Player p1, Player p2) {
-      if (p1.gamescore > p2.gamescore) {
+      if (p1.gamescore2 > p2.gamescore2) {
         return -1;
       } else {
         return 1;

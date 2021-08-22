@@ -6,12 +6,14 @@ import 'package:animate_do/animate_do.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 //import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 //import 'package:flutter_svg/svg.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -272,21 +274,24 @@ class _GameScreenState extends State<GameScreen>
         fetchDueUpHitter2Picture();
         fetchDueUpHitter3Picture();
 
-        if (firebaseGameObject.selectedGame.lastPlay.toString()
+        if (firebaseGameObject.selectedGame.lastPlay
+                .toString()
                 .toLowerCase()
                 .contains('homerun') ||
-            firebaseGameObject.selectedGame.lastPlay.toString()
+            firebaseGameObject.selectedGame.lastPlay
+                .toString()
                 .toLowerCase()
                 .contains('home run') ||
-            firebaseGameObject.selectedGame.lastPlay.toString()
+            firebaseGameObject.selectedGame.lastPlay
+                .toString()
                 .toLowerCase()
                 .contains('home')) {
-          if (firebaseGameObject.lastPlayID!=lastHomeRunID) {
+          if (firebaseGameObject.lastPlayID != lastHomeRunID) {
             showHomeRunAnimation();
             setState(() {
               lastHomeRunID = firebaseGameObject.lastPlayID;
             });
-          }else{
+          } else {
             print('skipped');
           }
           setState(() {
@@ -297,9 +302,11 @@ class _GameScreenState extends State<GameScreen>
         if (firebaseGameObject.status == -1) {
           openResultScreen();
         }
-        print("GAME STATUS: "+firebaseGameObject.status.toString());
-        print("GAME ISCLOSED: "+firebaseGameObject.selectedGame.isClosed.toString());
-        print("GAME STATUS: "+firebaseGameObject.selectedGame.status.toString());
+        print("GAME STATUS: " + firebaseGameObject.status.toString());
+        print("GAME ISCLOSED: " +
+            firebaseGameObject.selectedGame.isClosed.toString());
+        print("GAME STATUS: " +
+            firebaseGameObject.selectedGame.status.toString());
 
         if (firebaseGameObject.selectedGame.status == "Scheduled") {
           showGameNotStartedDialog();
@@ -591,7 +598,8 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getCupWidget({bool large = false}) {
     var scoreToShow = firebaseGameObject.cupScore2.toString();
-    if (firebaseGameObject.cupScore2 > -10 && firebaseGameObject.cupScore2 < 10) {
+    if (firebaseGameObject.cupScore2 > -10 &&
+        firebaseGameObject.cupScore2 < 10) {
       scoreToShow = "0" + firebaseGameObject.cupScore2.toString();
     }
     //scoreToShow = firebaseGameObject.cupScore.toString()+','+firebaseGameObject.cupScore2.toString(); //temporirily added
@@ -631,6 +639,18 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Row getMainRow(BuildContext context) {
+    int v = 0;
+    int sum = 0;
+    firebaseGameObject.players.forEach((element) {
+      sum = sum + element.gamescore2;
+    });
+
+    v = sum;
+    if(firebaseGameObject.cupScore2+sum!=0){
+      Vibrate.vibrate();
+    }
+
+
     return Row(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -642,6 +662,10 @@ class _GameScreenState extends State<GameScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             getScoreData(),
+//            Text(
+//              v.toString(),
+//              style: TextStyle(color: Colors.white, fontSize: 30),
+//            ),
             /* getPlayersRow()*/
             getNewPlayerCarousel()
           ],
@@ -942,7 +966,7 @@ class _GameScreenState extends State<GameScreen>
       }
     }
     setState(() {
-      if (msg!='null' && msg.isNotEmpty) {
+      if (msg != 'null' && msg.isNotEmpty) {
         msgArray.add(msg);
       }
     });
@@ -1836,26 +1860,22 @@ class _GameScreenState extends State<GameScreen>
 
   Widget getBSOLive() {
     try {
-      var ballsCount = firebaseGameObject.latestPlay[
-          'Balls'];
-//          firebaseGameObject.selectedGame
-//              .balls; //change back to original code when original game starts
+      var ballsCount = //firebaseGameObject.latestPlay['Balls'];
+          firebaseGameObject.selectedGame
+              .balls; //change back to original code when original game starts
       if (ballsCount != null && ballsCount > 3) {
         ballsCount = 3;
       }
-      var strikesCount =
-          firebaseGameObject.latestPlay[
-          'Strikes'];
-//          firebaseGameObject.selectedGame
-//              .strikes; //change back to original code when original game starts
+      var strikesCount =// firebaseGameObject.latestPlay['Strikes'];
+          firebaseGameObject.selectedGame
+              .strikes; //change back to original code when original game starts
       if (strikesCount != null && strikesCount > 2) {
         strikesCount = 2;
       }
 
-      var outs = firebaseGameObject.latestPlay[
-          'Outs'];
-//          firebaseGameObject.selectedGame
-//              .outs; //change back to original code when original game starts
+      var outs = //firebaseGameObject.latestPlay['Outs'];
+          firebaseGameObject.selectedGame
+              .outs; //change back to original code when original game starts
       //playShown = false; // remove this line when original game starts
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,

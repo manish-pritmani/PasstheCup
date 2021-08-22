@@ -253,8 +253,8 @@ class LobbyState extends State<Lobby> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FadeAnimation(
-                1, Text(widget.simulation ? 'Simulation Mode' : 'Real Game')),
+//            FadeAnimation(
+//                1, Text(widget.simulation ? 'Simulation Mode' : 'Real Game')),
             getGameLobbyTitle(),
             getTeamvsTeam(),
             SizedBox(

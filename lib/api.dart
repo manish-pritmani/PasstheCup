@@ -326,8 +326,8 @@ class API {
       GameObject simulationGameObject = GameObject.fromJson(simGame1);
       GameObject simulationGameObject2 = GameObject.fromJson(simGame2);
 
-      //list.insert(0, simulationGameObject);
-      //list.insert(1, simulationGameObject2);
+      list.insert(0, simulationGameObject);
+      list.insert(1, simulationGameObject2);
       return list;
     } else {
       // If the server did not return a 200 OK response,

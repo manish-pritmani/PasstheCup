@@ -73,7 +73,7 @@ class _LogScreen2State extends State<LogScreen2> {
     return Scaffold(
       appBar: AppBar(
         title:
-            Text("Play by Play (Recalculated): ${widget.gameObject.gameCode}"),
+            Text("Play by Play: ${widget.gameObject.gameCode}"),
       ),
       body: Container(
         padding: EdgeInsets.all(4),

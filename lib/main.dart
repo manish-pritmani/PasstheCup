@@ -135,7 +135,8 @@ class _HomePageState extends State<HomePage> {
                 FadeAnimation(
                     1,
                     Text(
-                      "Pass the Cup",
+                      "Pass the Cup\n\u207D\u1d2e\u1d49\u1d57\u1d43\u207E",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,

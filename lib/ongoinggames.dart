@@ -257,7 +257,7 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
                 },
               ),
               FlatButton(
-                child: Text('Recalculated Play by Play'),
+                child: Text('Play by Play'),
                 onPressed: () {
                   var materialPageRoute = MaterialPageRoute(builder: (context) => LogScreen2(gameObject));
                   Navigator.push(context, materialPageRoute);
@@ -369,8 +369,8 @@ class _OnGoingGameWidgetState extends State<OnGoingGameWidget> {
     int myscore = 0;
     int winnerIndex = 0;
     for (int i = 0; i < gameObject.players.length; i++) {
-      if (gameObject.players[i].gamescore > myscore) {
-        myscore = gameObject.players[i].gamescore;
+      if (gameObject.players[i].gamescore2 > myscore) {
+        myscore = gameObject.players[i].gamescore2;
         winnerIndex = i;
       }
     }

@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
+//import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:passthecup/ProfileStats.dart';
 import 'package:passthecup/animation/animation_controller.dart';
 import 'package:passthecup/authentication.dart';
@@ -201,22 +202,22 @@ class _WelcomeState extends State<Welcome> {
                 ),
                 decoration: BoxDecoration(color: Colors.grey[300]),
               ),
-              ListTile(
-                title: Text('Profile'),
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (c) {
-                    return ProfileStatsPage(page:0);
-                  }));
-                },
-              ),
-              ListTile(
-                title: Text('Stats'),
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (c) {
-                    return ProfileStatsPage(page:1);
-                  }));
-                },
-              ),
+//              ListTile(
+//                title: Text('Profile'),
+//                onTap: (){
+//                  Navigator.push(context, MaterialPageRoute(builder: (c) {
+//                    return ProfileStatsPage(page:0);
+//                  }));
+//                },
+//              ),
+//              ListTile(
+//                title: Text('Stats'),
+//                onTap: (){
+//                  Navigator.push(context, MaterialPageRoute(builder: (c) {
+//                    return ProfileStatsPage(page:1);
+//                  }));
+//                },
+//              ),
               ListTile(
                 title: Text('Scoring Settings'),
                 onTap: (){
@@ -226,6 +227,12 @@ class _WelcomeState extends State<Welcome> {
                 },
               ),
               Divider(),
+              ListTile(
+                title: Text('How to Play'),
+                onTap: (){
+                  open("https://www.sportsaddictgames.com/sports-addict-games/how-to-play");
+                },
+              ),
               ListTile(
                 title: Text('Privacy Policy'),
                 onTap: (){
@@ -589,6 +596,7 @@ class _WelcomeState extends State<Welcome> {
               onPressed: () {
                 var data2 = firebaseUserObject.data();
                 var data = data2["score"];
+                data = 50;
                 if (data > 0) {
                   Navigator.push(
                       context,
@@ -659,6 +667,7 @@ class _WelcomeState extends State<Welcome> {
   }
 
   void createRewardedVideoAds() {
+    //MobileAds.instance.initialize();
 //    RewardedVideoAd.instance.load(
 //        adUnitId: RewardedVideoAd.testAdUnitId,
 //        targetingInfo: Welcome.targetingInfo);
